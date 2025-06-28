@@ -1,0 +1,11 @@
+[X] echo bot
+[X] logger
+[X] database
+[ ] auto reload
+[ ] add user
+
+
+[ ] means that it is not implemented
+[X] means that it is implemented
+
+

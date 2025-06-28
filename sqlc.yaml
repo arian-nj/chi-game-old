@@ -1,0 +1,23 @@
+version: "2"
+sql:
+  - engine: "postgresql"
+    queries: "db/query/*.sql"
+    schema: "db/schema/*.sql"
+    gen:
+      go:
+        package: "database"
+        out: "database"
+        sql_package: "pgx/v5"
+        overrides:
+          - db_type: "bigserial"
+            go_type:
+              type: "int"
+          
+          - db_type: "bigserial"
+            go_type:
+              type: "int"
+            nullable: true
+          
+          - db_type: "pg_catalog.int8"
+            go_type:
+              type: "int"
