@@ -44,6 +44,7 @@ jobs:
     needs: 
       - build_and_push_bot_image
 
+    steps:
       - name: Docker Stack Deploy
         uses: cssnr/stack-deploy-action@v1
         with:
