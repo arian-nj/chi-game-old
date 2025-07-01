@@ -7,7 +7,6 @@ export DEV_DATABASE_URL=postgres://pgadmin:pgpass@127.0.0.1:5432/game?sslmode=di
 export RELEASE_DATABASE_URL=
 
 export RELEASE_MODE=dev 
-export SECRET_KEY=sdasfdgewfef
 export DEV_BOT_TOKEN="8027085911:AAGVhwYk7erGCW4CYPBxeCXsPXZqX8w4SPM" 
 
 BASE_LOCATION=$(pwd)
