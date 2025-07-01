@@ -30,7 +30,7 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GHCR_TOKEN }}
 
-      - name: Core Build and push Docker image
+      - name: Bot Build and push Docker image
         uses: docker/build-push-action@v6
         with:
           context: .

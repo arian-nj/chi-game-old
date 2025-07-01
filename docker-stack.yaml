@@ -8,7 +8,7 @@ services:
 
     environment:
       - RELEASE_BOT_TOKEN=8122683105:AAHIVYGHFjgb0DCv1SHQYjv30Wg3olsnnxI
-      - RELEASE_DATABASE_URL=postgres://pgadmin:sdoi32dfEF03Rf3f3g@db:5432/game?sslmode=disable
+      - RELEASE_DATABASE_URL=postgres://pgadmin:mq90rcqnuc38crn@db:5432/game?sslmode=disable
       - RELEASE_MODE=release
 
     deploy:
