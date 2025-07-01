@@ -5,9 +5,16 @@
 [X] add user
 [ ] user pool for db 
 [X] send for firends
-[ ] XO game before start
-[ ] XO game logic
+[X] XO game before start
+[X] XO game logic
+[X] XO game win tie EndGame
 
+
+
+
+
+
+[-] implementing
 [ ] means that it is not implemented
 [X] means that it is implemented
 
