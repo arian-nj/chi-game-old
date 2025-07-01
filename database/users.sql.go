@@ -46,13 +46,9 @@ func (q *Queries) CountAllUsers(ctx context.Context) ([]int64, error) {
 }
 
 const createUser = `-- name: CreateUser :exec
-INSERT INTO users
-    (tg_id)
-SELECT  $1
-WHERE
-    NOT EXISTS (
-        SELECT id FROM users WHERE tg_id=$1
-    )
+INSERT INTO users (tg_id) VALUES ($1)
+ON CONFLICT (tg_id) DO UPDATE
+SET updated_at = NOW(), is_active = TRUE
 `
 
 func (q *Queries) CreateUser(ctx context.Context, tgID int) error {

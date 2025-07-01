@@ -8,14 +8,15 @@ SELECT * FROM users;
 -- name: CountAllUsers :many
 SELECT COUNT(*) FROM users;
 
+
 -- name: CreateUser :exec
-INSERT INTO users
-    (tg_id)
-SELECT  $1
-WHERE
-    NOT EXISTS (
-        SELECT id FROM users WHERE tg_id=$1
-    );
+INSERT INTO users (tg_id) VALUES ($1)
+ON CONFLICT (tg_id) DO UPDATE
+SET updated_at = NOW(), is_active = TRUE;
+
+
+
+
     
 -- name: ActiveUser :exec
 UPDATE users SET is_active = TRUE

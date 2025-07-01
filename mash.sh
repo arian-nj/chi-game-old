@@ -36,6 +36,7 @@ case $COMMAND in
 	gensqlc)
 		generate_sqlc
 	;;
+
 	*)
 		echo "command '$COMMAND' is Unknown"
 esac

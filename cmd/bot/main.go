@@ -5,6 +5,7 @@ import (
 	"log/slog"
 	"time"
 
+	"github.com/arian-nj/ultrun/db"
 	"github.com/arian-nj/ultrun/gamebot"
 	"github.com/arian-nj/ultrun/internals/config"
 )
@@ -15,6 +16,11 @@ func main() {
 		panic(err)
 	}
 
+	err = db.Migrate(cfg.DatabseUrl)
+	if err != nil {
+		slog.Error("Failed to migrate database", "err", err)
+		return
+	}
 	manApp := gamebot.NewApplication(cfg)
 
 	err = manApp.ConfigureDatabase()
