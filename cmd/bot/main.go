@@ -29,7 +29,7 @@ func main() {
 		return
 	}
 
-	defer manApp.Conn.Close(context.Background())
+	defer manApp.Conn.Close()
 
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*2)
 	err = manApp.Conn.Ping(ctx)

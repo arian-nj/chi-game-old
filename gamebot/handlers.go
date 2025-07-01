@@ -1,8 +1,11 @@
 package gamebot
 
 import (
+	"context"
+	"fmt"
 	"strconv"
 
+	"github.com/arian-nj/ultrun/database"
 	"gopkg.in/telebot.v4"
 )
 
@@ -27,7 +30,8 @@ func (app *Application) onInlineQueryHandler(c telebot.Context) error {
 }
 
 func (app *Application) onInlineResult(c telebot.Context) error {
-	return app.ticInlineResultReciever(c)
+	err := app.ticInlineResultReciever(c)
+	return err
 }
 
 func (app *Application) JoinHubHandler(c telebot.Context) error {
@@ -49,5 +53,22 @@ func (app *Application) JoinHubHandler(c telebot.Context) error {
 	if !isOk {
 		return c.RespondAlert("جا نیست")
 	}
-	return c.RespondText("اضافه شدی")
+	err := c.RespondText("اضافه شدی")
+	if err != nil {
+		return err
+	}
+
+	_, err = app.Queries.CreateHub(context.Background(), database.CreateHubParams{GameType: string(hub.Game.GetGameType()), TgID: int(callback.Sender.ID)})
+	return err
+
+}
+
+func (app *Application) statHandler(c telebot.Context) error {
+	count, err := app.Queries.CountHubs(context.Background())
+	if err != nil {
+		return err
+	}
+
+	c.Send(fmt.Sprintf("تعداد بازی ها: %d", count))
+	return nil
 }

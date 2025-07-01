@@ -26,9 +26,22 @@ func (app *Application) RunBot(cfg *config.Config) error {
 	b.Handle(telebot.OnQuery, app.onInlineQueryHandler)
 	b.Handle(telebot.OnInlineResult, app.onInlineResult)
 	b.Handle(telebot.OnCallback, app.onCallback)
+	b.Handle("/stat", app.statHandler)
 
+	go app.ClearGamesCron()
 	b.Start()
 	return nil
+}
+func (app *Application) ClearGamesCron() {
+	for {
+		nowTime := time.Now()
+		for key, hub := range app.Lobby.Hubs {
+			if nowTime.Sub(hub.CreatedAt) > 30*time.Minute {
+				delete(app.Lobby.Hubs, key)
+			}
+		}
+		time.Sleep(1 * time.Minute)
+	}
 }
 
 var (

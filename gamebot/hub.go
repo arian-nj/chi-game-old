@@ -1,5 +1,7 @@
 package gamebot
 
+import "time"
+
 type Lobby struct {
 	Hubs HubsMap
 }
@@ -32,6 +34,7 @@ type Hub struct {
 	Game      GameInterface
 	MessageId string
 	Players   HubPlayers
+	CreatedAt time.Time
 }
 
 func (hub *Hub) MessageSig() (string, int64) {
@@ -44,6 +47,7 @@ func NewHub(name string, game GameInterface, messageId string) *Hub {
 		MessageId: messageId,
 		Players:   make([]*HumanPlayer, 0),
 		Game:      game,
+		CreatedAt: time.Now(),
 	}
 
 }
@@ -52,7 +56,14 @@ func (hub *Hub) AddPlayer(player *HumanPlayer) {
 	hub.Players = append(hub.Players, player)
 }
 
+type GameType string
+
+const (
+	TicTacToe GameType = "tictactoe"
+)
+
 type GameInterface interface {
+	GetGameType() GameType
 	StartGame(app *Application)
 	JoinGame(app *Application, player *HumanPlayer) bool
 	EndGame()

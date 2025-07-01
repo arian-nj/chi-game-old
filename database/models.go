@@ -8,6 +8,13 @@ import (
 	"github.com/jackc/pgx/v5/pgtype"
 )
 
+type Hub struct {
+	ID        int
+	CreatedAt pgtype.Timestamp
+	GameType  string
+	TgID      int
+}
+
 type User struct {
 	ID        int
 	TgID      int

@@ -45,7 +45,6 @@ func (game *TicGame) StartGame(app *Application) {
 		slog.Error("error when starting game", err.Error())
 		return
 	}
-
 }
 
 func (game *TicGame) JoinGame(app *Application, player *HumanPlayer) bool {
@@ -61,6 +60,10 @@ func (game *TicGame) JoinGame(app *Application, player *HumanPlayer) bool {
 
 func (game *TicGame) EndGame() {}
 
+func (game *TicGame) GetGameType() GameType {
+	return TicTacToe
+}
+
 func (app *Application) ticInlineResultReciever(c telebot.Context) error {
 	sender := c.InlineResult().Sender
 
@@ -73,6 +76,7 @@ func (app *Application) ticInlineResultReciever(c telebot.Context) error {
 	textMessage := ticStartText + "\n\n🕹 بازیکن " + fmt.Sprintf("[%s](tg://user?id=%d)", sender.FirstName, sender.ID) + " منتظر حریفه"
 
 	_, err := c.Bot().Edit(c.InlineResult(), textMessage, app.JoinGameKeyboard(), telebot.ModeMarkdownV2)
+
 	return err
 }
 
@@ -240,10 +244,15 @@ func CreatePlayersInlineButton(humanPlayers []*HumanPlayer, CurrentPlayerTurn in
 			playEmoji = XEmoji
 		}
 
+		name := hplayer.Name
+		if len(name) > 20 {
+			name = name[:20] + "..."
+		}
+
 		row := make([]telebot.InlineButton, 2)
 		row = append(row, telebot.InlineButton{
-			Text: fmt.Sprintf("%s %s (%s) %s", yourTurn, hplayer.Name, playEmoji, emoji),
-			Data: "_",
+			Text: fmt.Sprintf("%s %s (%s) %s", yourTurn, name, playEmoji, emoji),
+			URL:  fmt.Sprintf("tg://user?id=%d", hplayer.TgID),
 		})
 		buttons = append(buttons, row)
 	}

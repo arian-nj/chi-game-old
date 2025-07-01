@@ -5,13 +5,13 @@ import (
 
 	"github.com/arian-nj/ultrun/database"
 	"github.com/arian-nj/ultrun/internals/config"
-	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/pgxpool"
 )
 
 type CommonApp struct {
 	Config  *config.Config
 	Queries *database.Queries
-	Conn    *pgx.Conn
+	Conn    *pgxpool.Pool
 }
 
 func NewCommon(conf *config.Config) *CommonApp {
@@ -22,9 +22,8 @@ func NewCommon(conf *config.Config) *CommonApp {
 }
 
 func (c *CommonApp) ConfigureDatabase() error {
-	ctx := context.Background()
 
-	conn, err := pgx.Connect(ctx, c.Config.DatabseUrl)
+	conn, err := pgxpool.New(context.Background(), c.Config.DatabseUrl)
 	if err != nil {
 		return err
 	}

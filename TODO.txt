@@ -3,12 +3,16 @@
 [X] database
 [X] auto reload
 [X] add user
-[ ] user pool for db 
+[ ] use pool for db 
 [X] send for firends
 [X] XO game before start
 [X] XO game logic
 [X] XO game win tie EndGame
-
+[X] release pipeline
+[X] clear game when ends
+[ ] log games
+[ ] very basic statistics
+[ ] limit name lenght
 
 
 
