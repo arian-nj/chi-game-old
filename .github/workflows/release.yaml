@@ -35,7 +35,7 @@ jobs:
         with:
           context: .
           push: true
-          file: core.Dockerfile
+          file: bot.Dockerfile
           tags: |
             ghcr.io/arian-nj/tix-bot:latest
             ghcr.io/arian-nj/tix-bot:${{ github.sha }}
