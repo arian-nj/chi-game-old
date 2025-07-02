@@ -1,5 +1,7 @@
 package tictactoe
 
+const MaxCellSize = 3
+
 type Cell int
 
 const (
@@ -23,6 +25,10 @@ func NewTicBoard() *TicBoard {
 }
 
 func (borard *TicBoard) PlayMove(r, c int, moveType Cell) (bool, string) {
+	if (r < 0 || c < 0) && (r >= MaxCellSize || c >= MaxCellSize) {
+		return false, "خارج از محدوده چیکار داری میکنی؟"
+	}
+
 	if borard.Board[r][c] != Empty {
 		return false, "خالی نیست"
 	}

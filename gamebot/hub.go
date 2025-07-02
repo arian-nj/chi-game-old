@@ -45,16 +45,29 @@ func (hub *Hub) AddPlayer(player *HumanPlayer) {
 	hub.Players = append(hub.Players, player)
 }
 
+func (hub *Hub) JoinGame(player *HumanPlayer, app *Application) bool {
+	if len(hub.Players) >= 2 {
+		return false
+	}
+	hub.AddPlayer(player)
+	if len(hub.Players) == 2 {
+		hub.Game.StartGame(app)
+	}
+	return true
+
+}
+
 type GameType string
 
 const (
-	TicTacToe GameType = "ttt"
+	TicTacToeGameType GameType = "ttt"
+	DotBoxGameType    GameType = "dotbox"
 )
 
 type GameInterface interface {
 	GetGameType() GameType
+	GetMaxPlayer() int
 	StartGame(app *Application)
-	JoinGame(app *Application, player *HumanPlayer) bool
 }
 
 type HumanPlayer struct {

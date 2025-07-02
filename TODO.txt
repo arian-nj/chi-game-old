@@ -15,9 +15,12 @@
 [X] limit name lenght
 [ ] check admin for /stat
 
+[X] make hub game more seperate
+[X] line dot game panel
+[X] line dot scoring
 
-[ ] make hub game more seperate
-[ ] line dot console game
+
+[ ] make it panic safe
 
 maybe add scroing to make it harder to use other bots
 

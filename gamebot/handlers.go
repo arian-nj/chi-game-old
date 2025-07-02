@@ -10,7 +10,8 @@ import (
 )
 
 func (app *Application) inlineQueryHandler(c telebot.Context) error {
-	results := make(telebot.Results, 1)
+	results := telebot.Results{}
+	// XO result
 	xoResult := &telebot.ArticleResult{
 		Title:       "دوز بازی",
 		Description: "رو من کلیک کن",
@@ -20,8 +21,21 @@ func (app *Application) inlineQueryHandler(c telebot.Context) error {
 
 	xoResult.ReplyMarkup = startInlineKeyboard
 
-	xoResult.SetResultID(string(TicTacToe))
-	results[0] = xoResult
+	xoResult.SetResultID(string(TicTacToeGameType))
+	results = append(results, xoResult)
+
+	// Dot Box result
+	dotResult := &telebot.ArticleResult{
+		Title:       "نقطه بازی",
+		Description: "رو من کلیک کن",
+		Text:        dotBoxStartText,
+	}
+	dotResult.ParseMode = telebot.ModeMarkdownV2
+
+	dotResult.ReplyMarkup = startInlineKeyboard
+
+	dotResult.SetResultID(string(DotBoxGameType))
+	results = append(results, dotResult)
 
 	return c.Answer(&telebot.QueryResponse{
 		Results:   results,
@@ -32,8 +46,10 @@ func (app *Application) inlineQueryHandler(c telebot.Context) error {
 func (app *Application) inlineResultHandler(c telebot.Context) error {
 	resultId := c.InlineResult().ResultID
 	switch GameType(resultId) {
-	case TicTacToe:
+	case TicTacToeGameType:
 		return app.ticInlineResultReciever(c)
+	case DotBoxGameType:
+		return app.dotBoxInlineResultReciever(c)
 	}
 	return c.RespondAlert("این بازیرو ندارم!")
 }
@@ -42,8 +58,10 @@ func (app *Application) callbackHandler(c telebot.Context) error {
 	callback := c.Callback()
 	if callback.Data == "join_hub" {
 		app.JoinHubHandler(c)
-	} else if strings.HasPrefix(callback.Data, string(TicTacToe)+"_") {
+	} else if strings.HasPrefix(callback.Data, string(TicTacToeGameType)+"_") {
 		return app.TTTCallbackHandlers(c)
+	} else if strings.HasPrefix(callback.Data, string(DotBoxGameType)+"_") {
+		return app.DotBoxCallbackHandlers(c)
 	}
 	return nil
 }
@@ -62,7 +80,7 @@ func (app *Application) JoinHubHandler(c telebot.Context) error {
 		}
 	}
 
-	isOk := hub.Game.JoinGame(app, player)
+	isOk := hub.JoinGame(player, app)
 	if !isOk {
 		return c.RespondAlert("جا نیست")
 	}
@@ -75,7 +93,6 @@ func (app *Application) JoinHubHandler(c telebot.Context) error {
 	return err
 
 }
-
 func (app *Application) statHandler(c telebot.Context) error {
 	count, err := app.Queries.CountHubs(context.Background())
 	if err != nil {

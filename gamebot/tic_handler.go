@@ -7,7 +7,7 @@ import (
 	"strings"
 
 	"github.com/arian-nj/ultrun/internals/random"
-	tictactoe "github.com/arian-nj/ultrun/internals/tic-tac-toe"
+	tictactoe "github.com/arian-nj/ultrun/internals/tic_tac_toe"
 	"gopkg.in/telebot.v4"
 )
 
@@ -52,28 +52,21 @@ func (game *TicGame) StartGame(app *Application) {
 		CreateInlineKeyboard(
 			CreateBotNameInlineButton(app.Bot),
 			CreateTicBoardInlineButton(game.TicBoard),
-			CreatePlayersInlineButton(game.Hub.Players, game.CurrentPlayerIndex),
+			game.CreatePlayersInlineButton(game.Hub.Players, game.CurrentPlayerIndex),
 		),
 	)
 	if err != nil {
-		slog.Error("error when starting game", err.Error())
+		slog.Error("error when starting ttt game" + err.Error())
 		return
 	}
 }
 
-func (game *TicGame) JoinGame(app *Application, player *HumanPlayer) bool {
-	if len(game.Hub.Players) >= 2 {
-		return false
-	}
-	game.Hub.AddPlayer(player)
-	if len(game.Hub.Players) == 2 {
-		game.Hub.Game.StartGame(app)
-	}
-	return true
+func (game *TicGame) GetGameType() GameType {
+	return TicTacToeGameType
 }
 
-func (game *TicGame) GetGameType() GameType {
-	return TicTacToe
+func (game *TicGame) GetMaxPlayer() int {
+	return 2
 }
 
 func (app *Application) ticInlineResultReciever(c telebot.Context) error {
@@ -94,7 +87,7 @@ func (app *Application) ticInlineResultReciever(c telebot.Context) error {
 
 func (app *Application) TTTCallbackHandlers(c telebot.Context) error {
 	callback := c.Callback()
-	callbackData := strings.TrimPrefix(callback.Data, string(TicTacToe)+"_")
+	callbackData := strings.TrimPrefix(callback.Data, string(TicTacToeGameType)+"_")
 	messageId := c.Callback().MessageID
 
 	hub, is_found := app.Lobby.Hubs[messageId]
@@ -114,7 +107,7 @@ func (app *Application) TTTCallbackHandlers(c telebot.Context) error {
 
 func (game *TicGame) TicPlayHandler(c telebot.Context, app *Application) error {
 	callback := c.Callback()
-	callbackData := strings.TrimPrefix(callback.Data, string(TicTacToe)+"_play_")
+	callbackData := strings.TrimPrefix(callback.Data, string(TicTacToeGameType)+"_play_")
 
 	if len(callbackData) != 2 {
 		return fmt.Errorf("invalid ttt_play data")
@@ -174,7 +167,7 @@ func (game *TicGame) TicPlayHandler(c telebot.Context, app *Application) error {
 		CreateInlineKeyboard(
 			CreateBotNameInlineButton(app.Bot),
 			CreateTicBoardInlineButton(game.TicBoard),
-			CreatePlayersInlineButton(game.Hub.Players, game.CurrentPlayerIndex),
+			game.CreatePlayersInlineButton(game.Hub.Players, game.CurrentPlayerIndex),
 		),
 	)
 
@@ -218,9 +211,41 @@ func CreateTicBoardInlineButton(board *tictactoe.TicBoard) [][]telebot.InlineBut
 			}
 			buttons[r][c] = telebot.InlineButton{
 				Text: value,
-				Data: string(TicTacToe) + "_play_" + strconv.Itoa(r) + strconv.Itoa(c),
+				Data: string(TicTacToeGameType) + "_play_" + strconv.Itoa(r) + strconv.Itoa(c),
 			}
 		}
 	}
+	return buttons
+}
+
+func (game *TicGame) CreatePlayersInlineButton(humanPlayers []*HumanPlayer, CurrentPlayerTurn int) [][]telebot.InlineButton {
+	buttons := make([][]telebot.InlineButton, 0)
+	for index, hplayer := range humanPlayers {
+
+		yourTurn := ""
+		if CurrentPlayerTurn == index {
+			yourTurn = "🎮"
+		}
+
+		// emoji := ""
+		playEmoji := OEmoji
+		if index == 0 {
+			// emoji = "🗿"
+			playEmoji = XEmoji
+		}
+
+		name := hplayer.Name
+		if len(name) > 20 {
+			name = name[:20] + "..."
+		}
+
+		row := make([]telebot.InlineButton, 2)
+		row = append(row, telebot.InlineButton{
+			Text: fmt.Sprintf("%s %s (%s)", yourTurn, name, playEmoji),
+			URL:  fmt.Sprintf("tg://user?id=%d", hplayer.TgID),
+		})
+		buttons = append(buttons, row)
+	}
+
 	return buttons
 }
