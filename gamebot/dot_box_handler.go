@@ -190,7 +190,29 @@ func (game *DotBoxGame) PlayHandler(c telebot.Context, app *Application) error {
 		game.NextPlayer()
 	}
 
-	_, err := app.Bot.Edit(game.Hub, dotBoxStartText, telebot.ModeMarkdownV2,
+	if !game.DotBoxBoard.HasEmptyCell() {
+		text := ""
+		if game.PlayerOnScore != game.PlayerTwoScore {
+			winnerPlayer := game.Hub.Players[0]
+			if game.PlayerTwoScore > game.PlayerOnScore {
+				winnerPlayer = game.Hub.Players[0]
+			}
+			text = "\n🏆برنده بازی:*" + winnerPlayer.Name + "*"
+		} else {
+			text = "\nبازی مساوی شد"
+
+		}
+
+		_, err := app.Bot.Edit(game.Hub, game.EndGameText()+text, telebot.ModeMarkdownV2,
+			CreateInlineKeyboard(
+				CreateBotNameInlineButton(app.Bot),
+				EndgameInlineKeyboard,
+			),
+		)
+		return err
+
+	}
+	_, err := app.Bot.Edit(game.Hub, dotBoxStartText+"\n"+game.CreateBoardAsEmoji(), telebot.ModeMarkdownV2,
 		CreateInlineKeyboard(
 			CreateBotNameInlineButton(app.Bot),
 			CreateDotBoxInlineButton(game.DotBoxBoard),
@@ -202,6 +224,25 @@ func (game *DotBoxGame) PlayHandler(c telebot.Context, app *Application) error {
 		return err
 	}
 	return nil
+}
+
+func (game *DotBoxGame) EndGameText() string {
+	return ticStartText + "\nبازیکن ها:\n" + game.Hub.Players[0].Name + " " + strconv.Itoa(game.PlayerOnScore) + "\n" + game.Hub.Players[1].Name + " " + strconv.Itoa(game.PlayerTwoScore)
+}
+
+func (game *DotBoxGame) CreateBoardAsEmoji() string {
+	text := ""
+	for r, row := range game.DotBoxBoard.Board {
+		for c, cell := range row {
+			value := "⌾"
+			if cell != dotbox.Empty {
+				value = getSymbol(r, c)
+			}
+			text += value
+		}
+		text += "\n"
+	}
+	return text
 }
 
 func (game *DotBoxGame) CreatePlayersInlineButton(humanPlayers []*HumanPlayer, CurrentPlayerTurn int) [][]telebot.InlineButton {

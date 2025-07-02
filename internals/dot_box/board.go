@@ -26,6 +26,17 @@ func NewDotBoard() *DotBoxBoard {
 	}
 }
 
+func (board *DotBoxBoard) HasEmptyCell() bool {
+	for _, row := range board.Board {
+		for _, c := range row {
+			if c == Empty {
+				return true
+			}
+		}
+	}
+	return false
+}
+
 func (board *DotBoxBoard) PlayMove(r, c int, moveType Cell) (bool, string, bool) {
 	if (r < 0 || c < 0) && (r >= MaxCellSize || c >= MaxCellSize) {
 		return false, "خارج از محدوده چیکار داری میکنی؟", false

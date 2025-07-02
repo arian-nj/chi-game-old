@@ -18,6 +18,7 @@
 [X] make hub game more seperate
 [X] line dot game panel
 [X] line dot scoring
+[ ] end game
 
 
 [ ] make it panic safe

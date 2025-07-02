@@ -176,10 +176,10 @@ func (game *TicGame) TicPlayHandler(c telebot.Context, app *Application) error {
 }
 
 func (game *TicGame) EndGameText() string {
-	return ticStartText + "\nبازیکن ها:\n" + game.Hub.Players[0].Name + " " + XEmoji + "\n" + game.Hub.Players[1].Name + " " + OEmoji + "\n\n" + game.CreateTicBoardAsEmoji()
+	return ticStartText + "\nبازیکن ها:\n" + game.Hub.Players[0].Name + " " + XEmoji + "\n" + game.Hub.Players[1].Name + " " + OEmoji + "\n\n" + game.CreateBoardAsEmoji()
 }
 
-func (game *TicGame) CreateTicBoardAsEmoji() string {
+func (game *TicGame) CreateBoardAsEmoji() string {
 	text := ""
 	for _, row := range game.TicBoard.Board {
 		for _, cell := range row {
