@@ -11,6 +11,19 @@ import (
 	"gopkg.in/telebot.v4"
 )
 
+const (
+	EmptyEmoji = "◽️"
+	XEmoji     = "❌"  // player one
+	OEmoji     = "⭕️" // player two
+)
+
+const (
+	ticStartText = `❌ *دوز بازی* ⭕️`
+	ticRulesText = `
+	قوانین 🎮
+	یک سطر یا ستون یا قطر رو با علامتت پر کن`
+)
+
 type TicGame struct { // of GameInterface type
 	TicBoard           *tictactoe.TicBoard
 	Hub                *Hub
@@ -37,6 +50,7 @@ func (game *TicGame) StartGame(app *Application) {
 
 	_, err := app.Bot.Edit(game.Hub, ticStartText, telebot.ModeMarkdownV2,
 		CreateInlineKeyboard(
+			CreateBotNameInlineButton(app.Bot),
 			CreateTicBoardInlineButton(game.TicBoard),
 			CreatePlayersInlineButton(game.Hub.Players, game.CurrentPlayerIndex),
 		),
@@ -58,8 +72,6 @@ func (game *TicGame) JoinGame(app *Application, player *HumanPlayer) bool {
 	return true
 }
 
-func (game *TicGame) EndGame() {}
-
 func (game *TicGame) GetGameType() GameType {
 	return TicTacToe
 }
@@ -68,7 +80,7 @@ func (app *Application) ticInlineResultReciever(c telebot.Context) error {
 	sender := c.InlineResult().Sender
 
 	ticGame := NewTicGame()
-	hub := NewHub("دوز بازی", ticGame, c.InlineResult().MessageID)
+	hub := NewHub(ticGame, c.InlineResult().MessageID)
 	ticGame.Hub = hub
 	app.Lobby.Hubs.AddHub(hub)
 	hub.AddPlayer(NewHumanPlayer(int(sender.ID), sender.FirstName))
@@ -80,21 +92,9 @@ func (app *Application) ticInlineResultReciever(c telebot.Context) error {
 	return err
 }
 
-func CreateInlineKeyboard(buttonGroups ...[][]telebot.InlineButton) *telebot.ReplyMarkup {
-	var inlineKeyboard [][]telebot.InlineButton
-
-	for _, group := range buttonGroups {
-		inlineKeyboard = append(inlineKeyboard, group...)
-	}
-
-	return &telebot.ReplyMarkup{
-		InlineKeyboard: inlineKeyboard,
-	}
-}
-
-func (app *Application) XOCallbackHandlers(c telebot.Context) error {
+func (app *Application) TTTCallbackHandlers(c telebot.Context) error {
 	callback := c.Callback()
-	callbackData := strings.TrimPrefix(callback.Data, "xo_")
+	callbackData := strings.TrimPrefix(callback.Data, string(TicTacToe)+"_")
 	messageId := c.Callback().MessageID
 
 	hub, is_found := app.Lobby.Hubs[messageId]
@@ -114,10 +114,10 @@ func (app *Application) XOCallbackHandlers(c telebot.Context) error {
 
 func (game *TicGame) TicPlayHandler(c telebot.Context, app *Application) error {
 	callback := c.Callback()
-	callbackData := strings.TrimPrefix(callback.Data, "xo_play_")
+	callbackData := strings.TrimPrefix(callback.Data, string(TicTacToe)+"_play_")
 
 	if len(callbackData) != 2 {
-		return fmt.Errorf("invalid xo_play data")
+		return fmt.Errorf("invalid ttt_play data")
 	}
 
 	if game.Hub.Players[game.CurrentPlayerIndex].TgID != int(callback.Sender.ID) {
@@ -148,6 +148,7 @@ func (game *TicGame) TicPlayHandler(c telebot.Context, app *Application) error {
 
 		_, err := app.Bot.Edit(game.Hub, text, telebot.ModeMarkdownV2,
 			CreateInlineKeyboard(
+				CreateBotNameInlineButton(app.Bot),
 				EndgameInlineKeyboard,
 			),
 		)
@@ -159,6 +160,7 @@ func (game *TicGame) TicPlayHandler(c telebot.Context, app *Application) error {
 
 		_, err := app.Bot.Edit(game.Hub, text, telebot.ModeMarkdownV2,
 			CreateInlineKeyboard(
+				CreateBotNameInlineButton(app.Bot),
 				EndgameInlineKeyboard,
 			),
 		)
@@ -170,6 +172,7 @@ func (game *TicGame) TicPlayHandler(c telebot.Context, app *Application) error {
 
 	_, err := app.Bot.Edit(game.Hub, ticStartText, telebot.ModeMarkdownV2,
 		CreateInlineKeyboard(
+			CreateBotNameInlineButton(app.Bot),
 			CreateTicBoardInlineButton(game.TicBoard),
 			CreatePlayersInlineButton(game.Hub.Players, game.CurrentPlayerIndex),
 		),
@@ -178,6 +181,7 @@ func (game *TicGame) TicPlayHandler(c telebot.Context, app *Application) error {
 	return err
 
 }
+
 func (game *TicGame) EndGameText() string {
 	return ticStartText + "\nبازیکن ها:\n" + game.Hub.Players[0].Name + " " + XEmoji + "\n" + game.Hub.Players[1].Name + " " + OEmoji + "\n\n" + game.CreateTicBoardAsEmoji()
 }
@@ -199,13 +203,6 @@ func (game *TicGame) CreateTicBoardAsEmoji() string {
 	return text
 }
 
-var EndgameInlineKeyboard = [][]telebot.InlineButton{
-	{
-		{Text: "🤝 بازی با دوستان", InlineQueryChosenChat: &telebot.SwitchInlineQuery{AllowUserChats: true, AllowGroupChats: true}},
-		{Text: "🔄 دوباره", InlineQuery: ""},
-	},
-}
-
 func CreateTicBoardInlineButton(board *tictactoe.TicBoard) [][]telebot.InlineButton {
 	buttons := make([][]telebot.InlineButton, 3)
 	for r := range 3 {
@@ -221,80 +218,9 @@ func CreateTicBoardInlineButton(board *tictactoe.TicBoard) [][]telebot.InlineBut
 			}
 			buttons[r][c] = telebot.InlineButton{
 				Text: value,
-				Data: "xo_" + "play_" + strconv.Itoa(r) + strconv.Itoa(c),
+				Data: string(TicTacToe) + "_play_" + strconv.Itoa(r) + strconv.Itoa(c),
 			}
 		}
 	}
 	return buttons
 }
-
-func CreatePlayersInlineButton(humanPlayers []*HumanPlayer, CurrentPlayerTurn int) [][]telebot.InlineButton {
-	buttons := make([][]telebot.InlineButton, 0)
-	for index, hplayer := range humanPlayers {
-
-		yourTurn := ""
-		if CurrentPlayerTurn == index {
-			yourTurn = "🎮"
-		}
-
-		emoji := "👤"
-		playEmoji := OEmoji
-		if index == 0 {
-			emoji = "🗿"
-			playEmoji = XEmoji
-		}
-
-		name := hplayer.Name
-		if len(name) > 20 {
-			name = name[:20] + "..."
-		}
-
-		row := make([]telebot.InlineButton, 2)
-		row = append(row, telebot.InlineButton{
-			Text: fmt.Sprintf("%s %s (%s) %s", yourTurn, name, playEmoji, emoji),
-			URL:  fmt.Sprintf("tg://user?id=%d", hplayer.TgID),
-		})
-		buttons = append(buttons, row)
-	}
-
-	return buttons
-}
-
-var startInlineKeyboard = &telebot.ReplyMarkup{
-	InlineKeyboard: [][]telebot.InlineButton{
-		{
-			{
-				Text: "واسا بازی رو بسازم",
-				Data: "_",
-			},
-		},
-	},
-	ResizeKeyboard: true,
-}
-
-func (app *Application) JoinGameKeyboard() *telebot.ReplyMarkup {
-	var startInlineKeyboard = &telebot.ReplyMarkup{
-		InlineKeyboard: [][]telebot.InlineButton{
-			{
-				{
-					Text: "منم بازی",
-					Data: "join_hub",
-				},
-			},
-		},
-		ResizeKeyboard: true,
-	}
-	return startInlineKeyboard
-}
-
-const (
-	EmptyEmoji = "◽️"
-	XEmoji     = "❌"
-	OEmoji     = "⭕️"
-)
-const (
-	ticStartText = `❌ *دوز بازی* ⭕️`
-	ticRulesText = `
-	قوانین 🎮
-	یک سطر یا ستون یا قطر رو با علامتت پر کن`
-)

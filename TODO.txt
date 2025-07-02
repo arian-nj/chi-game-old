@@ -3,17 +3,23 @@
 [X] database
 [X] auto reload
 [X] add user
-[ ] use pool for db 
+[X] use pool for db 
 [X] send for firends
 [X] XO game before start
 [X] XO game logic
 [X] XO game win tie EndGame
 [X] release pipeline
 [X] clear game when ends
-[ ] log games
-[ ] very basic statistics
-[ ] limit name lenght
+[X] count hub games
+[X] very basic statistics
+[X] limit name lenght
+[ ] check admin for /stat
 
+
+[ ] make hub game more seperate
+[ ] line dot console game
+
+maybe add scroing to make it harder to use other bots
 
 
 
@@ -21,4 +27,4 @@
 [-] implementing
 [ ] means that it is not implemented
 [X] means that it is implemented
-
+ll

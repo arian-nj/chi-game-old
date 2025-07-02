@@ -2,7 +2,6 @@ package gamebot
 
 import (
 	"fmt"
-	"strings"
 	"time"
 
 	"github.com/arian-nj/ultrun/internals/config"
@@ -21,11 +20,13 @@ func (app *Application) RunBot(cfg *config.Config) error {
 	app.Bot = b
 
 	b.Use(app.addUserMiddleware)
-	b.Handle("/start", app.helloHandler)
-	b.Handle(telebot.OnText, app.onMessage)
-	b.Handle(telebot.OnQuery, app.onInlineQueryHandler)
-	b.Handle(telebot.OnInlineResult, app.onInlineResult)
-	b.Handle(telebot.OnCallback, app.onCallback)
+
+	b.Handle(telebot.OnQuery, app.inlineQueryHandler)
+	b.Handle(telebot.OnInlineResult, app.inlineResultHandler)
+	b.Handle(telebot.OnCallback, app.callbackHandler)
+
+	b.Handle(telebot.OnText, app.welcomeHandler)
+	b.Handle("/start", app.welcomeHandler)
 	b.Handle("/stat", app.statHandler)
 
 	go app.ClearGamesCron()
@@ -57,23 +58,9 @@ var (
 	}
 )
 
-func (app *Application) helloHandler(c telebot.Context) error {
+func (app *Application) welcomeHandler(c telebot.Context) error {
 	return c.Send(
 		`خوش اومدید 👋
 دکمه بازی با دوستان رو بزن تا تو هر چت یا گروهی با دوستات بازی کنی
 	`, selector)
-}
-
-func (app *Application) onMessage(c telebot.Context) error {
-	return c.Send(c.Message().Text)
-}
-
-func (app *Application) onCallback(c telebot.Context) error {
-	callback := c.Callback()
-	if callback.Data == "join_hub" {
-		app.JoinHubHandler(c)
-	} else if strings.HasPrefix(callback.Data, "xo_") {
-		return app.XOCallbackHandlers(c)
-	}
-	return nil
 }

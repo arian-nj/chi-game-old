@@ -3,13 +3,13 @@ package gamebot
 import (
 	"context"
 	"fmt"
-	"strconv"
+	"strings"
 
 	"github.com/arian-nj/ultrun/database"
 	"gopkg.in/telebot.v4"
 )
 
-func (app *Application) onInlineQueryHandler(c telebot.Context) error {
+func (app *Application) inlineQueryHandler(c telebot.Context) error {
 	results := make(telebot.Results, 1)
 	xoResult := &telebot.ArticleResult{
 		Title:       "دوز بازی",
@@ -20,7 +20,7 @@ func (app *Application) onInlineQueryHandler(c telebot.Context) error {
 
 	xoResult.ReplyMarkup = startInlineKeyboard
 
-	xoResult.SetResultID(strconv.Itoa(1))
+	xoResult.SetResultID(string(TicTacToe))
 	results[0] = xoResult
 
 	return c.Answer(&telebot.QueryResponse{
@@ -29,11 +29,24 @@ func (app *Application) onInlineQueryHandler(c telebot.Context) error {
 	})
 }
 
-func (app *Application) onInlineResult(c telebot.Context) error {
-	err := app.ticInlineResultReciever(c)
-	return err
+func (app *Application) inlineResultHandler(c telebot.Context) error {
+	resultId := c.InlineResult().ResultID
+	switch GameType(resultId) {
+	case TicTacToe:
+		return app.ticInlineResultReciever(c)
+	}
+	return c.RespondAlert("این بازیرو ندارم!")
 }
 
+func (app *Application) callbackHandler(c telebot.Context) error {
+	callback := c.Callback()
+	if callback.Data == "join_hub" {
+		app.JoinHubHandler(c)
+	} else if strings.HasPrefix(callback.Data, string(TicTacToe)+"_") {
+		return app.TTTCallbackHandlers(c)
+	}
+	return nil
+}
 func (app *Application) JoinHubHandler(c telebot.Context) error {
 	callback := c.Callback()
 	messageId := callback.MessageID

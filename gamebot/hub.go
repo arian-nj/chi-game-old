@@ -20,17 +20,7 @@ func (hubsMap HubsMap) AddHub(hub *Hub) {
 
 type HubPlayers []*HumanPlayer
 
-// func (hp HubPlayers) ChooseRandom() (*HumanPlayer, error) {
-// 	if len(hp) <= 0 {
-// 		return nil, fmt.Errorf("erro there is 0 players")
-// 	}
-// 	randomIndex := random.GenerateRandomNumber(len(hp))
-// 	return hp[randomIndex], nil
-// }
-//
-
 type Hub struct {
-	Name      string
 	Game      GameInterface
 	MessageId string
 	Players   HubPlayers
@@ -41,9 +31,8 @@ func (hub *Hub) MessageSig() (string, int64) {
 	return hub.MessageId, 0
 }
 
-func NewHub(name string, game GameInterface, messageId string) *Hub {
+func NewHub(game GameInterface, messageId string) *Hub {
 	return &Hub{
-		Name:      name,
 		MessageId: messageId,
 		Players:   make([]*HumanPlayer, 0),
 		Game:      game,
@@ -59,14 +48,13 @@ func (hub *Hub) AddPlayer(player *HumanPlayer) {
 type GameType string
 
 const (
-	TicTacToe GameType = "tictactoe"
+	TicTacToe GameType = "ttt"
 )
 
 type GameInterface interface {
 	GetGameType() GameType
 	StartGame(app *Application)
 	JoinGame(app *Application, player *HumanPlayer) bool
-	EndGame()
 }
 
 type HumanPlayer struct {
