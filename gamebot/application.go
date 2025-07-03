@@ -1,20 +1,17 @@
 package gamebot
 
 import (
-	commonapp "github.com/arian-nj/ultrun/internals/common_app"
-	"github.com/arian-nj/ultrun/internals/config"
-	"gopkg.in/telebot.v4"
+	commonapp "github.com/arian-nj/chibazi/internals/common_app"
 )
 
 type Application struct {
 	*commonapp.CommonApp
 	Lobby *Lobby
-	Bot   *telebot.Bot
 }
 
-func NewApplication(conf *config.Config) *Application {
+func NewApplication(common *commonapp.CommonApp) *Application {
 	return &Application{
-		CommonApp: commonapp.NewCommon(conf),
+		CommonApp: common,
 		Lobby:     NewLobby(),
 	}
 }

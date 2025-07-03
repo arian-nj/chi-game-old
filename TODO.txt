@@ -19,7 +19,16 @@
 [X] line dot game panel
 [X] line dot scoring
 [X] end game
-[ ] make conole games more decoupled remove hub in them user shared embed Game struct
+[X] make conole games more decoupled remove hub in them user shared embed Game struct
+
+[ ] make api base
+[ ] make front base
+[ ] send dot box with open web button
+[ ] authenticate opened player
+[ ] websocket and basic data transfer
+[ ] dot box game logic
+[ ] basic dot box game
+[ ] animation and polish
 
 [ ] make it panic safe
 

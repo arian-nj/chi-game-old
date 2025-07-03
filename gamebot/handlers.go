@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/arian-nj/ultrun/database"
+	"github.com/arian-nj/chibazi/database"
 	"gopkg.in/telebot.v4"
 )
 

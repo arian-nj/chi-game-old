@@ -6,8 +6,8 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/arian-nj/ultrun/internals/random"
-	tictactoe "github.com/arian-nj/ultrun/internals/tic_tac_toe"
+	"github.com/arian-nj/chibazi/internals/random"
+	tictactoe "github.com/arian-nj/chibazi/internals/tic_tac_toe"
 	"gopkg.in/telebot.v4"
 )
 

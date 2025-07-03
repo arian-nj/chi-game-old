@@ -1,22 +1,33 @@
 package gamebot
 
 import (
-	"fmt"
+	"context"
 	"time"
 
-	"github.com/arian-nj/ultrun/internals/config"
+	commonapp "github.com/arian-nj/chibazi/internals/common_app"
+	"golang.org/x/exp/slog"
 	"gopkg.in/telebot.v4"
 )
 
-func (app *Application) RunBot(cfg *config.Config) error {
+func RunBot(commonapp *commonapp.CommonApp, ctx context.Context) {
+	defer commonapp.Wg.Done()
+	app := NewApplication(commonapp)
+
 	pref := telebot.Settings{
-		Token:  cfg.BotToken,
+		Token:  commonapp.Config.BotToken,
 		Poller: &telebot.LongPoller{Timeout: 10 * time.Second},
 	}
 	b, err := telebot.NewBot(pref)
 	if err != nil {
-		return fmt.Errorf("new error %w", err)
+		slog.Error("new error %w", err)
+		return
 	}
+	go func() {
+		<-ctx.Done()
+		slog.Info("Shutting down Bot ...")
+		b.Stop()
+		slog.Info("Bot is shut down")
+	}()
 	app.Bot = b
 
 	b.Use(app.addUserMiddleware)
@@ -31,7 +42,6 @@ func (app *Application) RunBot(cfg *config.Config) error {
 
 	go app.ClearGamesCron()
 	b.Start()
-	return nil
 }
 func (app *Application) ClearGamesCron() {
 	for {

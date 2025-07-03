@@ -3,11 +3,16 @@ package main
 import (
 	"context"
 	"log/slog"
+	"os"
+	"os/signal"
+	"syscall"
 	"time"
 
-	"github.com/arian-nj/ultrun/db"
-	"github.com/arian-nj/ultrun/gamebot"
-	"github.com/arian-nj/ultrun/internals/config"
+	"github.com/arian-nj/chibazi/api"
+	"github.com/arian-nj/chibazi/db"
+	"github.com/arian-nj/chibazi/gamebot"
+	commonapp "github.com/arian-nj/chibazi/internals/common_app"
+	"github.com/arian-nj/chibazi/internals/config"
 )
 
 func main() {
@@ -21,18 +26,18 @@ func main() {
 		slog.Error("Failed to migrate database", "err", err)
 		return
 	}
-	manApp := gamebot.NewApplication(cfg)
+	commonApp := commonapp.NewCommon(cfg)
 
-	err = manApp.ConfigureDatabase()
+	err = commonApp.ConfigureDatabase()
 	if err != nil {
 		slog.Error("Failed to configure Database", "err", err)
 		return
 	}
 
-	defer manApp.Conn.Close()
+	defer commonApp.Conn.Close()
 
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*2)
-	err = manApp.Conn.Ping(ctx)
+	err = commonApp.Conn.Ping(ctx)
 	if err != nil {
 		slog.Error("Failed to connect to Database", "err", err)
 		return
@@ -41,10 +46,18 @@ func main() {
 
 	slog.Info("Connected to Database")
 
-	err = manApp.RunBot(cfg)
-	if err != nil {
-		slog.Error("Failed to run bot", "err", err)
-		return
-	}
+	parentCtx, cancel := context.WithCancel(context.Background())
 
+	quit := make(chan os.Signal, 1)
+	signal.Notify(quit, os.Interrupt, syscall.SIGTERM)
+
+	commonApp.Wg.Add(1)
+	go api.RunApi(commonApp, parentCtx)
+
+	commonApp.Wg.Add(1)
+	go gamebot.RunBot(commonApp, parentCtx)
+
+	<-quit
+	cancel()
+	commonApp.Wg.Wait()
 }

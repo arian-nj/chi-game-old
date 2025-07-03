@@ -1,10 +1,11 @@
-module github.com/arian-nj/ultrun
+module github.com/arian-nj/chibazi
 
 go 1.24.3
 
 require (
 	github.com/jackc/pgx/v5 v5.7.5
 	github.com/pressly/goose/v3 v3.24.3
+	golang.org/x/exp v0.0.0-20250506013437-ce4c2cf36ca6
 	gopkg.in/telebot.v4 v4.0.0-beta.5
 )
 

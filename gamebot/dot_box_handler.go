@@ -6,8 +6,8 @@ import (
 	"strconv"
 	"strings"
 
-	dotbox "github.com/arian-nj/ultrun/internals/dot_box"
-	"github.com/arian-nj/ultrun/internals/random"
+	dotbox "github.com/arian-nj/chibazi/internals/dot_box"
+	"github.com/arian-nj/chibazi/internals/random"
 	"gopkg.in/telebot.v4"
 )
 
