@@ -12,10 +12,8 @@ import (
 )
 
 type DotBoxGame struct { // of GameInterface type
-	DotBoxBoard        *dotbox.DotBoxBoard
-	Hub                *Hub
-	CurrentPlayerIndex int
-
+	*Game
+	DotBoxBoard    *dotbox.DotBoxBoard
 	PlayerOnScore  int
 	PlayerTwoScore int
 }
@@ -23,6 +21,7 @@ type DotBoxGame struct { // of GameInterface type
 func NewDotBoxGame() *DotBoxGame {
 	return &DotBoxGame{
 		DotBoxBoard: dotbox.NewDotBoard(),
+		Game:        NewGame(),
 	}
 }
 
@@ -30,39 +29,15 @@ const (
 	dotBoxStartText = `❌ *نقطه بازی* ⭕️`
 )
 
-func (game *DotBoxGame) NextPlayer() {
-	if game.CurrentPlayerIndex == len(game.Hub.Players)-1 {
-		game.CurrentPlayerIndex = 0
-		return
-	}
-	game.CurrentPlayerIndex += 1
-}
-
-func (app *Application) dotBoxInlineResultReciever(c telebot.Context) error {
-	sender := c.InlineResult().Sender
-
-	dotBoxGame := NewDotBoxGame()
-	hub := NewHub(dotBoxGame, c.InlineResult().MessageID)
-	dotBoxGame.Hub = hub
-	app.Lobby.Hubs.AddHub(hub)
-	hub.AddPlayer(NewHumanPlayer(int(sender.ID), sender.FirstName))
-
-	textMessage := dotBoxStartText + "\n\n🕹 بازیکن " + fmt.Sprintf("[%s](tg://user?id=%d)", sender.FirstName, sender.ID) + " منتظر حریفه"
-
-	_, err := c.Bot().Edit(c.InlineResult(), textMessage, app.JoinGameKeyboard(), telebot.ModeMarkdownV2)
-
-	return err
-}
-
-func (game *DotBoxGame) StartGame(app *Application) {
+func (game *DotBoxGame) StartGame(bot *telebot.Bot) {
 	randIndex := random.GenerateRandomNumber(2)
 	game.CurrentPlayerIndex = randIndex
 
-	_, err := app.Bot.Edit(game.Hub, ticStartText, telebot.ModeMarkdownV2,
+	_, err := bot.Edit(game, ticStartText, telebot.ModeMarkdownV2,
 		CreateInlineKeyboard(
-			CreateBotNameInlineButton(app.Bot),
+			CreateBotNameInlineButton(bot),
 			CreateDotBoxInlineButton(game.DotBoxBoard),
-			game.CreatePlayersInlineButton(game.Hub.Players, game.CurrentPlayerIndex),
+			game.CreatePlayersInlineButton(game.Players, game.CurrentPlayerIndex),
 		),
 	)
 	if err != nil {
@@ -124,27 +99,16 @@ func CreateDotBoxInlineButton(board *dotbox.DotBoxBoard) [][]telebot.InlineButto
 	return buttons
 }
 
-func (app *Application) DotBoxCallbackHandlers(c telebot.Context) error {
+func (game *DotBoxGame) CallbackHandlers(c telebot.Context, bot *telebot.Bot) error {
 	callback := c.Callback()
 	callbackData := strings.TrimPrefix(callback.Data, string(DotBoxGameType)+"_")
-	messageId := c.Callback().MessageID
-
-	hub, is_found := app.Lobby.Hubs[messageId]
-	if !is_found {
-		return c.RespondAlert("این بازی وجود نداره!")
-	}
-
-	dotBoxGame, ok := hub.Game.(*DotBoxGame)
-	if !ok {
-		panic("dot box callback handler can't convert game interface to dot box game struct")
-	}
 	if strings.HasPrefix(callbackData, "play_") {
-		return dotBoxGame.PlayHandler(c, app)
+		return game.PlayHandler(c, bot)
 	}
 	return nil
 }
 
-func (game *DotBoxGame) PlayHandler(c telebot.Context, app *Application) error {
+func (game *DotBoxGame) PlayHandler(c telebot.Context, bot *telebot.Bot) error {
 	callback := c.Callback()
 	callbackData := strings.TrimPrefix(callback.Data, string(DotBoxGameType)+"_play_")
 
@@ -152,7 +116,7 @@ func (game *DotBoxGame) PlayHandler(c telebot.Context, app *Application) error {
 		return fmt.Errorf("invalid ttt_play data")
 	}
 
-	if game.Hub.Players[game.CurrentPlayerIndex].TgID != int(callback.Sender.ID) {
+	if game.Players[game.CurrentPlayerIndex].TgID != int(callback.Sender.ID) {
 		return c.RespondText("نوبت تو نیست!")
 	}
 
@@ -193,9 +157,9 @@ func (game *DotBoxGame) PlayHandler(c telebot.Context, app *Application) error {
 	if !game.DotBoxBoard.HasEmptyCell() {
 		text := ""
 		if game.PlayerOnScore != game.PlayerTwoScore {
-			winnerPlayer := game.Hub.Players[0]
+			winnerPlayer := game.Players[0]
 			if game.PlayerTwoScore > game.PlayerOnScore {
-				winnerPlayer = game.Hub.Players[0]
+				winnerPlayer = game.Players[0]
 			}
 			text = "\n🏆برنده بازی:*" + winnerPlayer.Name + "*"
 		} else {
@@ -203,20 +167,20 @@ func (game *DotBoxGame) PlayHandler(c telebot.Context, app *Application) error {
 
 		}
 
-		_, err := app.Bot.Edit(game.Hub, game.EndGameText()+text, telebot.ModeMarkdownV2,
+		_, err := bot.Edit(game, game.EndGameText()+text, telebot.ModeMarkdownV2,
 			CreateInlineKeyboard(
-				CreateBotNameInlineButton(app.Bot),
+				CreateBotNameInlineButton(bot),
 				EndgameInlineKeyboard,
 			),
 		)
 		return err
 
 	}
-	_, err := app.Bot.Edit(game.Hub, dotBoxStartText+"\n"+game.CreateBoardAsEmoji(), telebot.ModeMarkdownV2,
+	_, err := bot.Edit(game, dotBoxStartText+"\n"+game.CreateBoardAsEmoji(), telebot.ModeMarkdownV2,
 		CreateInlineKeyboard(
-			CreateBotNameInlineButton(app.Bot),
+			CreateBotNameInlineButton(bot),
 			CreateDotBoxInlineButton(game.DotBoxBoard),
-			game.CreatePlayersInlineButton(game.Hub.Players, game.CurrentPlayerIndex),
+			game.CreatePlayersInlineButton(game.Players, game.CurrentPlayerIndex),
 		),
 	)
 
@@ -227,7 +191,7 @@ func (game *DotBoxGame) PlayHandler(c telebot.Context, app *Application) error {
 }
 
 func (game *DotBoxGame) EndGameText() string {
-	return ticStartText + "\nبازیکن ها:\n" + game.Hub.Players[0].Name + " " + strconv.Itoa(game.PlayerOnScore) + "\n" + game.Hub.Players[1].Name + " " + strconv.Itoa(game.PlayerTwoScore)
+	return ticStartText + "\nبازیکن ها:\n" + game.Players[0].Name + " " + strconv.Itoa(game.PlayerOnScore) + "\n" + game.Players[1].Name + " " + strconv.Itoa(game.PlayerTwoScore)
 }
 
 func (game *DotBoxGame) CreateBoardAsEmoji() string {

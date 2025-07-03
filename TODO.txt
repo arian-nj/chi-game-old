@@ -18,8 +18,8 @@
 [X] make hub game more seperate
 [X] line dot game panel
 [X] line dot scoring
-[ ] end game
-
+[X] end game
+[ ] make conole games more decoupled remove hub in them user shared embed Game struct
 
 [ ] make it panic safe
 

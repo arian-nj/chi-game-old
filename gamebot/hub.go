@@ -1,6 +1,8 @@
 package gamebot
 
-import "time"
+import (
+	"time"
+)
 
 type Lobby struct {
 	Hubs HubsMap
@@ -18,56 +20,32 @@ func (hubsMap HubsMap) AddHub(hub *Hub) {
 	hubsMap[hub.MessageId] = hub
 }
 
-type HubPlayers []*HumanPlayer
-
 type Hub struct {
 	Game      GameInterface
 	MessageId string
-	Players   HubPlayers
 	CreatedAt time.Time
-}
-
-func (hub *Hub) MessageSig() (string, int64) {
-	return hub.MessageId, 0
 }
 
 func NewHub(game GameInterface, messageId string) *Hub {
 	return &Hub{
 		MessageId: messageId,
-		Players:   make([]*HumanPlayer, 0),
 		Game:      game,
 		CreatedAt: time.Now(),
 	}
 
 }
 
-func (hub *Hub) AddPlayer(player *HumanPlayer) {
-	hub.Players = append(hub.Players, player)
-}
-
 func (hub *Hub) JoinGame(player *HumanPlayer, app *Application) bool {
-	if len(hub.Players) >= 2 {
+	if len(hub.Game.GetPlayers()) >= 2 {
 		return false
 	}
-	hub.AddPlayer(player)
-	if len(hub.Players) == 2 {
-		hub.Game.StartGame(app)
+
+	hub.Game.AddPlayer(player)
+	if len(hub.Game.GetPlayers()) == hub.Game.GetMaxPlayer() {
+		hub.Game.StartGame(app.Bot)
 	}
 	return true
 
-}
-
-type GameType string
-
-const (
-	TicTacToeGameType GameType = "ttt"
-	DotBoxGameType    GameType = "dotbox"
-)
-
-type GameInterface interface {
-	GetGameType() GameType
-	GetMaxPlayer() int
-	StartGame(app *Application)
 }
 
 type HumanPlayer struct {

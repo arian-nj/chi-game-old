@@ -45,23 +45,59 @@ func (app *Application) inlineQueryHandler(c telebot.Context) error {
 
 func (app *Application) inlineResultHandler(c telebot.Context) error {
 	resultId := c.InlineResult().ResultID
+
 	switch GameType(resultId) {
 	case TicTacToeGameType:
-		return app.ticInlineResultReciever(c)
+		return app.ticInlineResultReciever(c, NewTicGame(), ticStartText)
 	case DotBoxGameType:
-		return app.dotBoxInlineResultReciever(c)
+		return app.ticInlineResultReciever(c, NewDotBoxGame(), dotBoxStartText)
 	}
 	return c.RespondAlert("این بازیرو ندارم!")
 }
 
+func (app *Application) ticInlineResultReciever(c telebot.Context, game GameInterface, gameTitle string) error {
+	sender := c.InlineResult().Sender
+	messageId := c.InlineResult().MessageID
+
+	hub := NewHub(game, c.InlineResult().MessageID)
+	hub.Game.SetMessageID(messageId)
+	app.Lobby.Hubs.AddHub(hub)
+	hub.Game.AddPlayer(NewHumanPlayer(int(sender.ID), sender.FirstName))
+
+	textMessage := gameTitle + "\n\n🕹 بازیکن " + fmt.Sprintf("[%s](tg://user?id=%d)", sender.FirstName, sender.ID) + " منتظر حریفه"
+
+	_, err := c.Bot().Edit(c.InlineResult(), textMessage, app.JoinGameKeyboard(), telebot.ModeMarkdownV2)
+
+	return err
+}
+
 func (app *Application) callbackHandler(c telebot.Context) error {
 	callback := c.Callback()
+	messageId := c.Callback().MessageID
+
+	hub, is_found := app.Lobby.Hubs[messageId]
+	if !is_found {
+		return c.RespondAlert("این بازی وجود نداره!")
+	}
+
 	if callback.Data == "join_hub" {
-		app.JoinHubHandler(c)
-	} else if strings.HasPrefix(callback.Data, string(TicTacToeGameType)+"_") {
-		return app.TTTCallbackHandlers(c)
+		return app.JoinHubHandler(c)
+	}
+
+	if strings.HasPrefix(callback.Data, string(TicTacToeGameType)+"_") {
+		ticGame, ok := hub.Game.(*TicGame)
+		if !ok {
+			panic("xo callback handler can't convert game interface to ticgame struct")
+		}
+
+		return ticGame.TTTCallbackHandlers(c, app.Bot)
 	} else if strings.HasPrefix(callback.Data, string(DotBoxGameType)+"_") {
-		return app.DotBoxCallbackHandlers(c)
+		dotBoxGame, ok := hub.Game.(*DotBoxGame)
+		if !ok {
+			panic("dot box callback handler can't convert game interface to dot box game struct")
+		}
+
+		return dotBoxGame.CallbackHandlers(c, app.Bot)
 	}
 	return nil
 }
@@ -74,7 +110,7 @@ func (app *Application) JoinHubHandler(c telebot.Context) error {
 	}
 
 	player := NewHumanPlayer(int(callback.Sender.ID), callback.Sender.FirstName)
-	for _, joinedPlayer := range hub.Players {
+	for _, joinedPlayer := range hub.Game.GetPlayers() {
 		if joinedPlayer.TgID == player.TgID {
 			return c.RespondText("تو بازی هستی")
 		}

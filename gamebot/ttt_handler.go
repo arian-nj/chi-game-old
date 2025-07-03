@@ -25,34 +25,26 @@ const (
 )
 
 type TicGame struct { // of GameInterface type
-	TicBoard           *tictactoe.TicBoard
-	Hub                *Hub
-	CurrentPlayerIndex int
-}
-
-func (game *TicGame) NextPlayer() {
-	if game.CurrentPlayerIndex == len(game.Hub.Players)-1 {
-		game.CurrentPlayerIndex = 0
-		return
-	}
-	game.CurrentPlayerIndex += 1
+	*Game
+	TicBoard *tictactoe.TicBoard
 }
 
 func NewTicGame() *TicGame {
 	return &TicGame{
 		TicBoard: tictactoe.NewTicBoard(),
+		Game:     NewGame(),
 	}
 }
 
-func (game *TicGame) StartGame(app *Application) {
+func (game *TicGame) StartGame(bot *telebot.Bot) {
 	randIndex := random.GenerateRandomNumber(2)
 	game.CurrentPlayerIndex = randIndex
 
-	_, err := app.Bot.Edit(game.Hub, ticStartText, telebot.ModeMarkdownV2,
+	_, err := bot.Edit(game, ticStartText, telebot.ModeMarkdownV2,
 		CreateInlineKeyboard(
-			CreateBotNameInlineButton(app.Bot),
+			CreateBotNameInlineButton(bot),
 			CreateTicBoardInlineButton(game.TicBoard),
-			game.CreatePlayersInlineButton(game.Hub.Players, game.CurrentPlayerIndex),
+			game.CreatePlayersInlineButton(game.Players, game.CurrentPlayerIndex),
 		),
 	)
 	if err != nil {
@@ -69,43 +61,16 @@ func (game *TicGame) GetMaxPlayer() int {
 	return 2
 }
 
-func (app *Application) ticInlineResultReciever(c telebot.Context) error {
-	sender := c.InlineResult().Sender
-
-	ticGame := NewTicGame()
-	hub := NewHub(ticGame, c.InlineResult().MessageID)
-	ticGame.Hub = hub
-	app.Lobby.Hubs.AddHub(hub)
-	hub.AddPlayer(NewHumanPlayer(int(sender.ID), sender.FirstName))
-
-	textMessage := ticStartText + "\n\n🕹 بازیکن " + fmt.Sprintf("[%s](tg://user?id=%d)", sender.FirstName, sender.ID) + " منتظر حریفه"
-
-	_, err := c.Bot().Edit(c.InlineResult(), textMessage, app.JoinGameKeyboard(), telebot.ModeMarkdownV2)
-
-	return err
-}
-
-func (app *Application) TTTCallbackHandlers(c telebot.Context) error {
+func (game *TicGame) TTTCallbackHandlers(c telebot.Context, bot *telebot.Bot) error {
 	callback := c.Callback()
 	callbackData := strings.TrimPrefix(callback.Data, string(TicTacToeGameType)+"_")
-	messageId := c.Callback().MessageID
-
-	hub, is_found := app.Lobby.Hubs[messageId]
-	if !is_found {
-		return c.RespondAlert("این بازی وجود نداره!")
-	}
-
-	ticGame, ok := hub.Game.(*TicGame)
-	if !ok {
-		panic("xo callback handler can't convert game interface to ticgame struct")
-	}
 	if strings.HasPrefix(callbackData, "play_") {
-		return ticGame.TicPlayHandler(c, app)
+		return game.TicPlayHandler(c, bot)
 	}
 	return nil
 }
 
-func (game *TicGame) TicPlayHandler(c telebot.Context, app *Application) error {
+func (game *TicGame) TicPlayHandler(c telebot.Context, bot *telebot.Bot) error {
 	callback := c.Callback()
 	callbackData := strings.TrimPrefix(callback.Data, string(TicTacToeGameType)+"_play_")
 
@@ -113,7 +78,7 @@ func (game *TicGame) TicPlayHandler(c telebot.Context, app *Application) error {
 		return fmt.Errorf("invalid ttt_play data")
 	}
 
-	if game.Hub.Players[game.CurrentPlayerIndex].TgID != int(callback.Sender.ID) {
+	if game.Players[game.CurrentPlayerIndex].TgID != int(callback.Sender.ID) {
 		return c.RespondText("نوبت تو نیست!")
 	}
 
@@ -137,11 +102,11 @@ func (game *TicGame) TicPlayHandler(c telebot.Context, app *Application) error {
 		return c.RespondText(errMsg)
 	}
 	if game.TicBoard.HasWon() {
-		text := game.EndGameText() + "\n🏆برنده بازی:*" + game.Hub.Players[game.CurrentPlayerIndex].Name + "*"
+		text := game.EndGameText() + "\n🏆برنده بازی:*" + game.Players[game.CurrentPlayerIndex].Name + "*"
 
-		_, err := app.Bot.Edit(game.Hub, text, telebot.ModeMarkdownV2,
+		_, err := bot.Edit(game, text, telebot.ModeMarkdownV2,
 			CreateInlineKeyboard(
-				CreateBotNameInlineButton(app.Bot),
+				CreateBotNameInlineButton(bot),
 				EndgameInlineKeyboard,
 			),
 		)
@@ -151,23 +116,22 @@ func (game *TicGame) TicPlayHandler(c telebot.Context, app *Application) error {
 	if !game.TicBoard.IsAnyCellEmpty() {
 		text := game.EndGameText() + "\nبازی مساوی شد"
 
-		_, err := app.Bot.Edit(game.Hub, text, telebot.ModeMarkdownV2,
+		_, err := bot.Edit(game, text, telebot.ModeMarkdownV2,
 			CreateInlineKeyboard(
-				CreateBotNameInlineButton(app.Bot),
+				CreateBotNameInlineButton(bot),
 				EndgameInlineKeyboard,
 			),
 		)
 		return err
 
 	}
-
 	game.NextPlayer()
 
-	_, err := app.Bot.Edit(game.Hub, ticStartText, telebot.ModeMarkdownV2,
+	_, err := bot.Edit(game, ticStartText, telebot.ModeMarkdownV2,
 		CreateInlineKeyboard(
-			CreateBotNameInlineButton(app.Bot),
+			CreateBotNameInlineButton(bot),
 			CreateTicBoardInlineButton(game.TicBoard),
-			game.CreatePlayersInlineButton(game.Hub.Players, game.CurrentPlayerIndex),
+			game.CreatePlayersInlineButton(game.Players, game.CurrentPlayerIndex),
 		),
 	)
 
@@ -176,7 +140,7 @@ func (game *TicGame) TicPlayHandler(c telebot.Context, app *Application) error {
 }
 
 func (game *TicGame) EndGameText() string {
-	return ticStartText + "\nبازیکن ها:\n" + game.Hub.Players[0].Name + " " + XEmoji + "\n" + game.Hub.Players[1].Name + " " + OEmoji + "\n\n" + game.CreateBoardAsEmoji()
+	return ticStartText + "\nبازیکن ها:\n" + game.Players[0].Name + " " + XEmoji + "\n" + game.Players[1].Name + " " + OEmoji + "\n\n" + game.CreateBoardAsEmoji()
 }
 
 func (game *TicGame) CreateBoardAsEmoji() string {
