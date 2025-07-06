@@ -1,9 +1,19 @@
-package gamebot
+package keybul
 
 import (
+	"errors"
+
+	gametype "github.com/arian-nj/chibazi/internals/game_type"
 	"gopkg.in/telebot.v4"
 )
 
+func EditGameMessage(bot telebot.API, msg telebot.Editable, text string, keyboard *telebot.ReplyMarkup) error {
+	_, err := bot.Edit(msg, text, keyboard, telebot.ModeMarkdownV2)
+	if err != nil && !errors.Is(err, telebot.ErrTrueResult) {
+		return err
+	}
+	return nil
+}
 func CreateInlineKeyboard(buttonGroups ...[][]telebot.InlineButton) *telebot.ReplyMarkup {
 	var inlineKeyboard [][]telebot.InlineButton
 
@@ -16,19 +26,18 @@ func CreateInlineKeyboard(buttonGroups ...[][]telebot.InlineButton) *telebot.Rep
 	}
 }
 
-func CreateBotNameInlineButton(bot *telebot.Bot) [][]telebot.InlineButton {
-	botUsername := bot.Me.Username
+func CreateBotNameInlineButton() [][]telebot.InlineButton {
 	return [][]telebot.InlineButton{
 		{
 			{
 				Text: "Chi Bazi | چی بازی",
-				URL:  "t.me/" + botUsername + "?start=new",
+				URL:  "t.me/" + "ChiBaziBot" + "?start=new",
 			},
 		},
 	}
 }
 
-var startInlineKeyboard = &telebot.ReplyMarkup{
+var StartInlineKeyboard = &telebot.ReplyMarkup{
 	InlineKeyboard: [][]telebot.InlineButton{
 		{
 			{
@@ -40,19 +49,15 @@ var startInlineKeyboard = &telebot.ReplyMarkup{
 	ResizeKeyboard: true,
 }
 
-func (app *Application) JoinGameKeyboard() *telebot.ReplyMarkup {
-	var startInlineKeyboard = &telebot.ReplyMarkup{
-		InlineKeyboard: [][]telebot.InlineButton{
+func JoinGameKeyboard(game_type gametype.GameType) [][]telebot.InlineButton {
+	return [][]telebot.InlineButton{
+		{
 			{
-				{
-					Text: "منم بازی",
-					Data: "join_hub",
-				},
+				Text: "منم بازی",
+				Data: string(game_type) + "_join",
 			},
 		},
-		ResizeKeyboard: true,
 	}
-	return startInlineKeyboard
 }
 
 var EndgameInlineKeyboard = [][]telebot.InlineButton{

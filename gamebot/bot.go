@@ -4,10 +4,35 @@ import (
 	"context"
 	"time"
 
+	"github.com/arian-nj/chibazi/games/dotbox_console"
+	xoconsole "github.com/arian-nj/chibazi/games/xo_console"
 	commonapp "github.com/arian-nj/chibazi/internals/common_app"
+	"github.com/arian-nj/chibazi/linedot"
 	"golang.org/x/exp/slog"
 	"gopkg.in/telebot.v4"
 )
+
+type Lobby struct {
+	XOGames map[string]*xoconsole.XOGame
+	DotBox  map[string]*dotbox_console.DotBoxGame
+}
+
+type Application struct {
+	*commonapp.CommonApp
+	Lobby        *Lobby
+	DotLineGames map[string]*linedot.DotLineGame
+}
+
+func NewApplication(common *commonapp.CommonApp) *Application {
+	return &Application{
+		CommonApp: common,
+		Lobby: &Lobby{
+			XOGames: map[string]*xoconsole.XOGame{},
+			DotBox:  map[string]*dotbox_console.DotBoxGame{},
+		},
+		// DotLineGames: map[string]*linedot.DotLineGame{},
+	}
+}
 
 func RunBot(commonapp *commonapp.CommonApp, ctx context.Context) {
 	defer commonapp.Wg.Done()
@@ -33,44 +58,43 @@ func RunBot(commonapp *commonapp.CommonApp, ctx context.Context) {
 	b.Use(app.addUserMiddleware)
 
 	b.Handle(telebot.OnQuery, app.inlineQueryHandler)
-	b.Handle(telebot.OnInlineResult, app.inlineResultHandler)
-	b.Handle(telebot.OnCallback, app.callbackHandler)
+	b.Handle(telebot.OnInlineResult, app.inlineResultFeedbackHandler)
+	b.Handle(telebot.OnCallback, app.callbackRouter)
 
 	b.Handle(telebot.OnText, app.welcomeHandler)
 	b.Handle("/start", app.welcomeHandler)
 	b.Handle("/stat", app.statHandler)
 
-	go app.ClearGamesCron()
+	// go app.ClearDeadGamesCron()
 	b.Start()
 }
-func (app *Application) ClearGamesCron() {
-	for {
-		nowTime := time.Now()
-		for key, hub := range app.Lobby.Hubs {
-			if nowTime.Sub(hub.CreatedAt) > 30*time.Minute {
-				delete(app.Lobby.Hubs, key)
+
+// func (app *Application) ClearDeadGamesCron() {
+// 	for {
+// 		nowTime := time.Now()
+// 		for key, hub := range app.Lobby.Hubs {
+// 			if nowTime.Sub(hub.CreatedAt) > 30*time.Minute {
+// 				delete(app.Lobby.Hubs, key)
+// 			}
+// 		}
+// 		time.Sleep(1 * time.Minute)
+// 	}
+// }
+
+func (app *Application) addUserMiddleware(next telebot.HandlerFunc) telebot.HandlerFunc {
+	return func(c telebot.Context) error {
+		go func() {
+			user := c.Sender()
+			if user == nil {
+				slog.Error("User is nil")
+				return
 			}
-		}
-		time.Sleep(1 * time.Minute)
+			err := app.Queries.CreateUser(context.Background(), int(user.ID))
+			if err != nil {
+				slog.Error("Failed to create user", "err", err)
+				return
+			}
+		}()
+		return next(c)
 	}
-}
-
-var (
-	selector = &telebot.ReplyMarkup{
-		InlineKeyboard: [][]telebot.InlineButton{
-			{
-				{
-					Text:                  "بازی با دوستان",
-					InlineQueryChosenChat: &telebot.SwitchInlineQuery{AllowUserChats: true, AllowGroupChats: true},
-				},
-			},
-		},
-	}
-)
-
-func (app *Application) welcomeHandler(c telebot.Context) error {
-	return c.Send(
-		`خوش اومدید 👋
-دکمه بازی با دوستان رو بزن تا تو هر چت یا گروهی با دوستات بازی کنی
-	`, selector)
 }

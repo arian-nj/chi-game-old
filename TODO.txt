@@ -9,7 +9,6 @@
 [X] XO game logic
 [X] XO game win tie EndGame
 [X] release pipeline
-[X] clear game when ends
 [X] count hub games
 [X] very basic statistics
 [X] limit name lenght
@@ -20,15 +19,26 @@
 [X] line dot scoring
 [X] end game
 [X] make conole games more decoupled remove hub in them user shared embed Game struct
+[X] Seperate Lobby 
+[X] Seperate Conole XO
+[X] add support xo 3x3 4x4 5x5
+[X] Seperate Dot Game
+[ ] clear game when ends
+[ ] does loging played games still works?
+[ ] add rules to dot box game
+[ ] add win basic text rule to 5x5 and 3x3 XO Game
 
-[ ] make api base
-[ ] make front base
-[ ] send dot box with open web button
+[X] make api base
+[X] make front base embed in go
+[X] dev reverse proxy
+[ ] how sending and joining + implementation
 [ ] authenticate opened player
 [ ] websocket and basic data transfer
 [ ] dot box game logic
 [ ] basic dot box game
 [ ] animation and polish
+
+[ ] store web loading time stats
 
 [ ] make it panic safe
 

@@ -16,6 +16,7 @@ type Config struct {
 	BotToken    string
 	ReleaseMode ReleasMode
 	DatabseUrl  string
+	BaseUrl     string
 }
 
 func ParseConfig() (*Config, error) {
@@ -58,5 +59,6 @@ func ParseConfig() (*Config, error) {
 		conf.DatabseUrl = db_url
 	}
 
+	conf.BaseUrl = "https://192.168.0.107"
 	return &conf, nil
 }

@@ -1,7 +1,5 @@
 package tictactoe
 
-const MaxCellSize = 3
-
 type Cell int
 
 const (
@@ -11,60 +9,135 @@ const (
 )
 
 type TicBoard struct {
-	Board [3][3]Cell
+	Board       [][]Cell
+	MaxCellSize int
+	WinSize     int
 }
 
-func NewTicBoard() *TicBoard {
+func NewTicBoard(maxBoardSize int, winSize int) *TicBoard {
+	if winSize > int(maxBoardSize) {
+		panic("wtf win size is bigger than max board size")
+	}
+	maxSize := int(maxBoardSize)
+
+	board := make([][]Cell, maxSize)
+	for r := range maxSize {
+		board[r] = make([]Cell, maxSize)
+		for c := range maxSize {
+			board[r][c] = Empty
+		}
+	}
+
 	return &TicBoard{
-		Board: [3][3]Cell{
-			{Empty, Empty, Empty},
-			{Empty, Empty, Empty},
-			{Empty, Empty, Empty},
-		},
+		Board:       board,
+		MaxCellSize: maxSize,
+		WinSize:     winSize,
 	}
 }
 
-func (borard *TicBoard) PlayMove(r, c int, moveType Cell) (bool, string) {
-	if (r < 0 || c < 0) && (r >= MaxCellSize || c >= MaxCellSize) {
+func (board *TicBoard) PlayMove(r, c int, moveType Cell) (bool, string) {
+	if (r < 0 || c < 0) && (r >= board.MaxCellSize || c >= board.MaxCellSize) {
 		return false, "خارج از محدوده چیکار داری میکنی؟"
 	}
 
-	if borard.Board[r][c] != Empty {
+	if board.Board[r][c] != Empty {
 		return false, "خالی نیست"
 	}
-	borard.Board[r][c] = moveType
+	board.Board[r][c] = moveType
 	return true, ""
 }
 
-func (board *TicBoard) HasWon() bool {
-	// Check for a win in each row
-	for i := range 3 {
-		if board.Board[i][0] != Empty && board.Board[i][0] == board.Board[i][1] && board.Board[i][1] == board.Board[i][2] {
+func (board *TicBoard) HasWon(rint, cint int, moveType Cell) bool {
+	possibleWinsWays := board.MaxCellSize - board.WinSize + 1
+
+	// check row
+	row := board.Board[rint]
+	for startIndex := range possibleWinsWays {
+		flag := true
+		for index := startIndex; index < startIndex+board.WinSize; index++ {
+			if row[index] != moveType {
+				flag = false
+				break
+			}
+		}
+		if flag {
 			return true
 		}
 	}
 
-	// Check for a win in each column
-	for i := range 3 {
-		if board.Board[0][i] != Empty && board.Board[0][i] == board.Board[1][i] && board.Board[1][i] == board.Board[2][i] {
+	// check coulom
+	for startIndex := range possibleWinsWays {
+		flag := true
+		for index := startIndex; index < startIndex+board.WinSize; index++ {
+			if board.Board[index][cint] != moveType {
+				flag = false
+				break
+			}
+		}
+		if flag {
 			return true
 		}
 	}
 
-	// Check for a win on the main diagonal (top-left to bottom-right)
-	if board.Board[0][0] != Empty && board.Board[0][0] == board.Board[1][1] && board.Board[1][1] == board.Board[2][2] {
-		return true
+	// check diagonal
+	for startIndex := range possibleWinsWays {
+		flag := true
+		for index := startIndex; index < startIndex+board.WinSize; index++ {
+			if board.Board[index][index] != moveType {
+				flag = false
+				break
+			}
+		}
+		if flag {
+			return true
+		}
 	}
 
-	// Check for a win on the anti-diagonal (top-right to bottom-left)
-	if board.Board[0][2] != Empty && board.Board[0][2] == board.Board[1][1] && board.Board[1][1] == board.Board[2][0] {
-		return true
+	// check anti-diagonal
+	for startIndex := range possibleWinsWays {
+		flag := true
+		for index := startIndex; index < startIndex+board.WinSize; index++ {
+			if board.Board[index][board.MaxCellSize-1-index] != moveType {
+				flag = false
+				break
+			}
+		}
+		if flag {
+			return true
+		}
 	}
 
-	// If no winning condition is met, return false
 	return false
 }
 
+//	func (board *TicBoard) HasWon() bool {
+//		// Check for a win in each row
+//		for i := range 3 {
+//			if board.Board[i][0] != Empty && board.Board[i][0] == board.Board[i][1] && board.Board[i][1] == board.Board[i][2] {
+//				return true
+//			}
+//		}
+//
+//		// Check for a win in each column
+//		for i := range 3 {
+//			if board.Board[0][i] != Empty && board.Board[0][i] == board.Board[1][i] && board.Board[1][i] == board.Board[2][i] {
+//				return true
+//			}
+//		}
+//
+//		// Check for a win on the main diagonal (top-left to bottom-right)
+//		if board.Board[0][0] != Empty && board.Board[0][0] == board.Board[1][1] && board.Board[1][1] == board.Board[2][2] {
+//			return true
+//		}
+//
+//		// Check for a win on the anti-diagonal (top-right to bottom-left)
+//		if board.Board[0][2] != Empty && board.Board[0][2] == board.Board[1][1] && board.Board[1][1] == board.Board[2][0] {
+//			return true
+//		}
+//
+//		// If no winning condition is met, return false
+//		return false
+//	}
 func (board *TicBoard) IsAnyCellEmpty() bool {
 	for _, row := range board.Board {
 		for _, cell := range row {

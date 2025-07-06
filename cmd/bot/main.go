@@ -8,7 +8,6 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/arian-nj/chibazi/api"
 	"github.com/arian-nj/chibazi/db"
 	"github.com/arian-nj/chibazi/gamebot"
 	commonapp "github.com/arian-nj/chibazi/internals/common_app"
@@ -51,8 +50,8 @@ func main() {
 	quit := make(chan os.Signal, 1)
 	signal.Notify(quit, os.Interrupt, syscall.SIGTERM)
 
-	commonApp.Wg.Add(1)
-	go api.RunApi(commonApp, parentCtx)
+	// commonApp.Wg.Add(1)
+	// go api.RunApi(commonApp, parentCtx)
 
 	commonApp.Wg.Add(1)
 	go gamebot.RunBot(commonApp, parentCtx)

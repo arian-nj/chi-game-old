@@ -17,6 +17,14 @@ generate_sqlc() {
 	echo "OK"	
 }
 
+build_frontend() {
+	echo "Building frontend"
+	cd ./frontend/
+	npx eslint . --fix
+	npm run build
+	cd ..
+}
+
 COMMAND=$1
 
 if [ -z "COMMAND" ]; then
@@ -26,6 +34,7 @@ fi
 case $COMMAND in
 	run)
 		generate_sqlc
+		# build_frontend
 		echo "Starting Core API"
 		go run ./cmd/bot/.
 
@@ -36,6 +45,12 @@ case $COMMAND in
 		generate_sqlc
 	;;
 
+	treafik)
+		sudo traefik \
+	--entrypoints.web.address=:8080 \
+	--providers.file.filename=treafik.yaml \
+	--log.level=DEBUG
+	;;
 	*)
 		echo "command '$COMMAND' is Unknown"
 esac

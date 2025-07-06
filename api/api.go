@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/arian-nj/chibazi/frontend"
 	"github.com/arian-nj/chibazi/pkg/response"
 
 	commonapp "github.com/arian-nj/chibazi/internals/common_app"
@@ -28,8 +29,10 @@ func (app *Application) statusHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func (app *Application) createRouter() *http.ServeMux {
+	distFS := frontend.GetDistFS()
 	mux := http.NewServeMux()
 	mux.HandleFunc("/api/status", app.statusHandler)
+	mux.Handle("/web/", http.StripPrefix("/web/", http.FileServerFS(distFS)))
 	return mux
 }
 

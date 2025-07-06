@@ -1,0 +1,81 @@
+package linedot
+
+import (
+	"errors"
+	"fmt"
+
+	gametype "github.com/arian-nj/chibazi/internals/game_type"
+	keybul "github.com/arian-nj/chibazi/internals/keybul"
+	"gopkg.in/telebot.v4"
+)
+
+type Player struct {
+	TgID int
+}
+
+func NewPlayer(tgID int) *Player {
+	return &Player{
+		TgID: tgID,
+	}
+}
+
+type DotLineGame struct {
+	Players   []*Player
+	MessageID string
+}
+
+func NewDotLineGame() *DotLineGame {
+	return &DotLineGame{
+		Players: []*Player{},
+	}
+}
+
+func (game *DotLineGame) MessageSig() (messageID string, chatID int64) { // Implement Editable Interface
+	return game.MessageID, 0
+}
+
+func (game *DotLineGame) SendJoinPanel(c telebot.Context) error {
+	sender := c.InlineResult().Sender
+	messageId := c.InlineResult().MessageID
+	game.MessageID = messageId
+
+	textMessage := "web line dot game " + "\n\n🕹 بازیکن " + fmt.Sprintf("[%s](tg://user?id=%d)", sender.FirstName, sender.ID) + " منتظر حریفه"
+	game.Players = append(game.Players, NewPlayer(int(sender.ID)))
+	_, err := c.Bot().Edit(game, textMessage, game.JoinGameKeyboard(), telebot.ModeMarkdownV2)
+
+	if err != nil && !errors.Is(err, telebot.ErrTrueResult) {
+		return fmt.Errorf("error editing to join panel %w", err)
+	}
+	return nil
+}
+
+func (game *DotLineGame) JoinGame(c telebot.Context) error {
+	sender := c.Sender()
+	game.Players = append(game.Players, NewPlayer(int(sender.ID)))
+	return game.StartGame(c)
+}
+
+func (game *DotLineGame) JoinGameKeyboard() *telebot.ReplyMarkup {
+	var startInlineKeyboard = &telebot.ReplyMarkup{
+		InlineKeyboard: [][]telebot.InlineButton{
+			{
+				{
+					Text: "منم بازی",
+					Data: "join_" + string(gametype.WebDotBoxGameType),
+				},
+			},
+		},
+		ResizeKeyboard: true,
+	}
+	return startInlineKeyboard
+}
+
+func (game *DotLineGame) StartGame(c telebot.Context) error {
+	startKeyboard := [][]telebot.InlineButton{
+		{
+			{Text: "ورود به بازی", WebApp: &telebot.WebApp{URL: "https://192.168.84.112/web/"}},
+		},
+	}
+	_, err := c.Bot().Edit(game, "حریف منتظرته"+"\nدکمه ورود به بازی رو بزن", keybul.CreateInlineKeyboard(startKeyboard))
+	return err
+}
