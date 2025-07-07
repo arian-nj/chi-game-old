@@ -36,7 +36,7 @@ type Player struct {
 
 func newPlayer(name string, tgID int) *Player {
 	return &Player{
-		Name: name,
+		Name: keybul.EscapeReserved(name),
 		TgID: tgID,
 	}
 }
@@ -78,7 +78,7 @@ func (g *XOGame) SendJoinPanel(c telebot.Context) error {
 	inlineKeyboard := keybul.CreateInlineKeyboard(
 		keybul.JoinGameKeyboard(g.GameType),
 	)
-	text := XOStartText + "\n\n" + g.RulesText() + "\n\n🕹 بازیکن " + fmt.Sprintf("%s", sender.FirstName) + " منتظر حریفه"
+	text := XOStartText + "\n\n" + g.RulesText() + "\n\n🕹 بازیکن " + fmt.Sprintf("%s", keybul.EscapeReserved(sender.FirstName)) + " منتظر حریفه"
 	return keybul.EditGameMessage(c.Bot(), g, text, inlineKeyboard)
 }
 

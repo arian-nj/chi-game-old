@@ -47,97 +47,49 @@ func (board *TicBoard) PlayMove(r, c int, moveType Cell) (bool, string) {
 	return true, ""
 }
 
-func (board *TicBoard) HasWon(rint, cint int, moveType Cell) bool {
-	possibleWinsWays := board.MaxCellSize - board.WinSize + 1
+// HasWon checks if the last move at (r, c) resulted in a win.
+func (board *TicBoard) HasWon(r, c int, moveType Cell) bool {
+	// Each inner array is a {row_change, column_change} vector
+	directions := [][2]int{
+		{0, 1},  // Horizontal check
+		{1, 0},  // Vertical check
+		{1, 1},  // DIAGONAL check (\)
+		{1, -1}, // ANTI-DIAGONAL check (/)
+	}
 
-	// check row
-	row := board.Board[rint]
-	for startIndex := range possibleWinsWays {
-		flag := true
-		for index := startIndex; index < startIndex+board.WinSize; index++ {
-			if row[index] != moveType {
-				flag = false
+	for _, dir := range directions {
+		// Start at 1 to count the piece just played at (r, c)
+		count := 1
+
+		// Check in one direction (e.g., down-right)
+		for i := 1; i < board.WinSize; i++ {
+			nr, nc := r+(dir[0]*i), c+(dir[1]*i)
+			if nr >= 0 && nr < board.MaxCellSize && nc >= 0 && nc < board.MaxCellSize && board.Board[nr][nc] == moveType {
+				count++
+			} else {
 				break
 			}
 		}
-		if flag {
+
+		// Check in the opposite direction (e.g., up-left)
+		for i := 1; i < board.WinSize; i++ {
+			nr, nc := r-(dir[0]*i), c-(dir[1]*i)
+			if nr >= 0 && nr < board.MaxCellSize && nc >= 0 && nc < board.MaxCellSize && board.Board[nr][nc] == moveType {
+				count++
+			} else {
+				break
+			}
+		}
+
+		// If the total count on this axis meets the win condition, we have a winner
+		if count >= board.WinSize {
 			return true
 		}
 	}
 
-	// check coulom
-	for startIndex := range possibleWinsWays {
-		flag := true
-		for index := startIndex; index < startIndex+board.WinSize; index++ {
-			if board.Board[index][cint] != moveType {
-				flag = false
-				break
-			}
-		}
-		if flag {
-			return true
-		}
-	}
-
-	// check diagonal
-	for startIndex := range possibleWinsWays {
-		flag := true
-		for index := startIndex; index < startIndex+board.WinSize; index++ {
-			if board.Board[index][index] != moveType {
-				flag = false
-				break
-			}
-		}
-		if flag {
-			return true
-		}
-	}
-
-	// check anti-diagonal
-	for startIndex := range possibleWinsWays {
-		flag := true
-		for index := startIndex; index < startIndex+board.WinSize; index++ {
-			if board.Board[index][board.MaxCellSize-1-index] != moveType {
-				flag = false
-				break
-			}
-		}
-		if flag {
-			return true
-		}
-	}
-
+	// No winning line was found
 	return false
 }
-
-//	func (board *TicBoard) HasWon() bool {
-//		// Check for a win in each row
-//		for i := range 3 {
-//			if board.Board[i][0] != Empty && board.Board[i][0] == board.Board[i][1] && board.Board[i][1] == board.Board[i][2] {
-//				return true
-//			}
-//		}
-//
-//		// Check for a win in each column
-//		for i := range 3 {
-//			if board.Board[0][i] != Empty && board.Board[0][i] == board.Board[1][i] && board.Board[1][i] == board.Board[2][i] {
-//				return true
-//			}
-//		}
-//
-//		// Check for a win on the main diagonal (top-left to bottom-right)
-//		if board.Board[0][0] != Empty && board.Board[0][0] == board.Board[1][1] && board.Board[1][1] == board.Board[2][2] {
-//			return true
-//		}
-//
-//		// Check for a win on the anti-diagonal (top-right to bottom-left)
-//		if board.Board[0][2] != Empty && board.Board[0][2] == board.Board[1][1] && board.Board[1][1] == board.Board[2][0] {
-//			return true
-//		}
-//
-//		// If no winning condition is met, return false
-//		return false
-//	}
 func (board *TicBoard) IsAnyCellEmpty() bool {
 	for _, row := range board.Board {
 		for _, cell := range row {

@@ -59,7 +59,9 @@ func (g *DotBoxGame) SendJoinPanel(c telebot.Context) error {
 	inlineKeyboard := keybul.CreateInlineKeyboard(
 		keybul.JoinGameKeyboard(gametype.DotBoxGameType),
 	)
-	text := DotBoxStartText + "\n\n" + g.RulesText() + "\n\n🕹 بازیکن " + fmt.Sprintf("%s", sender.FirstName) + " منتظر حریفه"
+	text := DotBoxStartText + "\n\n" + g.RulesText() + "\n\n🕹 بازیکن " +
+		g.Players[0].Name + " منتظر حریفه"
+
 	return keybul.EditGameMessage(c.Bot(), g, text, inlineKeyboard)
 }
 
@@ -218,7 +220,7 @@ func (game *DotBoxGame) PlayHandler(c telebot.Context) error {
 		if game.PlayerOnScore != game.PlayerTwoScore {
 			winnerPlayer := game.Players[0]
 			if game.PlayerTwoScore > game.PlayerOnScore {
-				winnerPlayer = game.Players[0]
+				winnerPlayer = game.Players[1]
 			}
 			text = "\n🏆برنده بازی:*" + winnerPlayer.Name + "*"
 		} else {

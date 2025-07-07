@@ -2,10 +2,34 @@ package keybul
 
 import (
 	"errors"
+	"strings"
 
 	gametype "github.com/arian-nj/chibazi/internals/game_type"
 	"gopkg.in/telebot.v4"
 )
+
+func EscapeReserved(text string) string {
+	replacer := strings.NewReplacer(
+		"_", `\_`,
+		"[", `\[`,
+		"]", `\]`,
+		"(", `\(`,
+		")", `\)`,
+		"~", `\~`,
+		"`", "\\`", // The backslash needs to be escaped in a Go string literal
+		">", `\>`,
+		"#", `\#`,
+		"+", `\+`,
+		"-", `\-`,
+		"=", `\=`,
+		"|", `\|`,
+		"{", `\{`,
+		"}", `\}`,
+		".", `\.`,
+		"!", `\!`,
+	)
+	return replacer.Replace(text)
+}
 
 func EditGameMessage(bot telebot.API, msg telebot.Editable, text string, keyboard *telebot.ReplyMarkup) error {
 	_, err := bot.Edit(msg, text, keyboard, telebot.ModeMarkdownV2)

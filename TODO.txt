@@ -29,6 +29,8 @@
 [X] add win basic text rule to 5x5 and 3x3 XO Game
 [X] does loging played games still works? no. now works
 [X] clear game when ends
+[X] escape
+[ ] 5X5 not detect all diafnosal
 
 # 0.3.x Get Them in but
 # 0.3.0 Welcome Keyboard
