@@ -1,11 +1,14 @@
 package dotbox_console
 
 import (
+	"context"
 	"fmt"
 	"strconv"
 	"strings"
 	"time"
 
+	"github.com/arian-nj/chibazi/database"
+	commonapp "github.com/arian-nj/chibazi/internals/common_app"
 	dotbox "github.com/arian-nj/chibazi/internals/dot_box"
 	gametype "github.com/arian-nj/chibazi/internals/game_type"
 	keybul "github.com/arian-nj/chibazi/internals/keybul"
@@ -34,13 +37,15 @@ type DotBoxGame struct { // of GameInterface type
 	PlayerTwoScore     int
 
 	CreatedAt time.Time
+	common    *commonapp.CommonApp
 }
 
-func NewDotBoxGame() *DotBoxGame {
+func NewDotBoxGame(common *commonapp.CommonApp) *DotBoxGame {
 	return &DotBoxGame{
 		DotBoxBoard: dotbox.NewDotBoard(),
 		Players:     []*Player{},
 		CreatedAt:   time.Now(),
+		common:      common,
 	}
 }
 
@@ -77,13 +82,21 @@ func (game *DotBoxGame) StartGame(c telebot.Context) error {
 	randIndex := random.GenerateRandomNumber(2)
 	game.CurrentPlayerIndex = randIndex
 
-	return keybul.EditGameMessage(c.Bot(), game, DotBoxStartText,
+	err := keybul.EditGameMessage(c.Bot(), game, DotBoxStartText+"\n\n"+game.RulesText(),
 		keybul.CreateInlineKeyboard(
 			keybul.CreateBotNameInlineButton(),
 			CreateDotBoxInlineButton(game.DotBoxBoard),
 			game.CreatePlayersInlineButton(game.Players, game.CurrentPlayerIndex),
 		),
 	)
+	if err != nil {
+		return err
+	}
+	_, err = game.common.Queries.CreateHub(context.Background(), database.CreateHubParams{
+		GameType: string(gametype.DotBoxGameType),
+		TgID:     game.Players[0].TgID,
+	})
+	return err
 }
 
 func getSymbol(r, c int) string {
@@ -221,7 +234,7 @@ func (game *DotBoxGame) PlayHandler(c telebot.Context) error {
 		)
 
 	}
-	return keybul.EditGameMessage(c.Bot(), game, DotBoxStartText+"\n"+game.CreateBoardAsEmoji(), keybul.CreateInlineKeyboard(
+	return keybul.EditGameMessage(c.Bot(), game, DotBoxStartText+"\n\n"+game.RulesText()+"\n"+game.CreateBoardAsEmoji(), keybul.CreateInlineKeyboard(
 		keybul.CreateBotNameInlineButton(),
 		CreateDotBoxInlineButton(game.DotBoxBoard),
 		game.CreatePlayersInlineButton(game.Players, game.CurrentPlayerIndex),
@@ -277,4 +290,12 @@ func (game *DotBoxGame) CreatePlayersInlineButton(humanPlayers []*Player, Curren
 	}
 
 	return buttons
+}
+
+func (game *DotBoxGame) RulesText() string {
+	text := ""
+	text += "هر دکمه گوشه یک مربعه\n"
+	text += "هر مربعی که کامل کنی یک امتیاز میگیری\n"
+	text += "اگه امتیاز بگیری نوبتت نمیگذره"
+	return text
 }

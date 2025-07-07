@@ -16,17 +16,17 @@ func (app *Application) callbackRouter(c telebot.Context) error {
 	if after, has_prefix := strings.CutPrefix(callback.Data, string(gametype.XOGameType3X3)+"_"); has_prefix {
 		xoGame, has_game := app.Lobby.XOGames[messageId]
 		if has_game {
-			xoGame.XOCallbackHandlers(c, after)
+			return xoGame.XOCallbackHandlers(c, after)
 		}
 	} else if after, has_prefix := strings.CutPrefix(callback.Data, string(gametype.XOGameType5X5)+"_"); has_prefix {
 		xoGame, has_game := app.Lobby.XOGames[messageId]
 		if has_game {
-			xoGame.XOCallbackHandlers(c, after)
+			return xoGame.XOCallbackHandlers(c, after)
 		}
 	} else if after, has_prefix := strings.CutPrefix(callback.Data, string(gametype.DotBoxGameType)+"_"); has_prefix {
 		dotBoxGame, has_game := app.Lobby.DotBox[messageId]
 		if has_game {
-			dotBoxGame.CallbackHandlers(c, after)
+			return dotBoxGame.CallbackHandlers(c, after)
 		}
 	}
 	return nil
@@ -38,19 +38,19 @@ func (app *Application) inlineResultFeedbackHandler(c telebot.Context) error {
 
 	switch gametype.GameType(resultId) {
 	case gametype.XOGameType3X3:
-		newXOGame := xoconsole.NewXOGame(gametype.XOGameType3X3)
+		newXOGame := xoconsole.NewXOGame(gametype.XOGameType3X3, app.CommonApp)
 		app.Lobby.XOGames[messageID] = newXOGame
 		newXOGame.MessageId = messageID
 		return newXOGame.SendJoinPanel(c)
 
 	case gametype.XOGameType5X5:
-		newXOGame := xoconsole.NewXOGame(gametype.XOGameType5X5)
+		newXOGame := xoconsole.NewXOGame(gametype.XOGameType5X5, app.CommonApp)
 		app.Lobby.XOGames[messageID] = newXOGame
 		newXOGame.MessageId = messageID
 		return newXOGame.SendJoinPanel(c)
 
 	case gametype.DotBoxGameType:
-		newDotbox := dotbox_console.NewDotBoxGame()
+		newDotbox := dotbox_console.NewDotBoxGame(app.CommonApp)
 		app.Lobby.DotBox[messageID] = newDotbox
 		newDotbox.MessageId = messageID
 		return newDotbox.SendJoinPanel(c)

@@ -65,21 +65,28 @@ func RunBot(commonapp *commonapp.CommonApp, ctx context.Context) {
 	b.Handle("/start", app.welcomeHandler)
 	b.Handle("/stat", app.statHandler)
 
-	// go app.ClearDeadGamesCron()
+	go app.ClearDeadGamesCron()
 	b.Start()
 }
 
-// func (app *Application) ClearDeadGamesCron() {
-// 	for {
-// 		nowTime := time.Now()
-// 		for key, hub := range app.Lobby.Hubs {
-// 			if nowTime.Sub(hub.CreatedAt) > 30*time.Minute {
-// 				delete(app.Lobby.Hubs, key)
-// 			}
-// 		}
-// 		time.Sleep(1 * time.Minute)
-// 	}
-// }
+func (app *Application) ClearDeadGamesCron() {
+	for {
+		ExpireTime := 15 * time.Minute
+		nowTime := time.Now()
+		for key, hub := range app.Lobby.XOGames {
+			if nowTime.Sub(hub.CreatedAt) > ExpireTime {
+				delete(app.Lobby.XOGames, key)
+			}
+		}
+		for key, hub := range app.Lobby.DotBox {
+			if nowTime.Sub(hub.CreatedAt) > ExpireTime {
+				delete(app.Lobby.XOGames, key)
+			}
+		}
+
+		time.Sleep(1 * time.Minute)
+	}
+}
 
 func (app *Application) addUserMiddleware(next telebot.HandlerFunc) telebot.HandlerFunc {
 	return func(c telebot.Context) error {

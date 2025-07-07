@@ -1,11 +1,14 @@
 package xoconsole
 
 import (
+	"context"
 	"fmt"
 	"strconv"
 	"strings"
 	"time"
 
+	"github.com/arian-nj/chibazi/database"
+	commonapp "github.com/arian-nj/chibazi/internals/common_app"
 	gametype "github.com/arian-nj/chibazi/internals/game_type"
 	keybul "github.com/arian-nj/chibazi/internals/keybul"
 	"github.com/arian-nj/chibazi/internals/random"
@@ -39,16 +42,18 @@ func newPlayer(name string, tgID int) *Player {
 }
 
 type XOGame struct { // of GameInterface type
-	TicBoard           *tictactoe.TicBoard
+	XOBoard            *tictactoe.TicBoard
 	CurrentPlayerIndex int
 	Players            []*Player
 	MessageId          string
 	GameType           gametype.GameType
 
+	common *commonapp.CommonApp
+
 	CreatedAt time.Time
 }
 
-func NewXOGame(gt gametype.GameType) *XOGame {
+func NewXOGame(gt gametype.GameType, common *commonapp.CommonApp) *XOGame {
 	maxBoardSize := 3
 	winSize := 3
 	if gt == gametype.XOGameType5X5 {
@@ -57,12 +62,13 @@ func NewXOGame(gt gametype.GameType) *XOGame {
 	}
 
 	return &XOGame{
-		TicBoard: tictactoe.NewTicBoard(maxBoardSize, winSize),
-		Players:  []*Player{},
+		XOBoard: tictactoe.NewTicBoard(maxBoardSize, winSize),
+		Players: []*Player{},
 
 		GameType: gt,
 
 		CreatedAt: time.Now(),
+		common:    common,
 	}
 }
 
@@ -96,17 +102,21 @@ func (game *XOGame) StartGame(c telebot.Context) error {
 	randIndex := random.GenerateRandomNumber(2)
 	game.CurrentPlayerIndex = randIndex
 
-	_, err := c.Bot().Edit(game, XOStartText, telebot.ModeMarkdownV2,
+	err := keybul.EditGameMessage(c.Bot(), game, XOStartText+"\n\n"+game.RulesText(),
 		keybul.CreateInlineKeyboard(
 			keybul.CreateBotNameInlineButton(),
-			CreateTicBoardInlineButton(game.TicBoard),
+			CreateTicBoardInlineButton(game.XOBoard),
 			game.CreatePlayersInlineButton(game.Players, game.CurrentPlayerIndex),
 		),
 	)
 	if err != nil {
 		return fmt.Errorf("error when starting xo game %w", err)
 	}
-	return nil
+	_, err = game.common.Queries.CreateHub(context.Background(), database.CreateHubParams{
+		GameType: string(game.GameType),
+		TgID:     game.Players[0].TgID,
+	})
+	return err
 }
 
 func (game *XOGame) XOCallbackHandlers(c telebot.Context, callbackData string) error {
@@ -159,11 +169,11 @@ func (game *XOGame) XOPlayHandler(c telebot.Context, callbackData string) error 
 		moveType = tictactoe.O
 	}
 
-	isValid, errMsg := game.TicBoard.PlayMove(rint, cint, moveType)
+	isValid, errMsg := game.XOBoard.PlayMove(rint, cint, moveType)
 	if !isValid {
 		return c.RespondText(errMsg)
 	}
-	hasWon := game.TicBoard.HasWon(rint, cint, moveType)
+	hasWon := game.XOBoard.HasWon(rint, cint, moveType)
 	if hasWon {
 		text := game.EndGameText() + "\n🏆برنده بازی:*" + game.Players[game.CurrentPlayerIndex].Name + "*"
 		_, err := c.Bot().Edit(game, text, telebot.ModeMarkdownV2,
@@ -175,11 +185,12 @@ func (game *XOGame) XOPlayHandler(c telebot.Context, callbackData string) error 
 
 		return err
 	}
-	if !game.TicBoard.IsAnyCellEmpty() {
+	if !game.XOBoard.IsAnyCellEmpty() {
 		text := game.EndGameText() + "\nبازی مساوی شد"
 
 		_, err := c.Bot().Edit(game, text, telebot.ModeMarkdownV2,
 			keybul.CreateInlineKeyboard(
+				keybul.CreateBotNameInlineButton(),
 				keybul.CreateBotNameInlineButton(),
 				keybul.EndgameInlineKeyboard,
 			),
@@ -189,10 +200,10 @@ func (game *XOGame) XOPlayHandler(c telebot.Context, callbackData string) error 
 	}
 	game.NextPlayer()
 
-	_, err := c.Bot().Edit(game, XOStartText, telebot.ModeMarkdownV2,
+	_, err := c.Bot().Edit(game, XOStartText+"\n\n"+game.RulesText(), telebot.ModeMarkdownV2,
 		keybul.CreateInlineKeyboard(
 			keybul.CreateBotNameInlineButton(),
-			CreateTicBoardInlineButton(game.TicBoard),
+			CreateTicBoardInlineButton(game.XOBoard),
 			game.CreatePlayersInlineButton(game.Players, game.CurrentPlayerIndex),
 		),
 	)
@@ -207,7 +218,7 @@ func (game *XOGame) EndGameText() string {
 
 func (game *XOGame) CreateBoardAsEmoji() string {
 	text := ""
-	for _, row := range game.TicBoard.Board {
+	for _, row := range game.XOBoard.Board {
 		for _, cell := range row {
 			if cell == tictactoe.Empty {
 				text += EmptyEmoji
@@ -274,4 +285,12 @@ func (game *XOGame) CreatePlayersInlineButton(humanPlayers []*Player, CurrentPla
 	}
 
 	return buttons
+}
+
+func (game *XOGame) RulesText() string {
+	text := ""
+	// text += "قوانین:\د"
+	text += fmt.Sprintf("❕اندازه *%dX%d*\n", game.XOBoard.MaxCellSize, game.XOBoard.MaxCellSize)
+	text += fmt.Sprintf("⚠️با یه خط *%d تایی* برنده ای", game.XOBoard.WinSize)
+	return text
 }
