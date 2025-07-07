@@ -39,7 +39,7 @@ func (game *DotLineGame) SendJoinPanel(c telebot.Context) error {
 	messageId := c.InlineResult().MessageID
 	game.MessageID = messageId
 
-	textMessage := "web line dot game " + "\n\n🕹 بازیکن " + fmt.Sprintf("[%s](tg://user?id=%d)", sender.FirstName, sender.ID) + " منتظر حریفه"
+	textMessage := "web line dot game " + "\n\n🕹 بازیکن " + fmt.Sprintf("%s", sender.FirstName) + " منتظر حریفه"
 	game.Players = append(game.Players, NewPlayer(int(sender.ID)))
 	_, err := c.Bot().Edit(game, textMessage, game.JoinGameKeyboard(), telebot.ModeMarkdownV2)
 

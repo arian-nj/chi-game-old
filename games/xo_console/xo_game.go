@@ -78,7 +78,7 @@ func (g *XOGame) SendJoinPanel(c telebot.Context) error {
 	inlineKeyboard := keybul.CreateInlineKeyboard(
 		keybul.JoinGameKeyboard(g.GameType),
 	)
-	text := XOStartText + "\n\n" + g.RulesText() + "\n\n🕹 بازیکن " + fmt.Sprintf("[%s](tg://user?id=%d)", sender.FirstName, sender.ID) + " منتظر حریفه"
+	text := XOStartText + "\n\n" + g.RulesText() + "\n\n🕹 بازیکن " + fmt.Sprintf("%s", sender.FirstName) + " منتظر حریفه"
 	return keybul.EditGameMessage(c.Bot(), g, text, inlineKeyboard)
 }
 
@@ -278,7 +278,8 @@ func (game *XOGame) CreatePlayersInlineButton(humanPlayers []*Player, CurrentPla
 		row := make([]telebot.InlineButton, 2)
 		row = append(row, telebot.InlineButton{
 			Text: fmt.Sprintf("%s %s (%s)", yourTurn, name, playEmoji),
-			URL:  fmt.Sprintf("tg://user?id=%d", hplayer.TgID),
+			// URL:  fmt.Sprintf("tg://user?id=%d", hplayer.TgID),
+			Data: "_",
 		})
 		buttons = append(buttons, row)
 	}

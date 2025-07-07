@@ -29,7 +29,7 @@ func (app *Application) callbackRouter(c telebot.Context) error {
 			return dotBoxGame.CallbackHandlers(c, after)
 		}
 	}
-	return nil
+	return c.RespondText("هیچی")
 }
 
 func (app *Application) inlineResultFeedbackHandler(c telebot.Context) error {

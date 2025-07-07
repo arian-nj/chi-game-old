@@ -59,7 +59,7 @@ func (g *DotBoxGame) SendJoinPanel(c telebot.Context) error {
 	inlineKeyboard := keybul.CreateInlineKeyboard(
 		keybul.JoinGameKeyboard(gametype.DotBoxGameType),
 	)
-	text := DotBoxStartText + "\n\n" + g.RulesText() + "\n\n🕹 بازیکن " + fmt.Sprintf("[%s](tg://user?id=%d)", sender.FirstName, sender.ID) + " منتظر حریفه"
+	text := DotBoxStartText + "\n\n" + g.RulesText() + "\n\n🕹 بازیکن " + fmt.Sprintf("%s", sender.FirstName) + " منتظر حریفه"
 	return keybul.EditGameMessage(c.Bot(), g, text, inlineKeyboard)
 }
 
@@ -284,7 +284,8 @@ func (game *DotBoxGame) CreatePlayersInlineButton(humanPlayers []*Player, Curren
 		row := make([]telebot.InlineButton, 2)
 		row = append(row, telebot.InlineButton{
 			Text: fmt.Sprintf("%s %s (%s)", yourTurn, name, score),
-			URL:  fmt.Sprintf("tg://user?id=%d", hplayer.TgID),
+			// URL:  fmt.Sprintf("tg://user?id=%d", hplayer.TgID),
+			Data: "_",
 		})
 		buttons = append(buttons, row)
 	}
