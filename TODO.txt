@@ -12,7 +12,6 @@
 [X] count hub games
 [X] very basic statistics
 [X] limit name lenght
-[ ] check admin for /stat
 
 [X] make hub game more seperate
 [X] line dot game panel
@@ -30,11 +29,25 @@
 [X] does loging played games still works? no. now works
 [X] clear game when ends
 [X] escape
-[ ] 5X5 not detect all diafnosal
+[X] 5X5 not detect all diagonals
 
-# 0.3.x Get Them in but
-# 0.3.0 Welcome Keyboard
--
+[] 0.3.x Get Them in but
+	[ ] 0.3.0 Welcome Keyboard
+	[ ] 0.3.1 random opponent game
+	[ ] 0.3.2 in bot game chat
+	[ ] 0.3.3 off/on chat
+
+# 0.4.0
+# XO ai to fake player
+
+[ ] 0.5.0 statistics
+	[ ] check admin for /stat
+	[ ] add user stat
+	[ ] seperate game stats
+
+# 0.6.0 connect four
+
+
 
 [X] make api base
 [X] make front base embed in go

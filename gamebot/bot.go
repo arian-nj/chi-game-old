@@ -64,6 +64,8 @@ func RunBot(commonapp *commonapp.CommonApp, ctx context.Context) {
 	b.Handle(telebot.OnText, app.welcomeHandler)
 	b.Handle("/start", app.welcomeHandler)
 	b.Handle("/stat", app.statHandler)
+	b.Handle(PlayWithFriendsButtonText, app.PlayWithFriendsHandler)
+	b.Handle(PlayWithRandomPlayerText, app.PlayWithRandomPlayerHandler)
 
 	go app.ClearDeadGamesCron()
 	b.Start()
@@ -105,3 +107,8 @@ func (app *Application) addUserMiddleware(next telebot.HandlerFunc) telebot.Hand
 		return next(c)
 	}
 }
+
+const (
+	PlayWithFriendsButtonText = "🎮 بازی تو پیوی یا گروه🫂"
+	PlayWithRandomPlayerText  = "🎲 بازی با ناشناس 🕹"
+)

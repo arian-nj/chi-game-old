@@ -80,8 +80,30 @@ func (app *Application) statHandler(c telebot.Context) error {
 	return nil
 }
 
+func (app *Application) welcomeHandler(c telebot.Context) error {
+	return c.Send(
+		`خوش اومدید 👋`, welcomeReplyKeyboard)
+}
+
 var (
-	welcomeInlinequery = &telebot.ReplyMarkup{
+	welcomeReplyKeyboard = &telebot.ReplyMarkup{
+		ReplyKeyboard: [][]telebot.ReplyButton{
+			{
+				{Text: PlayWithFriendsButtonText},
+				{Text: PlayWithRandomPlayerText},
+			},
+		},
+		ResizeKeyboard: true,
+	}
+)
+
+func (app *Application) PlayWithFriendsHandler(c telebot.Context) error {
+	return c.Send(
+		`دکمه بازی با دوستان رو بزن تا تو هر چت یا گروهی با دوستات بازی کنی`, playWithFriendsInline)
+}
+
+var (
+	playWithFriendsInline = &telebot.ReplyMarkup{
 		InlineKeyboard: [][]telebot.InlineButton{
 			{
 				{
@@ -93,9 +115,6 @@ var (
 	}
 )
 
-func (app *Application) welcomeHandler(c telebot.Context) error {
-	return c.Send(
-		`خوش اومدید 👋
-دکمه بازی با دوستان رو بزن تا تو هر چت یا گروهی با دوستات بازی کنی
-	`, welcomeInlinequery)
+func (app *Application) PlayWithRandomPlayerHandler(c telebot.Context) error {
+	return c.Send("بزودی ...")
 }
