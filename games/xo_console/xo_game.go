@@ -78,7 +78,7 @@ func (g *XOGame) SendJoinPanel(c telebot.Context) error {
 	inlineKeyboard := keybul.CreateInlineKeyboard(
 		keybul.JoinGameKeyboard(g.GameType),
 	)
-	text := XOStartText + "\n\n🕹 بازیکن " + fmt.Sprintf("[%s](tg://user?id=%d)", sender.FirstName, sender.ID) + " منتظر حریفه"
+	text := XOStartText + "\n\n" + g.RulesText() + "\n\n🕹 بازیکن " + fmt.Sprintf("[%s](tg://user?id=%d)", sender.FirstName, sender.ID) + " منتظر حریفه"
 	return keybul.EditGameMessage(c.Bot(), g, text, inlineKeyboard)
 }
 
@@ -190,7 +190,6 @@ func (game *XOGame) XOPlayHandler(c telebot.Context, callbackData string) error 
 
 		_, err := c.Bot().Edit(game, text, telebot.ModeMarkdownV2,
 			keybul.CreateInlineKeyboard(
-				keybul.CreateBotNameInlineButton(),
 				keybul.CreateBotNameInlineButton(),
 				keybul.EndgameInlineKeyboard,
 			),
