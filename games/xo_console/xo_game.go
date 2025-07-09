@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/arian-nj/chibazi/database"
+	consoleplayer "github.com/arian-nj/chibazi/internals/console_player"
 	gametype "github.com/arian-nj/chibazi/internals/game_type"
 	keybul "github.com/arian-nj/chibazi/internals/keybul"
 	"github.com/arian-nj/chibazi/internals/random"
@@ -29,32 +30,10 @@ const (
 	یک سطر یا ستون یا قطر رو با علامتت پر کن`
 )
 
-type Player struct {
-	TgID int
-	Name string
-
-	MessageID int
-}
-
-func NewPlayer(name string, tgID int) *Player {
-	return &Player{
-		Name: keybul.EscapeReserved(name),
-		TgID: tgID,
-	}
-}
-
-func (p *Player) SetMessageSig(messageID int) *Player {
-	p.MessageID = messageID
-	return p
-}
-func (p *Player) MessageSig() (string, int64) {
-	return strconv.Itoa(p.MessageID), int64(p.TgID)
-}
-
 type XOGame struct { // of GameInterface type
 	XOBoard            *tictactoe.TicBoard
 	CurrentPlayerIndex int
-	Players            []*Player
+	Players            []*consoleplayer.ConsolePlayer
 	GameType           gametype.GameType
 
 	ViaMessageId string // Via Bots
@@ -75,7 +54,7 @@ func NewXOGame(gt gametype.GameType, queries *database.Queries) *XOGame {
 
 	return &XOGame{
 		XOBoard:            tictactoe.NewTicBoard(maxBoardSize, winSize),
-		Players:            []*Player{},
+		Players:            []*consoleplayer.ConsolePlayer{},
 		CurrentPlayerIndex: randIndex,
 
 		GameType:  gt,
@@ -86,7 +65,7 @@ func NewXOGame(gt gametype.GameType, queries *database.Queries) *XOGame {
 
 func (g *XOGame) SendJoinPanel(c telebot.Context) error {
 	sender := c.Sender()
-	g.AddPlayer(NewPlayer(sender.FirstName, int(sender.ID)))
+	g.AddPlayer(consoleplayer.NewPlayer(sender.FirstName, int(sender.ID)))
 	inlineKeyboard := keybul.CreateInlineKeyboard(
 		keybul.JoinGameKeyboard(g.GameType),
 	)
@@ -106,7 +85,7 @@ func (g *XOGame) MessageSig() (string, int64) {
 	return g.ViaMessageId, 0
 }
 
-func (g *XOGame) AddPlayer(player *Player) {
+func (g *XOGame) AddPlayer(player *consoleplayer.ConsolePlayer) {
 	g.Players = append(g.Players, player)
 }
 
@@ -144,7 +123,7 @@ func (g *XOGame) XOJoinGameHandler(c telebot.Context, callbackData string) error
 		text := "خودت بازیو ساختی تو بازی هستی"
 		return c.RespondText(text)
 	}
-	g.AddPlayer(NewPlayer(sender.FirstName, int(sender.ID)))
+	g.AddPlayer(consoleplayer.NewPlayer(sender.FirstName, int(sender.ID)))
 	text := "اضافه شدی بازی شروع شد"
 	err := c.RespondText(text)
 	if err != nil {
@@ -267,7 +246,7 @@ func CreateTicBoardInlineButton(board *tictactoe.TicBoard) [][]telebot.InlineBut
 	return buttons
 }
 
-func (g *XOGame) CreatePlayersInlineButton(humanPlayers []*Player, CurrentPlayerTurn int) [][]telebot.InlineButton {
+func (g *XOGame) CreatePlayersInlineButton(humanPlayers []*consoleplayer.ConsolePlayer, CurrentPlayerTurn int) [][]telebot.InlineButton {
 	buttons := make([][]telebot.InlineButton, 0)
 	for index, hplayer := range humanPlayers {
 

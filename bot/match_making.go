@@ -1,10 +1,11 @@
-package gamebot
+package bot
 
 import (
 	"log/slog"
 	"strconv"
 
 	xoconsole "github.com/arian-nj/chibazi/games/xo_console"
+	consoleplayer "github.com/arian-nj/chibazi/internals/console_player"
 	gametype "github.com/arian-nj/chibazi/internals/game_type"
 	matchmaking "github.com/arian-nj/chibazi/internals/match_making"
 	"gopkg.in/telebot.v4"
@@ -26,10 +27,11 @@ func (app *Application) MakeMatches() {
 }
 
 func (app *Application) createRandomGame(gameType gametype.GameType, tickets []*matchmaking.Ticket) {
+	playerOne := consoleplayer.NewPlayer(tickets[0].Name, tickets[0].UserID).SetMessageSig(tickets[0].MessageID)
+	playerTwo := consoleplayer.NewPlayer(tickets[1].Name, tickets[1].UserID).SetMessageSig(tickets[1].MessageID)
+
 	switch gameType {
 	case gametype.XOGameType3X3:
-		playerOne := xoconsole.NewPlayer(tickets[0].Name, tickets[0].UserID).SetMessageSig(tickets[0].MessageID)
-		playerTwo := xoconsole.NewPlayer(tickets[1].Name, tickets[1].UserID).SetMessageSig(tickets[1].MessageID)
 		newXOGame := xoconsole.NewXOGame(gametype.XOGameType3X3, app.Queries)
 		newXOGame.AddPlayer(playerOne)
 		newXOGame.AddPlayer(playerTwo)

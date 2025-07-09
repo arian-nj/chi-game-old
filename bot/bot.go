@@ -1,4 +1,4 @@
-package gamebot
+package bot
 
 import (
 	"context"

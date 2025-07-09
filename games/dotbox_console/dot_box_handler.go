@@ -28,12 +28,15 @@ func newPlayer(name string, tgID int) *Player {
 }
 
 type DotBoxGame struct { // of GameInterface type
-	DotBoxBoard        *dotbox.DotBoxBoard
+	DotBoxBoard *dotbox.DotBoxBoard
+
 	CurrentPlayerIndex int
 	Players            []*Player
-	MessageId          string
-	PlayerOnScore      int
-	PlayerTwoScore     int
+
+	PlayerOnScore  int
+	PlayerTwoScore int
+
+	MessageId string
 
 	CreatedAt time.Time
 	Queries   *database.Queries
@@ -99,52 +102,6 @@ func (g *DotBoxGame) StartGame(c telebot.Context) error {
 		TgID:     g.Players[0].TgID,
 	})
 	return err
-}
-
-func getSymbol(r, c int) string {
-
-	if r == 0 && c == dotbox.MaxCellSize-1 {
-		return "┐"
-	} else if r == 0 && c == 0 {
-		return "┌"
-	} else if r == dotbox.MaxCellSize-1 && c == 0 {
-		return "└"
-	} else if r == dotbox.MaxCellSize-1 && c == dotbox.MaxCellSize-1 {
-		return "┘"
-	}
-
-	if r == 0 {
-		return "┬"
-	} else if r == dotbox.MaxCellSize-1 {
-		return "┴"
-	} else if c == 0 {
-		return "├"
-	} else if c == dotbox.MaxCellSize-1 {
-		return "┤"
-	}
-
-	return "┿"
-}
-
-func CreateDotBoxInlineButton(board *dotbox.DotBoxBoard) [][]telebot.InlineButton {
-	buttons := [][]telebot.InlineButton{}
-
-	for r := range dotbox.MaxCellSize {
-		row := []telebot.InlineButton{}
-		for c := range dotbox.MaxCellSize {
-			value := " "
-			if board.Board[r][c] != dotbox.Empty {
-				value = getSymbol(r, c)
-			}
-			btn := telebot.InlineButton{
-				Text: value,
-				Data: string(gametype.DotBoxGameType) + "_play_" + strconv.Itoa(r) + strconv.Itoa(c),
-			}
-			row = append(row, btn)
-		}
-		buttons = append(buttons, row)
-	}
-	return buttons
 }
 
 func (g *DotBoxGame) CallbackHandlers(c telebot.Context, callbackData string) error {
@@ -244,6 +201,27 @@ func (g *DotBoxGame) PlayHandler(c telebot.Context) error {
 
 }
 
+func CreateDotBoxInlineButton(board *dotbox.DotBoxBoard) [][]telebot.InlineButton {
+	buttons := [][]telebot.InlineButton{}
+
+	for r := range dotbox.MaxCellSize {
+		row := []telebot.InlineButton{}
+		for c := range dotbox.MaxCellSize {
+			value := " "
+			if board.Board[r][c] != dotbox.Empty {
+				value = getSymbol(r, c)
+			}
+			btn := telebot.InlineButton{
+				Text: value,
+				Data: string(gametype.DotBoxGameType) + "_play_" + strconv.Itoa(r) + strconv.Itoa(c),
+			}
+			row = append(row, btn)
+		}
+		buttons = append(buttons, row)
+	}
+	return buttons
+}
+
 func (g *DotBoxGame) EndGameText() string {
 	return DotBoxStartText + "\nبازیکن ها:\n" + g.Players[0].Name + " " + strconv.Itoa(g.PlayerOnScore) + "\n" + g.Players[1].Name + " " + strconv.Itoa(g.PlayerTwoScore)
 }
@@ -261,6 +239,31 @@ func (g *DotBoxGame) CreateBoardAsEmoji() string {
 		text += "\n"
 	}
 	return text
+}
+
+func getSymbol(r, c int) string {
+
+	if r == 0 && c == dotbox.MaxCellSize-1 {
+		return "┐"
+	} else if r == 0 && c == 0 {
+		return "┌"
+	} else if r == dotbox.MaxCellSize-1 && c == 0 {
+		return "└"
+	} else if r == dotbox.MaxCellSize-1 && c == dotbox.MaxCellSize-1 {
+		return "┘"
+	}
+
+	if r == 0 {
+		return "┬"
+	} else if r == dotbox.MaxCellSize-1 {
+		return "┴"
+	} else if c == 0 {
+		return "├"
+	} else if c == dotbox.MaxCellSize-1 {
+		return "┤"
+	}
+
+	return "┿"
 }
 
 func (g *DotBoxGame) CreatePlayersInlineButton(humanPlayers []*Player, CurrentPlayerTurn int) [][]telebot.InlineButton {

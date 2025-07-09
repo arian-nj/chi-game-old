@@ -36,7 +36,7 @@
 	[X] 0.3.1 random opponent game
 	[] 0.3.2 in bot game chat
 	[] 0.3.3 off/on chat
-[] check for user multiple game
+[] handle duplicate requests
 [] cancel match making
 
 # 0.4.0
