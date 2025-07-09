@@ -8,7 +8,6 @@ import (
 	"time"
 
 	"github.com/arian-nj/chibazi/database"
-	commonapp "github.com/arian-nj/chibazi/internals/common_app"
 	dotbox "github.com/arian-nj/chibazi/internals/dot_box"
 	gametype "github.com/arian-nj/chibazi/internals/game_type"
 	keybul "github.com/arian-nj/chibazi/internals/keybul"
@@ -37,15 +36,16 @@ type DotBoxGame struct { // of GameInterface type
 	PlayerTwoScore     int
 
 	CreatedAt time.Time
-	common    *commonapp.CommonApp
+	Queries   *database.Queries
 }
 
-func NewDotBoxGame(common *commonapp.CommonApp) *DotBoxGame {
+func NewDotBoxGame(queries *database.Queries) *DotBoxGame {
 	return &DotBoxGame{
 		DotBoxBoard: dotbox.NewDotBoard(),
 		Players:     []*Player{},
 		CreatedAt:   time.Now(),
-		common:      common,
+
+		Queries: queries,
 	}
 }
 
@@ -62,7 +62,7 @@ func (g *DotBoxGame) SendJoinPanel(c telebot.Context) error {
 	text := DotBoxStartText + "\n\n" + g.RulesText() + "\n\n🕹 بازیکن " +
 		g.Players[0].Name + " منتظر حریفه"
 
-	return keybul.EditGameMessage(c.Bot(), g, text, inlineKeyboard)
+	return g.Edit(c.Bot(), g, text, inlineKeyboard)
 }
 
 func (g *DotBoxGame) NextPlayer() {
@@ -80,23 +80,23 @@ func (g *DotBoxGame) MessageSig() (string, int64) {
 func (g *DotBoxGame) addPlayer(player *Player) {
 	g.Players = append(g.Players, player)
 }
-func (game *DotBoxGame) StartGame(c telebot.Context) error {
+func (g *DotBoxGame) StartGame(c telebot.Context) error {
 	randIndex := random.GenerateRandomNumber(2)
-	game.CurrentPlayerIndex = randIndex
+	g.CurrentPlayerIndex = randIndex
 
-	err := keybul.EditGameMessage(c.Bot(), game, DotBoxStartText+"\n\n"+game.RulesText(),
+	err := g.Edit(c.Bot(), g, DotBoxStartText+"\n\n"+g.RulesText(),
 		keybul.CreateInlineKeyboard(
 			keybul.CreateBotNameInlineButton(),
-			CreateDotBoxInlineButton(game.DotBoxBoard),
-			game.CreatePlayersInlineButton(game.Players, game.CurrentPlayerIndex),
+			CreateDotBoxInlineButton(g.DotBoxBoard),
+			g.CreatePlayersInlineButton(g.Players, g.CurrentPlayerIndex),
 		),
 	)
 	if err != nil {
 		return err
 	}
-	_, err = game.common.Queries.CreateHub(context.Background(), database.CreateHubParams{
+	_, err = g.Queries.CreateHub(context.Background(), database.CreateHubParams{
 		GameType: string(gametype.DotBoxGameType),
-		TgID:     game.Players[0].TgID,
+		TgID:     g.Players[0].TgID,
 	})
 	return err
 }
@@ -147,29 +147,29 @@ func CreateDotBoxInlineButton(board *dotbox.DotBoxBoard) [][]telebot.InlineButto
 	return buttons
 }
 
-func (game *DotBoxGame) CallbackHandlers(c telebot.Context, callbackData string) error {
+func (g *DotBoxGame) CallbackHandlers(c telebot.Context, callbackData string) error {
 	if strings.HasPrefix(callbackData, "play_") {
-		return game.PlayHandler(c)
+		return g.PlayHandler(c)
 	} else if strings.HasPrefix(callbackData, "join") {
-		return game.JoinGameHandler(c, callbackData)
+		return g.JoinGameHandler(c, callbackData)
 	}
 	return nil
 }
-func (game *DotBoxGame) JoinGameHandler(c telebot.Context, callbackData string) error {
+func (g *DotBoxGame) JoinGameHandler(c telebot.Context, callbackData string) error {
 	sender := c.Callback().Sender
-	if sender.ID == int64(game.Players[0].TgID) {
+	if sender.ID == int64(g.Players[0].TgID) {
 		text := "خودت بازیو ساختی تو بازی هستی"
 		return c.RespondText(text)
 	}
-	game.addPlayer(newPlayer(sender.FirstName, int(sender.ID)))
+	g.addPlayer(newPlayer(sender.FirstName, int(sender.ID)))
 	text := "اضافه شدی بازی شروع شد"
 	err := c.RespondText(text)
 	if err != nil {
 		return err
 	}
-	return game.StartGame(c)
+	return g.StartGame(c)
 }
-func (game *DotBoxGame) PlayHandler(c telebot.Context) error {
+func (g *DotBoxGame) PlayHandler(c telebot.Context) error {
 	callback := c.Callback()
 	callbackData := strings.TrimPrefix(callback.Data, string(gametype.DotBoxGameType)+"_play_")
 
@@ -177,7 +177,7 @@ func (game *DotBoxGame) PlayHandler(c telebot.Context) error {
 		return fmt.Errorf("invalid ttt_play data")
 	}
 
-	if game.Players[game.CurrentPlayerIndex].TgID != int(callback.Sender.ID) {
+	if g.Players[g.CurrentPlayerIndex].TgID != int(callback.Sender.ID) {
 		return c.RespondText("نوبت تو نیست!")
 	}
 
@@ -190,21 +190,21 @@ func (game *DotBoxGame) PlayHandler(c telebot.Context) error {
 	}
 
 	moveType := dotbox.Empty
-	if game.CurrentPlayerIndex == 0 {
+	if g.CurrentPlayerIndex == 0 {
 		moveType = dotbox.Blue
 	} else {
 		moveType = dotbox.Red
 	}
-	isValid, errMsg, isScore := game.DotBoxBoard.PlayMove(rint, cint, moveType)
+	isValid, errMsg, isScore := g.DotBoxBoard.PlayMove(rint, cint, moveType)
 	if !isValid {
 		return c.RespondText(errMsg)
 	}
 
 	if isScore {
-		if game.CurrentPlayerIndex == 0 {
-			game.PlayerOnScore += 1
+		if g.CurrentPlayerIndex == 0 {
+			g.PlayerOnScore += 1
 		} else {
-			game.PlayerTwoScore += 2
+			g.PlayerTwoScore += 2
 		}
 
 		err := c.RespondText("امتیاز گرفتی بازم نوبتته")
@@ -212,15 +212,15 @@ func (game *DotBoxGame) PlayHandler(c telebot.Context) error {
 			return err
 		}
 	} else {
-		game.NextPlayer()
+		g.NextPlayer()
 	}
 
-	if !game.DotBoxBoard.HasEmptyCell() {
+	if !g.DotBoxBoard.HasEmptyCell() {
 		text := ""
-		if game.PlayerOnScore != game.PlayerTwoScore {
-			winnerPlayer := game.Players[0]
-			if game.PlayerTwoScore > game.PlayerOnScore {
-				winnerPlayer = game.Players[1]
+		if g.PlayerOnScore != g.PlayerTwoScore {
+			winnerPlayer := g.Players[0]
+			if g.PlayerTwoScore > g.PlayerOnScore {
+				winnerPlayer = g.Players[1]
 			}
 			text = "\n🏆برنده بازی:*" + winnerPlayer.Name + "*"
 		} else {
@@ -228,29 +228,29 @@ func (game *DotBoxGame) PlayHandler(c telebot.Context) error {
 
 		}
 
-		return keybul.EditGameMessage(c.Bot(), game, game.EndGameText()+text,
+		return g.Edit(c.Bot(), g, g.EndGameText()+text,
 			keybul.CreateInlineKeyboard(
 				keybul.CreateBotNameInlineButton(),
-				keybul.EndgameInlineKeyboard,
+				keybul.EndGameInlineKeyboard(true),
 			),
 		)
 
 	}
-	return keybul.EditGameMessage(c.Bot(), game, DotBoxStartText+"\n\n"+game.RulesText()+"\n"+game.CreateBoardAsEmoji(), keybul.CreateInlineKeyboard(
+	return g.Edit(c.Bot(), g, DotBoxStartText+"\n\n"+g.RulesText()+"\n"+g.CreateBoardAsEmoji(), keybul.CreateInlineKeyboard(
 		keybul.CreateBotNameInlineButton(),
-		CreateDotBoxInlineButton(game.DotBoxBoard),
-		game.CreatePlayersInlineButton(game.Players, game.CurrentPlayerIndex),
+		CreateDotBoxInlineButton(g.DotBoxBoard),
+		g.CreatePlayersInlineButton(g.Players, g.CurrentPlayerIndex),
 	))
 
 }
 
-func (game *DotBoxGame) EndGameText() string {
-	return DotBoxStartText + "\nبازیکن ها:\n" + game.Players[0].Name + " " + strconv.Itoa(game.PlayerOnScore) + "\n" + game.Players[1].Name + " " + strconv.Itoa(game.PlayerTwoScore)
+func (g *DotBoxGame) EndGameText() string {
+	return DotBoxStartText + "\nبازیکن ها:\n" + g.Players[0].Name + " " + strconv.Itoa(g.PlayerOnScore) + "\n" + g.Players[1].Name + " " + strconv.Itoa(g.PlayerTwoScore)
 }
 
-func (game *DotBoxGame) CreateBoardAsEmoji() string {
+func (g *DotBoxGame) CreateBoardAsEmoji() string {
 	text := ""
-	for r, row := range game.DotBoxBoard.Board {
+	for r, row := range g.DotBoxBoard.Board {
 		for c, cell := range row {
 			value := "⌾"
 			if cell != dotbox.Empty {
@@ -263,7 +263,7 @@ func (game *DotBoxGame) CreateBoardAsEmoji() string {
 	return text
 }
 
-func (game *DotBoxGame) CreatePlayersInlineButton(humanPlayers []*Player, CurrentPlayerTurn int) [][]telebot.InlineButton {
+func (g *DotBoxGame) CreatePlayersInlineButton(humanPlayers []*Player, CurrentPlayerTurn int) [][]telebot.InlineButton {
 	buttons := make([][]telebot.InlineButton, 0)
 	for index, hplayer := range humanPlayers {
 
@@ -273,9 +273,9 @@ func (game *DotBoxGame) CreatePlayersInlineButton(humanPlayers []*Player, Curren
 		}
 
 		// emoji := ""
-		score := fmt.Sprint(game.PlayerTwoScore)
+		score := fmt.Sprint(g.PlayerTwoScore)
 		if index == 0 {
-			score = fmt.Sprint(game.PlayerOnScore)
+			score = fmt.Sprint(g.PlayerOnScore)
 		}
 
 		name := hplayer.Name
@@ -295,10 +295,14 @@ func (game *DotBoxGame) CreatePlayersInlineButton(humanPlayers []*Player, Curren
 	return buttons
 }
 
-func (game *DotBoxGame) RulesText() string {
+func (g *DotBoxGame) RulesText() string {
 	text := ""
 	text += "هر دکمه گوشه یک مربعه\n"
 	text += "هر مربعی که کامل کنی یک امتیاز میگیری\n"
 	text += "اگه امتیاز بگیری نوبتت نمیگذره"
 	return text
+}
+
+func (g *DotBoxGame) Edit(bot telebot.API, msg telebot.Editable, text string, keyboard *telebot.ReplyMarkup) error {
+	return keybul.EditGameMessage(bot, msg, text, keyboard)
 }

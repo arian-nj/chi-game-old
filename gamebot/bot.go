@@ -4,33 +4,19 @@ import (
 	"context"
 	"time"
 
-	"github.com/arian-nj/chibazi/games/dotbox_console"
-	xoconsole "github.com/arian-nj/chibazi/games/xo_console"
 	commonapp "github.com/arian-nj/chibazi/internals/common_app"
-	"github.com/arian-nj/chibazi/linedot"
+
 	"golang.org/x/exp/slog"
 	"gopkg.in/telebot.v4"
 )
 
-type Lobby struct {
-	XOGames map[string]*xoconsole.XOGame
-	DotBox  map[string]*dotbox_console.DotBoxGame
-}
-
 type Application struct {
 	*commonapp.CommonApp
-	Lobby        *Lobby
-	DotLineGames map[string]*linedot.DotLineGame
 }
 
 func NewApplication(common *commonapp.CommonApp) *Application {
 	return &Application{
 		CommonApp: common,
-		Lobby: &Lobby{
-			XOGames: map[string]*xoconsole.XOGame{},
-			DotBox:  map[string]*dotbox_console.DotBoxGame{},
-		},
-		// DotLineGames: map[string]*linedot.DotLineGame{},
 	}
 }
 
@@ -64,16 +50,21 @@ func RunBot(commonapp *commonapp.CommonApp, ctx context.Context) {
 	b.Handle(telebot.OnText, app.welcomeHandler)
 	b.Handle("/start", app.welcomeHandler)
 	b.Handle("/stat", app.statHandler)
+
 	b.Handle(PlayWithFriendsButtonText, app.PlayWithFriendsHandler)
 	b.Handle(PlayWithRandomPlayerText, app.PlayWithRandomPlayerHandler)
 
+	b.Handle(Xo3x3ButtonText, app.PlayRandomXO3X3Handler)
+	b.Handle(Xo5x5ButtonText, app.PlayRandomXO5X5Handler)
+
 	go app.ClearDeadGamesCron()
+	go app.MakeMatches()
 	b.Start()
 }
 
 func (app *Application) ClearDeadGamesCron() {
 	for {
-		ExpireTime := 15 * time.Minute
+		ExpireTime := 2 * time.Minute
 		nowTime := time.Now()
 		for key, hub := range app.Lobby.XOGames {
 			if nowTime.Sub(hub.CreatedAt) > ExpireTime {
@@ -82,7 +73,7 @@ func (app *Application) ClearDeadGamesCron() {
 		}
 		for key, hub := range app.Lobby.DotBox {
 			if nowTime.Sub(hub.CreatedAt) > ExpireTime {
-				delete(app.Lobby.XOGames, key)
+				delete(app.Lobby.DotBox, key)
 			}
 		}
 
@@ -111,4 +102,13 @@ func (app *Application) addUserMiddleware(next telebot.HandlerFunc) telebot.Hand
 const (
 	PlayWithFriendsButtonText = "🎮 بازی تو پیوی یا گروه🫂"
 	PlayWithRandomPlayerText  = "🎲 بازی با ناشناس 🕹"
+)
+
+const (
+	Xo3x3ButtonText = "بازی دوز ۳ در ۳❌"
+	Xo5x5ButtonText = "بازی دوز ۵ در ۵⭕️"
+)
+
+const (
+	MainKeyboardButtonText = "صفحه اصلی🏠"
 )

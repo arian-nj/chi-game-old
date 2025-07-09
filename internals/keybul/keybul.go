@@ -83,10 +83,15 @@ func JoinGameKeyboard(game_type gametype.GameType) [][]telebot.InlineButton {
 		},
 	}
 }
-
-var EndgameInlineKeyboard = [][]telebot.InlineButton{
-	{
-		{Text: "🤝 بازی با دوستان", InlineQueryChosenChat: &telebot.SwitchInlineQuery{AllowUserChats: true, AllowGroupChats: true}},
-		{Text: "🔄 دوباره", InlineQuery: ""},
-	},
+func EndGameInlineKeyboard(isVia bool) [][]telebot.InlineButton {
+	if !isVia {
+		return [][]telebot.InlineButton{}
+	}
+	var EndgameInlineKeyboard = [][]telebot.InlineButton{
+		{
+			{Text: "🤝 بازی با دوستان", InlineQueryChosenChat: &telebot.SwitchInlineQuery{AllowUserChats: true, AllowGroupChats: true}},
+			{Text: "🔄 دوباره", InlineQuery: ""},
+		},
+	}
+	return EndgameInlineKeyboard
 }

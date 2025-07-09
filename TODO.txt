@@ -32,13 +32,16 @@
 [X] 5X5 not detect all diagonals
 
 [] 0.3.x Get Them in but
-	[ ] 0.3.0 Welcome Keyboard
-	[ ] 0.3.1 random opponent game
-	[ ] 0.3.2 in bot game chat
-	[ ] 0.3.3 off/on chat
+	[X] 0.3.0 Welcome Keyboard
+	[X] 0.3.1 random opponent game
+	[] 0.3.2 in bot game chat
+	[] 0.3.3 off/on chat
+[] check for user multiple game
+[] cancel match making
 
 # 0.4.0
-# XO ai to fake player
+[] XO ai
+[] play with ai on timeout
 
 [ ] 0.5.0 statistics
 	[ ] check admin for /stat

@@ -3,12 +3,12 @@ package xoconsole
 import (
 	"context"
 	"fmt"
+	"log/slog"
 	"strconv"
 	"strings"
 	"time"
 
 	"github.com/arian-nj/chibazi/database"
-	commonapp "github.com/arian-nj/chibazi/internals/common_app"
 	gametype "github.com/arian-nj/chibazi/internals/game_type"
 	keybul "github.com/arian-nj/chibazi/internals/keybul"
 	"github.com/arian-nj/chibazi/internals/random"
@@ -32,54 +32,66 @@ const (
 type Player struct {
 	TgID int
 	Name string
+
+	MessageID int
 }
 
-func newPlayer(name string, tgID int) *Player {
+func NewPlayer(name string, tgID int) *Player {
 	return &Player{
 		Name: keybul.EscapeReserved(name),
 		TgID: tgID,
 	}
 }
 
+func (p *Player) SetMessageSig(messageID int) *Player {
+	p.MessageID = messageID
+	return p
+}
+func (p *Player) MessageSig() (string, int64) {
+	return strconv.Itoa(p.MessageID), int64(p.TgID)
+}
+
 type XOGame struct { // of GameInterface type
 	XOBoard            *tictactoe.TicBoard
 	CurrentPlayerIndex int
 	Players            []*Player
-	MessageId          string
 	GameType           gametype.GameType
 
-	common *commonapp.CommonApp
+	ViaMessageId string // Via Bots
+
+	Queries *database.Queries
 
 	CreatedAt time.Time
 }
 
-func NewXOGame(gt gametype.GameType, common *commonapp.CommonApp) *XOGame {
+func NewXOGame(gt gametype.GameType, queries *database.Queries) *XOGame {
 	maxBoardSize := 3
 	winSize := 3
 	if gt == gametype.XOGameType5X5 {
 		maxBoardSize = 5
 		winSize = 4
 	}
+	randIndex := random.GenerateRandomNumber(2)
 
 	return &XOGame{
-		XOBoard: tictactoe.NewTicBoard(maxBoardSize, winSize),
-		Players: []*Player{},
+		XOBoard:            tictactoe.NewTicBoard(maxBoardSize, winSize),
+		Players:            []*Player{},
+		CurrentPlayerIndex: randIndex,
 
-		GameType: gt,
-
+		GameType:  gt,
+		Queries:   queries,
 		CreatedAt: time.Now(),
-		common:    common,
 	}
 }
 
 func (g *XOGame) SendJoinPanel(c telebot.Context) error {
 	sender := c.Sender()
-	g.addPlayer(newPlayer(sender.FirstName, int(sender.ID)))
+	g.AddPlayer(NewPlayer(sender.FirstName, int(sender.ID)))
 	inlineKeyboard := keybul.CreateInlineKeyboard(
 		keybul.JoinGameKeyboard(g.GameType),
 	)
 	text := XOStartText + "\n\n" + g.RulesText() + "\n\n🕹 بازیکن " + fmt.Sprintf("%s", keybul.EscapeReserved(sender.FirstName)) + " منتظر حریفه"
-	return keybul.EditGameMessage(c.Bot(), g, text, inlineKeyboard)
+	return g.Edit(c.Bot(), g, text, inlineKeyboard)
 }
 
 func (g *XOGame) NextPlayer() {
@@ -91,66 +103,63 @@ func (g *XOGame) NextPlayer() {
 }
 
 func (g *XOGame) MessageSig() (string, int64) {
-	return g.MessageId, 0
+	return g.ViaMessageId, 0
 }
 
-func (g *XOGame) addPlayer(player *Player) {
+func (g *XOGame) AddPlayer(player *Player) {
 	g.Players = append(g.Players, player)
 }
 
-func (game *XOGame) StartGame(c telebot.Context) error {
-	randIndex := random.GenerateRandomNumber(2)
-	game.CurrentPlayerIndex = randIndex
-
-	err := keybul.EditGameMessage(c.Bot(), game, XOStartText+"\n\n"+game.RulesText(),
+func (g *XOGame) StartGame(bot telebot.API) error {
+	err := g.Edit(bot, g, XOStartText+"\n\n"+g.RulesText(),
 		keybul.CreateInlineKeyboard(
 			keybul.CreateBotNameInlineButton(),
-			CreateTicBoardInlineButton(game.XOBoard),
-			game.CreatePlayersInlineButton(game.Players, game.CurrentPlayerIndex),
+			CreateTicBoardInlineButton(g.XOBoard),
+			g.CreatePlayersInlineButton(g.Players, g.CurrentPlayerIndex),
 		),
 	)
 	if err != nil {
 		return fmt.Errorf("error when starting xo game %w", err)
 	}
-	_, err = game.common.Queries.CreateHub(context.Background(), database.CreateHubParams{
-		GameType: string(game.GameType),
-		TgID:     game.Players[0].TgID,
+	_, err = g.Queries.CreateHub(context.Background(), database.CreateHubParams{
+		GameType: string(g.GameType),
+		TgID:     g.Players[0].TgID,
 	})
 	return err
 }
 
-func (game *XOGame) XOCallbackHandlers(c telebot.Context, callbackData string) error {
+func (g *XOGame) XOCallbackHandlers(c telebot.Context, callbackData string) error {
 	if after, hasPrefix := strings.CutPrefix(callbackData, "join"); hasPrefix {
-		return game.XOJoinGameHandler(c, after)
+		return g.XOJoinGameHandler(c, after)
 
 	} else if after, hasPrefix := strings.CutPrefix(callbackData, "play_"); hasPrefix {
-		return game.XOPlayHandler(c, after)
+		return g.XOPlayHandler(c, after)
 	}
 	return c.RespondAlert("no a valid callback")
 }
 
-func (game *XOGame) XOJoinGameHandler(c telebot.Context, callbackData string) error {
+func (g *XOGame) XOJoinGameHandler(c telebot.Context, callbackData string) error {
 	sender := c.Callback().Sender
-	if sender.ID == int64(game.Players[0].TgID) {
+	if sender.ID == int64(g.Players[0].TgID) {
 		text := "خودت بازیو ساختی تو بازی هستی"
 		return c.RespondText(text)
 	}
-	game.addPlayer(newPlayer(sender.FirstName, int(sender.ID)))
+	g.AddPlayer(NewPlayer(sender.FirstName, int(sender.ID)))
 	text := "اضافه شدی بازی شروع شد"
 	err := c.RespondText(text)
 	if err != nil {
 		return err
 	}
-	return game.StartGame(c)
+	return g.StartGame(c.Bot())
 }
 
-func (game *XOGame) XOPlayHandler(c telebot.Context, callbackData string) error {
+func (g *XOGame) XOPlayHandler(c telebot.Context, callbackData string) error {
 	sender := c.Sender()
 	if len(callbackData) != 2 {
 		return fmt.Errorf("invalid ttt_play data")
 	}
 
-	if game.Players[game.CurrentPlayerIndex].TgID != int(sender.ID) {
+	if g.Players[g.CurrentPlayerIndex].TgID != int(sender.ID) {
 		return c.RespondText("نوبت تو نیست!")
 	}
 
@@ -163,47 +172,48 @@ func (game *XOGame) XOPlayHandler(c telebot.Context, callbackData string) error 
 	}
 
 	moveType := tictactoe.Empty
-	if game.CurrentPlayerIndex == 0 {
+	if g.CurrentPlayerIndex == 0 {
 		moveType = tictactoe.X
 	} else {
 		moveType = tictactoe.O
 	}
 
-	isValid, errMsg := game.XOBoard.PlayMove(rint, cint, moveType)
+	isValid, errMsg := g.XOBoard.PlayMove(rint, cint, moveType)
 	if !isValid {
 		return c.RespondText(errMsg)
 	}
-	hasWon := game.XOBoard.HasWon(rint, cint, moveType)
+
+	hasWon := g.XOBoard.HasWon(rint, cint, moveType)
 	if hasWon {
-		text := game.EndGameText() + "\n🏆برنده بازی:*" + game.Players[game.CurrentPlayerIndex].Name + "*"
-		_, err := c.Bot().Edit(game, text, telebot.ModeMarkdownV2,
+		text := g.EndGameText() + "\n🏆برنده بازی:*" + g.Players[g.CurrentPlayerIndex].Name + "*"
+		err := g.Edit(c.Bot(), g, text,
 			keybul.CreateInlineKeyboard(
 				keybul.CreateBotNameInlineButton(),
-				keybul.EndgameInlineKeyboard,
+				keybul.EndGameInlineKeyboard(g.ViaMessageId != ""),
 			),
 		)
 
 		return err
 	}
-	if !game.XOBoard.IsAnyCellEmpty() {
-		text := game.EndGameText() + "\nبازی مساوی شد"
+	if !g.XOBoard.IsAnyCellEmpty() {
+		text := g.EndGameText() + "\nبازی مساوی شد"
 
-		_, err := c.Bot().Edit(game, text, telebot.ModeMarkdownV2,
+		err := g.Edit(c.Bot(), g, text,
 			keybul.CreateInlineKeyboard(
 				keybul.CreateBotNameInlineButton(),
-				keybul.EndgameInlineKeyboard,
+				keybul.EndGameInlineKeyboard(g.ViaMessageId != ""),
 			),
 		)
 		return err
 
 	}
-	game.NextPlayer()
+	g.NextPlayer()
 
-	_, err := c.Bot().Edit(game, XOStartText+"\n\n"+game.RulesText(), telebot.ModeMarkdownV2,
+	err := g.Edit(c.Bot(), g, XOStartText+"\n\n"+g.RulesText(),
 		keybul.CreateInlineKeyboard(
 			keybul.CreateBotNameInlineButton(),
-			CreateTicBoardInlineButton(game.XOBoard),
-			game.CreatePlayersInlineButton(game.Players, game.CurrentPlayerIndex),
+			CreateTicBoardInlineButton(g.XOBoard),
+			g.CreatePlayersInlineButton(g.Players, g.CurrentPlayerIndex),
 		),
 	)
 
@@ -211,19 +221,20 @@ func (game *XOGame) XOPlayHandler(c telebot.Context, callbackData string) error 
 
 }
 
-func (game *XOGame) EndGameText() string {
-	return XOStartText + "\nبازیکن ها:\n" + game.Players[0].Name + " " + XEmoji + "\n" + game.Players[1].Name + " " + OEmoji + "\n\n" + game.CreateBoardAsEmoji()
+func (g *XOGame) EndGameText() string {
+	return XOStartText + "\nبازیکن ها:\n" + g.Players[0].Name + " " + XEmoji + "\n" + g.Players[1].Name + " " + OEmoji + "\n\n" + g.CreateBoardAsEmoji()
 }
 
-func (game *XOGame) CreateBoardAsEmoji() string {
+func (g *XOGame) CreateBoardAsEmoji() string {
 	text := ""
-	for _, row := range game.XOBoard.Board {
+	for _, row := range g.XOBoard.Board {
 		for _, cell := range row {
-			if cell == tictactoe.Empty {
+			switch cell {
+			case tictactoe.Empty:
 				text += EmptyEmoji
-			} else if cell == tictactoe.X {
+			case tictactoe.X:
 				text += XEmoji
-			} else if cell == tictactoe.O {
+			case tictactoe.O:
 				text += OEmoji
 			}
 		}
@@ -238,13 +249,15 @@ func CreateTicBoardInlineButton(board *tictactoe.TicBoard) [][]telebot.InlineBut
 		buttons[r] = make([]telebot.InlineButton, board.MaxCellSize)
 		for c := range board.MaxCellSize {
 			var value string
-			if board.Board[r][c] == tictactoe.Empty {
+			switch board.Board[r][c] {
+			case tictactoe.Empty:
 				value = "◽️"
-			} else if board.Board[r][c] == tictactoe.X {
+			case tictactoe.X:
 				value = "❌"
-			} else {
+			case tictactoe.O:
 				value = "⭕️"
 			}
+
 			buttons[r][c] = telebot.InlineButton{
 				Text: value,
 				Data: string(gametype.XOGameType3X3) + "_play_" + strconv.Itoa(r) + strconv.Itoa(c),
@@ -254,7 +267,7 @@ func CreateTicBoardInlineButton(board *tictactoe.TicBoard) [][]telebot.InlineBut
 	return buttons
 }
 
-func (game *XOGame) CreatePlayersInlineButton(humanPlayers []*Player, CurrentPlayerTurn int) [][]telebot.InlineButton {
+func (g *XOGame) CreatePlayersInlineButton(humanPlayers []*Player, CurrentPlayerTurn int) [][]telebot.InlineButton {
 	buttons := make([][]telebot.InlineButton, 0)
 	for index, hplayer := range humanPlayers {
 
@@ -287,10 +300,27 @@ func (game *XOGame) CreatePlayersInlineButton(humanPlayers []*Player, CurrentPla
 	return buttons
 }
 
-func (game *XOGame) RulesText() string {
+func (g *XOGame) RulesText() string {
 	text := ""
 	// text += "قوانین:\د"
-	text += fmt.Sprintf("❕اندازه *%dX%d*\n", game.XOBoard.MaxCellSize, game.XOBoard.MaxCellSize)
-	text += fmt.Sprintf("⚠️با یه خط *%d تایی* برنده ای", game.XOBoard.WinSize)
+	text += fmt.Sprintf("❕اندازه *%dX%d*\n", g.XOBoard.MaxCellSize, g.XOBoard.MaxCellSize)
+	text += fmt.Sprintf("⚠️با یه خط *%d تایی* برنده ای", g.XOBoard.WinSize)
 	return text
+}
+
+func (g *XOGame) Edit(bot telebot.API, msg telebot.Editable, text string, keyboard *telebot.ReplyMarkup) error {
+	if g.ViaMessageId != "" {
+		err := keybul.EditGameMessage(bot, g, text, keyboard)
+		if err != nil {
+			return fmt.Errorf("can't edit via message %w", err)
+		}
+		return nil
+	}
+	for _, p := range g.Players {
+		err := keybul.EditGameMessage(bot, p, text, keyboard)
+		if err != nil {
+			slog.Error("can't edit player message ", "error", err)
+		}
+	}
+	return nil
 }

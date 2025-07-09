@@ -4,10 +4,10 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/arian-nj/chibazi/games/dotbox_console"
 	xoconsole "github.com/arian-nj/chibazi/games/xo_console"
 	gametype "github.com/arian-nj/chibazi/internals/game_type"
 	keybul "github.com/arian-nj/chibazi/internals/keybul"
+	matchmaking "github.com/arian-nj/chibazi/internals/match_making"
 	"gopkg.in/telebot.v4"
 )
 
@@ -38,19 +38,19 @@ func (app *Application) inlineQueryHandler(c telebot.Context) error {
 	xoResult5x5.SetResultID(string(gametype.XOGameType5X5))
 	results = append(results, xoResult5x5)
 
-	// Dot Box result
-	dotResult := &telebot.ArticleResult{
-		Title:       "نقطه بازی",
-		Description: "رو من کلیک کن",
-		Text:        dotbox_console.DotBoxStartText,
-	}
-	dotResult.ParseMode = telebot.ModeMarkdownV2
-
-	dotResult.ReplyMarkup = keybul.StartInlineKeyboard
-
-	dotResult.SetResultID(string(gametype.DotBoxGameType))
-	results = append(results, dotResult)
-
+	// // Dot Box result
+	// dotResult := &telebot.ArticleResult{
+	// 	Title:       "نقطه بازی",
+	// 	Description: "رو من کلیک کن",
+	// 	Text:        dotbox_console.DotBoxStartText,
+	// }
+	// dotResult.ParseMode = telebot.ModeMarkdownV2
+	//
+	// dotResult.ReplyMarkup = keybul.StartInlineKeyboard
+	//
+	// dotResult.SetResultID(string(gametype.DotBoxGameType))
+	// results = append(results, dotResult)
+	//
 	// // Web Dot Box result
 	// webDotResult := &telebot.ArticleResult{
 	// 	Title:       "نقطه بازی گرافیکی",
@@ -116,5 +116,45 @@ var (
 )
 
 func (app *Application) PlayWithRandomPlayerHandler(c telebot.Context) error {
-	return c.Send("بزودی ...")
+	return c.Send("چی بازی؟", WhatRandomGameReplyKeyboard)
 }
+
+func (app *Application) PlayRandomXO3X3Handler(c telebot.Context) error {
+	sender := c.Sender()
+
+	msg, err := c.Bot().Send(sender, "دنبال حریفم")
+	if err != nil {
+		return err
+	}
+	app.MatchMaking.Mutex.Lock()
+	defer app.MatchMaking.Mutex.Unlock()
+
+	newTicket := matchmaking.NewTicket(sender.FirstName, int(sender.ID), msg.ID, gametype.XOGameType3X3)
+
+	queue := app.MatchMaking.WaitingPlayers[gametype.XOGameType3X3]
+	app.MatchMaking.WaitingPlayers[gametype.XOGameType3X3] = append(queue, newTicket)
+	return nil
+}
+
+func (app *Application) PlayRandomXO5X5Handler(c telebot.Context) error {
+	return c.Send("چی بازی؟")
+}
+
+var (
+	WhatRandomGameReplyKeyboard = &telebot.ReplyMarkup{
+		ReplyKeyboard: [][]telebot.ReplyButton{
+			{
+				{
+					Text: Xo3x3ButtonText,
+				},
+				{
+					Text: Xo5x5ButtonText,
+				},
+			},
+			{
+				{Text: MainKeyboardButtonText},
+			},
+		},
+		ResizeKeyboard: true,
+	}
+)
