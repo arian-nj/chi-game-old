@@ -4,7 +4,6 @@ import (
 	"errors"
 	"strings"
 
-	gametype "github.com/arian-nj/chibazi/internals/game_type"
 	"gopkg.in/telebot.v4"
 )
 
@@ -73,16 +72,17 @@ var StartInlineKeyboard = &telebot.ReplyMarkup{
 	ResizeKeyboard: true,
 }
 
-func JoinGameKeyboard(game_type gametype.GameType) [][]telebot.InlineButton {
-	return [][]telebot.InlineButton{
+// func JoinGameKeyboard() [][]telebot.InlineButton {
+var JoinGameInlineButtons = [][]telebot.InlineButton{
+	{
 		{
-			{
-				Text: "منم بازی",
-				Data: string(game_type) + "_join",
-			},
+			Text: "منم بازی",
+			Data: "join",
 		},
-	}
+	},
 }
+
+// }
 func EndGameInlineKeyboard(isVia bool) [][]telebot.InlineButton {
 	if !isVia {
 		return [][]telebot.InlineButton{}

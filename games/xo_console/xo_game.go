@@ -6,7 +6,6 @@ import (
 	"log/slog"
 	"strconv"
 	"strings"
-	"time"
 
 	"github.com/arian-nj/chibazi/database"
 	consoleplayer "github.com/arian-nj/chibazi/internals/console_player"
@@ -33,14 +32,12 @@ const (
 type XOGame struct { // of GameInterface type
 	XOBoard            *tictactoe.TicBoard
 	CurrentPlayerIndex int
-	Players            []*consoleplayer.ConsolePlayer
+	players            []*consoleplayer.ConsolePlayer
 	GameType           gametype.GameType
 
 	ViaMessageId string // Via Bots
 
 	Queries *database.Queries
-
-	CreatedAt time.Time
 }
 
 func NewXOGame(gt gametype.GameType, queries *database.Queries) *XOGame {
@@ -54,12 +51,11 @@ func NewXOGame(gt gametype.GameType, queries *database.Queries) *XOGame {
 
 	return &XOGame{
 		XOBoard:            tictactoe.NewTicBoard(maxBoardSize, winSize),
-		Players:            []*consoleplayer.ConsolePlayer{},
+		players:            []*consoleplayer.ConsolePlayer{},
 		CurrentPlayerIndex: randIndex,
 
-		GameType:  gt,
-		Queries:   queries,
-		CreatedAt: time.Now(),
+		GameType: gt,
+		Queries:  queries,
 	}
 }
 
@@ -67,14 +63,18 @@ func (g *XOGame) SendJoinPanel(c telebot.Context) error {
 	sender := c.Sender()
 	g.AddPlayer(consoleplayer.NewPlayer(sender.FirstName, int(sender.ID)))
 	inlineKeyboard := keybul.CreateInlineKeyboard(
-		keybul.JoinGameKeyboard(g.GameType),
+		keybul.JoinGameInlineButtons,
 	)
 	text := XOStartText + "\n\n" + g.RulesText() + "\n\n🕹 بازیکن " + fmt.Sprintf("%s", keybul.EscapeReserved(sender.FirstName)) + " منتظر حریفه"
 	return g.Edit(c.Bot(), g, text, inlineKeyboard)
 }
 
+func (g *XOGame) Players() []*consoleplayer.ConsolePlayer {
+	return g.players
+}
+
 func (g *XOGame) NextPlayer() {
-	if g.CurrentPlayerIndex == len(g.Players)-1 {
+	if g.CurrentPlayerIndex == len(g.players)-1 {
 		g.CurrentPlayerIndex = 0
 		return
 	}
@@ -86,7 +86,7 @@ func (g *XOGame) MessageSig() (string, int64) {
 }
 
 func (g *XOGame) AddPlayer(player *consoleplayer.ConsolePlayer) {
-	g.Players = append(g.Players, player)
+	g.players = append(g.players, player)
 }
 
 func (g *XOGame) StartGame(bot telebot.API) error {
@@ -94,7 +94,7 @@ func (g *XOGame) StartGame(bot telebot.API) error {
 		keybul.CreateInlineKeyboard(
 			keybul.CreateBotNameInlineButton(),
 			CreateTicBoardInlineButton(g.XOBoard),
-			g.CreatePlayersInlineButton(g.Players, g.CurrentPlayerIndex),
+			g.CreatePlayersInlineButton(g.players, g.CurrentPlayerIndex),
 		),
 	)
 	if err != nil {
@@ -102,12 +102,13 @@ func (g *XOGame) StartGame(bot telebot.API) error {
 	}
 	_, err = g.Queries.CreateHub(context.Background(), database.CreateHubParams{
 		GameType: string(g.GameType),
-		TgID:     g.Players[0].TgID,
+		TgID:     g.players[0].TgID,
 	})
 	return err
 }
 
-func (g *XOGame) XOCallbackHandlers(c telebot.Context, callbackData string) error {
+func (g *XOGame) CallbackHandler(c telebot.Context) error {
+	callbackData := c.Callback().Data
 	if after, hasPrefix := strings.CutPrefix(callbackData, "join"); hasPrefix {
 		return g.XOJoinGameHandler(c, after)
 
@@ -119,7 +120,7 @@ func (g *XOGame) XOCallbackHandlers(c telebot.Context, callbackData string) erro
 
 func (g *XOGame) XOJoinGameHandler(c telebot.Context, callbackData string) error {
 	sender := c.Callback().Sender
-	if sender.ID == int64(g.Players[0].TgID) {
+	if sender.ID == int64(g.players[0].TgID) {
 		text := "خودت بازیو ساختی تو بازی هستی"
 		return c.RespondText(text)
 	}
@@ -138,7 +139,7 @@ func (g *XOGame) XOPlayHandler(c telebot.Context, callbackData string) error {
 		return fmt.Errorf("invalid ttt_play data")
 	}
 
-	if g.Players[g.CurrentPlayerIndex].TgID != int(sender.ID) {
+	if g.players[g.CurrentPlayerIndex].TgID != int(sender.ID) {
 		return c.RespondText("نوبت تو نیست!")
 	}
 
@@ -164,7 +165,7 @@ func (g *XOGame) XOPlayHandler(c telebot.Context, callbackData string) error {
 
 	hasWon := g.XOBoard.HasWon(rint, cint, moveType)
 	if hasWon {
-		text := g.EndGameText() + "\n🏆برنده بازی:*" + g.Players[g.CurrentPlayerIndex].Name + "*"
+		text := g.EndGameText() + "\n🏆برنده بازی:*" + g.players[g.CurrentPlayerIndex].Name + "*"
 		err := g.Edit(c.Bot(), g, text,
 			keybul.CreateInlineKeyboard(
 				keybul.CreateBotNameInlineButton(),
@@ -192,7 +193,7 @@ func (g *XOGame) XOPlayHandler(c telebot.Context, callbackData string) error {
 		keybul.CreateInlineKeyboard(
 			keybul.CreateBotNameInlineButton(),
 			CreateTicBoardInlineButton(g.XOBoard),
-			g.CreatePlayersInlineButton(g.Players, g.CurrentPlayerIndex),
+			g.CreatePlayersInlineButton(g.players, g.CurrentPlayerIndex),
 		),
 	)
 
@@ -201,7 +202,7 @@ func (g *XOGame) XOPlayHandler(c telebot.Context, callbackData string) error {
 }
 
 func (g *XOGame) EndGameText() string {
-	return XOStartText + "\nبازیکن ها:\n" + g.Players[0].Name + " " + XEmoji + "\n" + g.Players[1].Name + " " + OEmoji + "\n\n" + g.CreateBoardAsEmoji()
+	return XOStartText + "\nبازیکن ها:\n" + g.players[0].Name + " " + XEmoji + "\n" + g.players[1].Name + " " + OEmoji + "\n\n" + g.CreateBoardAsEmoji()
 }
 
 func (g *XOGame) CreateBoardAsEmoji() string {
@@ -239,7 +240,7 @@ func CreateTicBoardInlineButton(board *tictactoe.TicBoard) [][]telebot.InlineBut
 
 			buttons[r][c] = telebot.InlineButton{
 				Text: value,
-				Data: string(gametype.XOGameType3X3) + "_play_" + strconv.Itoa(r) + strconv.Itoa(c),
+				Data: "play_" + strconv.Itoa(r) + strconv.Itoa(c),
 			}
 		}
 	}
@@ -294,12 +295,14 @@ func (g *XOGame) Edit(bot telebot.API, msg telebot.Editable, text string, keyboa
 			return fmt.Errorf("can't edit via message %w", err)
 		}
 		return nil
-	}
-	for _, p := range g.Players {
-		err := keybul.EditGameMessage(bot, p, text, keyboard)
-		if err != nil {
-			slog.Error("can't edit player message ", "error", err)
+	} else {
+		for _, p := range g.players {
+			err := keybul.EditGameMessage(bot, p, text, keyboard)
+			if err != nil {
+				slog.Error("can't edit player message ", "error", err)
+			}
 		}
+
 	}
 	return nil
 }

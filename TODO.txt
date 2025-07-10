@@ -34,10 +34,17 @@
 [] 0.3.x Get Them in but
 	[X] 0.3.0 Welcome Keyboard
 	[X] 0.3.1 random opponent game
-	[] 0.3.2 in bot game chat
+	[X] 0.3.2 in bot game chat
 	[] 0.3.3 off/on chat
-[] handle duplicate requests
-[] cancel match making
+
+[X] add name to chat
+[] resend game to go to end button
+[X] handle duplicate requests
+[] handle currently playing a game
+	let play multiple games if chat is off
+[X] cancel match making
+[X] is it only private chats or onText detect Group chats to?
+[X] test via game
 
 # 0.4.0
 [] XO ai

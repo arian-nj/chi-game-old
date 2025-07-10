@@ -2,9 +2,11 @@ package bot
 
 import (
 	"context"
+	"sync"
 	"time"
 
 	commonapp "github.com/arian-nj/chibazi/internals/common_app"
+	gametype "github.com/arian-nj/chibazi/internals/game_type"
 
 	"golang.org/x/exp/slog"
 	"gopkg.in/telebot.v4"
@@ -12,12 +14,24 @@ import (
 
 type Application struct {
 	*commonapp.CommonApp
+
+	GameSessions map[string]*GameSession
+	MatchMaking  *MatchMaking
 }
 
 func NewApplication(common *commonapp.CommonApp) *Application {
 	return &Application{
-		CommonApp: common,
+		CommonApp:    common,
+		GameSessions: make(map[string]*GameSession),
+		MatchMaking: &MatchMaking{
+			WaitingPlayers: make(map[gametype.GameType][]*Ticket),
+			Mutex:          sync.Mutex{},
+		},
 	}
+}
+
+func (app *Application) AddGameSession(key string, gs *GameSession) {
+	app.GameSessions[key] = gs
 }
 
 func RunBot(commonapp *commonapp.CommonApp, ctx context.Context) {
@@ -47,7 +61,6 @@ func RunBot(commonapp *commonapp.CommonApp, ctx context.Context) {
 	b.Handle(telebot.OnInlineResult, app.inlineResultFeedbackHandler)
 	b.Handle(telebot.OnCallback, app.callbackRouter)
 
-	b.Handle(telebot.OnText, app.welcomeHandler)
 	b.Handle("/start", app.welcomeHandler)
 	b.Handle("/stat", app.statHandler)
 
@@ -56,6 +69,10 @@ func RunBot(commonapp *commonapp.CommonApp, ctx context.Context) {
 
 	b.Handle(Xo3x3ButtonText, app.PlayRandomXO3X3Handler)
 	b.Handle(Xo5x5ButtonText, app.PlayRandomXO5X5Handler)
+
+	b.Handle(CancelGameButtonText, app.CancelSearchingForGame)
+
+	b.Handle(telebot.OnText, app.textHandler)
 
 	go app.ClearDeadGamesCron()
 	go app.MakeMatches()
@@ -66,17 +83,11 @@ func (app *Application) ClearDeadGamesCron() {
 	for {
 		ExpireTime := 2 * time.Minute
 		nowTime := time.Now()
-		for key, hub := range app.Lobby.XOGames {
-			if nowTime.Sub(hub.CreatedAt) > ExpireTime {
-				delete(app.Lobby.XOGames, key)
+		for key, gameSession := range app.GameSessions {
+			if nowTime.Sub(gameSession.CreatedAt) > ExpireTime {
+				delete(app.GameSessions, key)
 			}
 		}
-		for key, hub := range app.Lobby.DotBox {
-			if nowTime.Sub(hub.CreatedAt) > ExpireTime {
-				delete(app.Lobby.DotBox, key)
-			}
-		}
-
 		time.Sleep(1 * time.Minute)
 	}
 }
@@ -107,6 +118,8 @@ const (
 const (
 	Xo3x3ButtonText = "بازی دوز ۳ در ۳❌"
 	Xo5x5ButtonText = "بازی دوز ۵ در ۵⭕️"
+
+	CancelGameButtonText = "🔙 نگرد پشیمون شدم"
 )
 
 const (

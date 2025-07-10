@@ -3,11 +3,11 @@ package bot
 import (
 	"context"
 	"fmt"
+	"strconv"
 
 	xoconsole "github.com/arian-nj/chibazi/games/xo_console"
 	gametype "github.com/arian-nj/chibazi/internals/game_type"
 	keybul "github.com/arian-nj/chibazi/internals/keybul"
-	matchmaking "github.com/arian-nj/chibazi/internals/match_making"
 	"gopkg.in/telebot.v4"
 )
 
@@ -84,6 +84,22 @@ func (app *Application) welcomeHandler(c telebot.Context) error {
 	return c.Send(
 		`خوش اومدید 👋`, welcomeReplyKeyboard)
 }
+func (app *Application) textHandler(c telebot.Context) error {
+	if !c.Message().Private() {
+		return nil
+	}
+
+	text := c.Text()
+	senderID := int(c.Sender().ID)
+
+	gameSession, ok := app.GameSessions[strconv.Itoa(senderID)]
+	if ok {
+		return gameSession.HandleChatMessage(c.Bot(), senderID, text)
+	}
+
+	return c.Send(
+		`خوش اومدید 👋`, welcomeReplyKeyboard)
+}
 
 var (
 	welcomeReplyKeyboard = &telebot.ReplyMarkup{
@@ -120,21 +136,38 @@ func (app *Application) PlayWithRandomPlayerHandler(c telebot.Context) error {
 }
 
 func (app *Application) PlayRandomXO3X3Handler(c telebot.Context) error {
+	text := ""
 	sender := c.Sender()
 
-	msg, err := c.Bot().Send(sender, "دنبال حریفم")
+	if app.RemovePlayerFromMatchMaking(int(sender.ID)) {
+		text += "قبلیو لغو کردم\n"
+	}
+
+	text += "دنبال حریفم"
+	msg, err := c.Bot().Send(sender, text, CancelGameReplyKeyboard)
 	if err != nil {
 		return err
 	}
 	app.MatchMaking.Mutex.Lock()
 	defer app.MatchMaking.Mutex.Unlock()
 
-	newTicket := matchmaking.NewTicket(sender.FirstName, int(sender.ID), msg.ID, gametype.XOGameType3X3)
+	newTicket := NewTicket(sender.FirstName, int(sender.ID), msg.ID, gametype.XOGameType3X3)
 
 	queue := app.MatchMaking.WaitingPlayers[gametype.XOGameType3X3]
 	app.MatchMaking.WaitingPlayers[gametype.XOGameType3X3] = append(queue, newTicket)
 	return nil
 }
+
+var (
+	CancelGameReplyKeyboard = &telebot.ReplyMarkup{
+		ReplyKeyboard: [][]telebot.ReplyButton{
+			{
+				{Text: CancelGameButtonText},
+			},
+		},
+		ResizeKeyboard: true,
+	}
+)
 
 func (app *Application) PlayRandomXO5X5Handler(c telebot.Context) error {
 	return c.Send("چی بازی؟")
@@ -158,3 +191,8 @@ var (
 		ResizeKeyboard: true,
 	}
 )
+
+func (app *Application) CancelSearchingForGame(c telebot.Context) error {
+	app.RemovePlayerFromMatchMaking(int(c.Sender().ID))
+	return c.Send("لغوش کردم 😔", WhatRandomGameReplyKeyboard)
+}
