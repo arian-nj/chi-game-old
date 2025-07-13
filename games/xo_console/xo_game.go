@@ -12,7 +12,7 @@ import (
 	gametype "github.com/arian-nj/chibazi/internals/game_type"
 	keybul "github.com/arian-nj/chibazi/internals/keybul"
 	"github.com/arian-nj/chibazi/internals/random"
-	tictactoe "github.com/arian-nj/chibazi/internals/tic_tac_toe"
+	"github.com/arian-nj/chibazi/internals/xo_core"
 	"gopkg.in/telebot.v4"
 )
 
@@ -30,7 +30,7 @@ const (
 )
 
 type XOGame struct { // of GameInterface type
-	XOBoard            *tictactoe.TicBoard
+	XOBoard            *xo_core.TicBoard
 	CurrentPlayerIndex int
 	players            []*consoleplayer.ConsolePlayer
 	GameType           gametype.GameType
@@ -50,7 +50,7 @@ func NewXOGame(gt gametype.GameType, queries *database.Queries) *XOGame {
 	randIndex := random.GenerateRandomNumber(2)
 
 	return &XOGame{
-		XOBoard:            tictactoe.NewTicBoard(maxBoardSize, winSize),
+		XOBoard:            xo_core.NewTicBoard(maxBoardSize, winSize),
 		players:            []*consoleplayer.ConsolePlayer{},
 		CurrentPlayerIndex: randIndex,
 
@@ -151,11 +151,11 @@ func (g *XOGame) XOPlayHandler(c telebot.Context, callbackData string) error {
 		c.RespondAlert("یه مشکلی هست")
 	}
 
-	moveType := tictactoe.Empty
+	moveType := xo_core.Empty
 	if g.CurrentPlayerIndex == 0 {
-		moveType = tictactoe.X
+		moveType = xo_core.X
 	} else {
-		moveType = tictactoe.O
+		moveType = xo_core.O
 	}
 
 	isValid, errMsg := g.XOBoard.PlayMove(rint, cint, moveType)
@@ -163,7 +163,8 @@ func (g *XOGame) XOPlayHandler(c telebot.Context, callbackData string) error {
 		return c.RespondText(errMsg)
 	}
 
-	hasWon := g.XOBoard.HasWon(rint, cint, moveType)
+	cellIndex := g.XOBoard.CellIndex(rint, cint)
+	hasWon := g.XOBoard.HasWon(cellIndex)
 	if hasWon {
 		text := g.EndGameText() + "\n🏆برنده بازی:*" + g.players[g.CurrentPlayerIndex].Name + "*"
 		err := g.Edit(c.Bot(), g, text,
@@ -207,34 +208,36 @@ func (g *XOGame) EndGameText() string {
 
 func (g *XOGame) CreateBoardAsEmoji() string {
 	text := ""
-	for _, row := range g.XOBoard.Board {
-		for _, cell := range row {
-			switch cell {
-			case tictactoe.Empty:
-				text += EmptyEmoji
-			case tictactoe.X:
-				text += XEmoji
-			case tictactoe.O:
-				text += OEmoji
-			}
+	for cellIndex, cell := range g.XOBoard.Board {
+		if cellIndex%3 == 0 {
+			text += "\n"
 		}
-		text += "\n"
+
+		switch cell {
+		case xo_core.Empty:
+			text += EmptyEmoji
+		case xo_core.X:
+			text += XEmoji
+		case xo_core.O:
+			text += OEmoji
+		}
 	}
+
 	return text
 }
 
-func CreateTicBoardInlineButton(board *tictactoe.TicBoard) [][]telebot.InlineButton {
+func CreateTicBoardInlineButton(board *xo_core.TicBoard) [][]telebot.InlineButton {
 	buttons := make([][]telebot.InlineButton, board.MaxCellSize)
 	for r := range board.MaxCellSize {
 		buttons[r] = make([]telebot.InlineButton, board.MaxCellSize)
 		for c := range board.MaxCellSize {
 			var value string
-			switch board.Board[r][c] {
-			case tictactoe.Empty:
+			switch board.GetCell(r, c) {
+			case xo_core.Empty:
 				value = "◽️"
-			case tictactoe.X:
+			case xo_core.X:
 				value = "❌"
-			case tictactoe.O:
+			case xo_core.O:
 				value = "⭕️"
 			}
 

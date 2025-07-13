@@ -70,13 +70,14 @@ func (app *Application) createRandomGame(gameType gametype.GameType, tickets []*
 		player.MessageID = msg.ID
 	}
 
+	var newSession GameSession
 	switch gameType {
 	case gametype.XOGameType3X3:
 		newXOGame := xoconsole.NewXOGame(gametype.XOGameType3X3, app.Queries)
 		newXOGame.AddPlayer(playerOne)
 		newXOGame.AddPlayer(playerTwo)
 
-		newSession := NewGameSession(gameType, newXOGame)
+		newSession = NewGameSession(gameType, newXOGame)
 		app.AddGameSession(strconv.Itoa(playerOne.TgID), newSession)
 		app.AddGameSession(strconv.Itoa(playerTwo.TgID), newSession)
 
@@ -84,8 +85,13 @@ func (app *Application) createRandomGame(gameType gametype.GameType, tickets []*
 		if err != nil {
 			slog.Error("error in starting random xo match", "error", err)
 		}
-
+	default:
+		slog.Error("not possible")
+		return
 	}
+	// for _,player := range newSession.GameState.Players() {
+
+	// }
 }
 
 func (app *Application) inlineResultFeedbackHandler(c telebot.Context) error {
