@@ -7,6 +7,8 @@ package database
 
 import (
 	"context"
+
+	"github.com/jackc/pgx/v5/pgtype"
 )
 
 const activeUser = `-- name: ActiveUser :exec
@@ -21,34 +23,50 @@ func (q *Queries) ActiveUser(ctx context.Context, tgID int) error {
 	return err
 }
 
-const countAllUsers = `-- name: CountAllUsers :many
+const countActiveUsers = `-- name: CountActiveUsers :one
+SELECT COUNT(*) FROM users
+WHERE is_active = TRUE
+`
+
+func (q *Queries) CountActiveUsers(ctx context.Context) (int64, error) {
+	row := q.db.QueryRow(ctx, countActiveUsers)
+	var count int64
+	err := row.Scan(&count)
+	return count, err
+}
+
+const countAllUsers = `-- name: CountAllUsers :one
 SELECT COUNT(*) FROM users
 `
 
-func (q *Queries) CountAllUsers(ctx context.Context) ([]int64, error) {
-	rows, err := q.db.Query(ctx, countAllUsers)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-	var items []int64
-	for rows.Next() {
-		var count int64
-		if err := rows.Scan(&count); err != nil {
-			return nil, err
-		}
-		items = append(items, count)
-	}
-	if err := rows.Err(); err != nil {
-		return nil, err
-	}
-	return items, nil
+func (q *Queries) CountAllUsers(ctx context.Context) (int64, error) {
+	row := q.db.QueryRow(ctx, countAllUsers)
+	var count int64
+	err := row.Scan(&count)
+	return count, err
+}
+
+const countUsersCreatedBetween = `-- name: CountUsersCreatedBetween :one
+SELECT COUNT(*) FROM users
+WHERE created_at >= $1 AND created_at <= $2
+`
+
+type CountUsersCreatedBetweenParams struct {
+	CreatedAt   pgtype.Timestamp
+	CreatedAt_2 pgtype.Timestamp
+}
+
+func (q *Queries) CountUsersCreatedBetween(ctx context.Context, arg CountUsersCreatedBetweenParams) (int64, error) {
+	row := q.db.QueryRow(ctx, countUsersCreatedBetween, arg.CreatedAt, arg.CreatedAt_2)
+	var count int64
+	err := row.Scan(&count)
+	return count, err
 }
 
 const createUser = `-- name: CreateUser :exec
-INSERT INTO users (tg_id) VALUES ($1)
-ON CONFLICT (tg_id) DO UPDATE
-SET updated_at = NOW(), is_active = TRUE
+INSERT INTO users (tg_id) VALUES ($1) ON
+	CONFLICT (tg_id) DO UPDATE
+	SET updated_at = NOW(), is_active = TRUE
 `
 
 func (q *Queries) CreateUser(ctx context.Context, tgID int) error {

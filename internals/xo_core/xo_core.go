@@ -1,5 +1,7 @@
 package xo_core
 
+import "slices"
+
 type Cell int
 
 const (
@@ -121,12 +123,7 @@ func (board *TicBoard) HasWon(index int) bool {
 	return false
 }
 func (board *TicBoard) IsAnyCellEmpty() bool {
-	for _, cell := range board.Board {
-		if cell == Empty {
-			return true
-		}
-	}
-	return false
+	return slices.Contains(board.Board, Empty)
 }
 
 // package tictactoe

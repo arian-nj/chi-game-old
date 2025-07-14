@@ -12,7 +12,10 @@ func (app *Application) callbackRouter(c telebot.Context) error {
 		messageId = strconv.Itoa(int(callback.Sender.ID))
 	}
 
-	gameSession, has_game := app.GameSessions[messageId]
+	app.GameSessions.Mutex.Lock()
+	gameSession, has_game := app.GameSessions.Sessions[messageId]
+	app.GameSessions.Mutex.Unlock()
+
 	if has_game {
 		return gameSession.GameState.CallbackHandler(c)
 	}

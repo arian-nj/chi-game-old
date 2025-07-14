@@ -53,7 +53,7 @@ func CreateBotNameInlineButton() [][]telebot.InlineButton {
 	return [][]telebot.InlineButton{
 		{
 			{
-				Text: "Chi Bazi | چی بازی",
+				Text: "بازی و چت | چی بازی",
 				URL:  "t.me/" + "ChiBaziBot" + "?start=new",
 			},
 		},

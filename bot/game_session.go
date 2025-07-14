@@ -2,6 +2,7 @@ package bot
 
 import (
 	"fmt"
+	"sync"
 	"time"
 
 	consoleplayer "github.com/arian-nj/chibazi/internals/console_player"
@@ -14,8 +15,14 @@ type Game interface {
 	CallbackHandler(c telebot.Context) error
 }
 
+type AllSession struct {
+	Sessions map[string]*GameSession
+	Mutex    sync.Mutex
+}
+
 type GameSession struct {
-	Gametype gametype.GameType
+	Gametype  gametype.GameType
+	ChatState bool
 
 	GameState Game
 
@@ -26,6 +33,7 @@ func NewGameSession(gameType gametype.GameType, gameState Game) *GameSession {
 	return &GameSession{
 		Gametype:  gameType,
 		GameState: gameState,
+		ChatState: true,
 		CreatedAt: time.Now(),
 	}
 }

@@ -15,23 +15,29 @@ import (
 type Application struct {
 	*commonapp.CommonApp
 
-	GameSessions map[string]*GameSession
+	GameSessions *AllSession
 	MatchMaking  *MatchMaking
 }
 
 func NewApplication(common *commonapp.CommonApp) *Application {
 	return &Application{
-		CommonApp:    common,
-		GameSessions: make(map[string]*GameSession),
+		CommonApp: common,
+		GameSessions: &AllSession{
+			Sessions: map[string]*GameSession{},
+			Mutex:    sync.Mutex{},
+		},
 		MatchMaking: &MatchMaking{
-			WaitingPlayers: make(map[gametype.GameType][]*Ticket),
+			WaitingPlayers: map[gametype.GameType][]*Ticket{},
 			Mutex:          sync.Mutex{},
 		},
 	}
 }
 
 func (app *Application) AddGameSession(key string, gs *GameSession) {
-	app.GameSessions[key] = gs
+	app.GameSessions.Mutex.Lock()
+	defer app.GameSessions.Mutex.Unlock()
+
+	app.GameSessions.Sessions[key] = gs
 }
 
 func RunBot(commonapp *commonapp.CommonApp, ctx context.Context) {
@@ -72,6 +78,8 @@ func RunBot(commonapp *commonapp.CommonApp, ctx context.Context) {
 
 	b.Handle(CancelGameButtonText, app.CancelSearchingForGame)
 
+	b.Handle(StopChatButtonText, app.StopChatHandler)
+
 	b.Handle(telebot.OnText, app.textHandler)
 
 	go app.ClearDeadGamesCron()
@@ -83,9 +91,11 @@ func (app *Application) ClearDeadGamesCron() {
 	for {
 		ExpireTime := 2 * time.Minute
 		nowTime := time.Now()
-		for key, gameSession := range app.GameSessions {
+		for key, gameSession := range app.GameSessions.Sessions {
 			if nowTime.Sub(gameSession.CreatedAt) > ExpireTime {
-				delete(app.GameSessions, key)
+				app.GameSessions.Mutex.Lock()
+				delete(app.GameSessions.Sessions, key)
+				app.GameSessions.Mutex.Unlock()
 			}
 		}
 		time.Sleep(1 * time.Minute)
@@ -124,4 +134,8 @@ const (
 
 const (
 	MainKeyboardButtonText = "صفحه اصلی🏠"
+)
+
+const (
+	StopChatButtonText = "قطع چت ✂️"
 )

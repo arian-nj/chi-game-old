@@ -31,29 +31,40 @@
 [X] escape
 [X] 5X5 not detect all diagonals
 
-[] 0.3.x Get Them in butt
+[X] 0.3.x Get Them in butt
 	[X] 0.3.0 Welcome Keyboard
 	[X] 0.3.1 random opponent game
 	[X] 0.3.2 in bot game chat
-	[.] 0.3.3 off/on chat
+	[X] 0.3.3 turn off chat
 
 [X] add name to chat
-[] resend game to go to end button
+[-] resend game to go to end button
 [X] handle duplicate requests
-[] handle currently playing a game
-	let play multiple games if chat is off? no 
 [X] cancel match making
 [X] is it only private chats or onText detect Group chats to?
 [X] test via game
 
+[X] handle currently playing a game
+	let play multiple games if chat is off? no
+[X] fix spamming play button
+
 # 0.4.0
 [X] XO ai
 [] play with ai on matchmaking timeout
+[] activate 5X5 XO
+[] add timer for players not playing
+[] clean up and disconnect after game
+
 
 [ ] 0.5.0 statistics
-	[ ] check admin for /stat
+	[X] check admin for /stat
 	[ ] add user stat
-	[ ] seperate game stats
+	[-] seperate game stats
+
+
+[] about and description text
+
+[] deploy
 
 # 0.6.0 connect four
 

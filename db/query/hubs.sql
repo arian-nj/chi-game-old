@@ -12,6 +12,7 @@ WHERE created_at >= NOW() - INTERVAL '1 hour';
 SELECT COUNT(*) AS hubs_today
 FROM hubs
 WHERE created_at >= date_trunc('day', NOW());
+
 --
 -- --name: CountLast7DaysHubs :many
 -- WITH days AS (

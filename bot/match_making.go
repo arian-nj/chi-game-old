@@ -1,6 +1,7 @@
 package bot
 
 import (
+	"fmt"
 	"log/slog"
 	"strconv"
 	"sync"
@@ -34,17 +35,36 @@ func NewTicket(name string, userID, messageID int, gameType gametype.GameType) *
 	}
 }
 
+func (app *Application) AddTicket(gameType gametype.GameType, newTicket *Ticket) {
+
+	queue := app.MatchMaking.WaitingPlayers[gameType]
+	app.MatchMaking.WaitingPlayers[gameType] = append(queue, newTicket)
+
+}
+
+func (app *Application) CheckIsAllowedToPlay(playerId int) bool {
+	_, isFound := app.GameSessions.Sessions[strconv.Itoa(playerId)]
+	return !isFound
+}
+
 func (app *Application) MakeMatches() {
+	defer app.MatchMaking.Mutex.Unlock()
+	var doFlag = false
 	for {
+		doFlag = false
 		for gameTypeKey, ticketsList := range app.MatchMaking.WaitingPlayers {
 			app.MatchMaking.Mutex.Lock()
 			if len(ticketsList) >= 2 {
+				doFlag = true
 				ticketOne := ticketsList[0]
 				ticketTwo := ticketsList[1]
 				app.MatchMaking.WaitingPlayers[gameTypeKey] = ticketsList[2:]
 				app.createRandomGame(gameTypeKey, []*Ticket{ticketOne, ticketTwo})
 			}
 			app.MatchMaking.Mutex.Unlock()
+		}
+		if doFlag == false {
+			time.Sleep(100 * time.Millisecond)
 		}
 	}
 }
@@ -70,7 +90,7 @@ func (app *Application) createRandomGame(gameType gametype.GameType, tickets []*
 		player.MessageID = msg.ID
 	}
 
-	var newSession GameSession
+	var newSession *GameSession
 	switch gameType {
 	case gametype.XOGameType3X3:
 		newXOGame := xoconsole.NewXOGame(gametype.XOGameType3X3, app.Queries)
@@ -89,9 +109,33 @@ func (app *Application) createRandomGame(gameType gametype.GameType, tickets []*
 		slog.Error("not possible")
 		return
 	}
-	// for _,player := range newSession.GameState.Players() {
+	for _, player := range newSession.GameState.Players() {
+		for _, oppPlayer := range newSession.GameState.Players() {
+			if player.TgID == oppPlayer.TgID {
+				continue
+			}
+			_, err := app.Bot.Send(&telebot.User{ID: int64(player.TgID)}, FoundOpponentText(oppPlayer.Name), telebot.ModeMarkdownV2, StopChatReplyKeyboard)
+			if err != nil {
+				slog.Error("can't send found opponent message ", "error", err)
+			}
+		}
+	}
+}
 
-	// }
+func FoundOpponentText(oppName string) string {
+	text := ""
+	text += "🕹 بازی شروع شد☝️\n\n"
+	text += fmt.Sprintf("👀 به حریفت *%s* سلام کن 🤝", oppName)
+	return text
+}
+
+var StopChatReplyKeyboard = &telebot.ReplyMarkup{
+	ReplyKeyboard: [][]telebot.ReplyButton{
+		{
+			{Text: StopChatButtonText},
+		},
+	},
+	ResizeKeyboard: true,
 }
 
 func (app *Application) inlineResultFeedbackHandler(c telebot.Context) error {
@@ -121,8 +165,6 @@ func (app *Application) inlineResultFeedbackHandler(c telebot.Context) error {
 }
 
 func (app *Application) RemovePlayerFromMatchMaking(userID int) bool {
-	app.MatchMaking.Mutex.Lock()
-	defer app.MatchMaking.Mutex.Unlock()
 
 	for gameType, tickets := range app.MatchMaking.WaitingPlayers {
 		for index, ticket := range tickets {

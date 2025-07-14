@@ -5,19 +5,22 @@ WHERE tg_id = $1;
 -- name: GetAllUsers :many
 SELECT * FROM users;
 
--- name: CountAllUsers :many
+-- name: CountAllUsers :one
 SELECT COUNT(*) FROM users;
 
-
 -- name: CreateUser :exec
-INSERT INTO users (tg_id) VALUES ($1)
-ON CONFLICT (tg_id) DO UPDATE
-SET updated_at = NOW(), is_active = TRUE;
+INSERT INTO users (tg_id) VALUES ($1) ON
+	CONFLICT (tg_id) DO UPDATE
+	SET updated_at = NOW(), is_active = TRUE;
 
+-- name: CountActiveUsers :one
+SELECT COUNT(*) FROM users
+WHERE is_active = TRUE;
 
+-- name: CountUsersCreatedBetween :one
+SELECT COUNT(*) FROM users
+WHERE created_at >= $1 AND created_at <= $2;
 
-
-    
 -- name: ActiveUser :exec
 UPDATE users SET is_active = TRUE
 WHERE (

@@ -3,11 +3,15 @@ package bot
 import (
 	"context"
 	"fmt"
+	"log/slog"
 	"strconv"
+	"time"
 
+	"github.com/arian-nj/chibazi/database"
 	xoconsole "github.com/arian-nj/chibazi/games/xo_console"
 	gametype "github.com/arian-nj/chibazi/internals/game_type"
 	keybul "github.com/arian-nj/chibazi/internals/keybul"
+	"github.com/jackc/pgx/v5/pgtype"
 	"gopkg.in/telebot.v4"
 )
 
@@ -71,13 +75,52 @@ func (app *Application) inlineQueryHandler(c telebot.Context) error {
 }
 
 func (app *Application) statHandler(c telebot.Context) error {
-	count, err := app.Queries.CountHubs(context.Background())
+	if c.Sender().ID != 1909090204 {
+		return app.textHandler(c)
+	}
+
+	allGamesCount, err := app.Queries.CountHubs(context.Background())
 	if err != nil {
 		return err
 	}
 
-	c.Send(fmt.Sprintf("تعداد بازی ها: %d", count))
-	return nil
+	lastHourCount, err := app.Queries.CountLastHourHub(context.Background())
+	if err != nil {
+		return err
+	}
+
+	lastDayCount, err := app.Queries.CountLastDayHubs(context.Background())
+	if err != nil {
+		return err
+	}
+
+	allUsers, err := app.Queries.CountAllUsers(context.Background())
+	if err != nil {
+		return err
+	}
+	now := time.Now()
+	newUsersLastHour, err := app.Queries.CountUsersCreatedBetween(context.Background(), database.CountUsersCreatedBetweenParams{
+		CreatedAt:   pgtype.Timestamp{Time: now.Add(-time.Hour)},
+		CreatedAt_2: pgtype.Timestamp{Time: now},
+	})
+
+	newUsersLastDay, err := app.Queries.CountUsersCreatedBetween(context.Background(), database.CountUsersCreatedBetweenParams{
+		CreatedAt:   pgtype.Timestamp{Time: now.Add(-(time.Duration(now.Hour()) + time.Duration(now.Minute()) + time.Duration(now.Second())))},
+		CreatedAt_2: pgtype.Timestamp{Time: now},
+	})
+
+	text := ""
+	text += "*All Games Count*\n" +
+		fmt.Sprintf("ever played games: %d\n", allGamesCount) +
+		fmt.Sprintf("last day games: %d\n", lastDayCount) +
+		fmt.Sprintf("last hour games: %d\n", lastHourCount) +
+		"\n\n" +
+
+		fmt.Sprintf("all users: %d\n", allUsers) +
+		fmt.Sprintf("new user last hour: %d\n", newUsersLastHour) +
+		fmt.Sprintf("last day users: %d\n", newUsersLastDay)
+
+	return c.Send(text, telebot.ModeMarkdownV2)
 }
 
 func (app *Application) welcomeHandler(c telebot.Context) error {
@@ -92,8 +135,10 @@ func (app *Application) textHandler(c telebot.Context) error {
 	text := c.Text()
 	senderID := int(c.Sender().ID)
 
-	gameSession, ok := app.GameSessions[strconv.Itoa(senderID)]
-	if ok {
+	app.GameSessions.Mutex.Lock()
+	gameSession, ok := app.GameSessions.Sessions[strconv.Itoa(senderID)]
+	app.GameSessions.Mutex.Unlock()
+	if ok && gameSession.ChatState {
 		return gameSession.HandleChatMessage(c.Bot(), senderID, text)
 	}
 
@@ -135,26 +180,35 @@ func (app *Application) PlayWithRandomPlayerHandler(c telebot.Context) error {
 	return c.Send("چی بازی؟", WhatRandomGameReplyKeyboard)
 }
 
+func (app *Application) openLocks() {
+	app.GameSessions.Mutex.Unlock()
+	app.MatchMaking.Mutex.Unlock()
+}
 func (app *Application) PlayRandomXO3X3Handler(c telebot.Context) error {
 	text := ""
 	sender := c.Sender()
 
+	app.GameSessions.Mutex.Lock()
+	app.MatchMaking.Mutex.Lock()
+
+	if app.CheckIsAllowedToPlay(int(sender.ID)) == false {
+		app.openLocks()
+		return c.Send("بازی قبلیت باید تموم بشه")
+	}
+
 	if app.RemovePlayerFromMatchMaking(int(sender.ID)) {
 		text += "قبلیو لغو کردم\n"
 	}
+	app.openLocks()
 
 	text += "دنبال حریفم"
 	msg, err := c.Bot().Send(sender, text, CancelGameReplyKeyboard)
 	if err != nil {
 		return err
 	}
-	app.MatchMaking.Mutex.Lock()
-	defer app.MatchMaking.Mutex.Unlock()
 
 	newTicket := NewTicket(sender.FirstName, int(sender.ID), msg.ID, gametype.XOGameType3X3)
-
-	queue := app.MatchMaking.WaitingPlayers[gametype.XOGameType3X3]
-	app.MatchMaking.WaitingPlayers[gametype.XOGameType3X3] = append(queue, newTicket)
+	app.AddTicket(gametype.XOGameType3X3, newTicket)
 	return nil
 }
 
@@ -193,6 +247,30 @@ var (
 )
 
 func (app *Application) CancelSearchingForGame(c telebot.Context) error {
+	app.MatchMaking.Mutex.Lock()
+	defer app.MatchMaking.Mutex.Unlock()
+
 	app.RemovePlayerFromMatchMaking(int(c.Sender().ID))
 	return c.Send("لغوش کردم 😔", WhatRandomGameReplyKeyboard)
+}
+
+func (app *Application) StopChatHandler(c telebot.Context) error {
+	sender := c.Sender()
+
+	app.GameSessions.Mutex.Lock()
+	gameSession, isFound := app.GameSessions.Sessions[strconv.Itoa(int(sender.ID))]
+	app.GameSessions.Mutex.Unlock()
+	if !isFound {
+		return c.RespondText("بازی فعالی نداری")
+	}
+	gameSession.ChatState = false
+
+	for _, player := range gameSession.GameState.Players() {
+		_, err := c.Bot().Send(&telebot.User{ID: int64(player.TgID)}, "⛔️چت قطع شد", welcomeReplyKeyboard)
+		if err != nil {
+			slog.Error("can't send close chat message ", "error", err)
+		}
+	}
+
+	return nil
 }
