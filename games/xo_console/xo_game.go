@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/arian-nj/chibazi/database"
+	consolegame "github.com/arian-nj/chibazi/games/console_game"
 	consoleplayer "github.com/arian-nj/chibazi/internals/console_player"
 	gametype "github.com/arian-nj/chibazi/internals/game_type"
 	keybul "github.com/arian-nj/chibazi/internals/keybul"
@@ -32,17 +33,10 @@ const (
 const MaxPlayerTime = time.Minute * 2
 
 type XOGame struct { // of GameInterface type
-	XOBoard            *xo_core.TicBoard
-	CurrentPlayerIndex int
-	players            []*consoleplayer.ConsolePlayer
-	GameType           gametype.GameType
+	*consolegame.ConsoleGame
+	XOBoard *xo_core.TicBoard
 
-	ViaMessageId string // Via Bots
-
-	LastEdit   time.Time
-	Queries    *database.Queries
-	CancelGame context.CancelFunc
-	Ctx        context.Context
+	Queries *database.Queries
 }
 
 func NewXOGame(gt gametype.GameType, queries *database.Queries) *XOGame {
@@ -53,21 +47,15 @@ func NewXOGame(gt gametype.GameType, queries *database.Queries) *XOGame {
 		winSize = 4
 	}
 	randIndex := random.GenerateRandomNumber(2)
-	ctx, cancel := context.WithCancel(context.Background())
 	return &XOGame{
-		XOBoard:            xo_core.NewTicBoard(maxBoardSize, winSize),
-		players:            []*consoleplayer.ConsolePlayer{},
-		CurrentPlayerIndex: randIndex,
-
-		GameType:   gt,
-		Queries:    queries,
-		CancelGame: cancel,
-		Ctx:        ctx,
+		ConsoleGame: consolegame.NewConsoleGame(gt, randIndex),
+		XOBoard:     xo_core.NewTicBoard(maxBoardSize, winSize),
+		Queries:     queries,
 	}
 }
 
 func (g *XOGame) MonitorTimeout(bot telebot.API) {
-	for _, player := range g.players {
+	for _, player := range g.Players() {
 		now := time.Now()
 		player.TurnStartedAt = now
 	}
@@ -79,7 +67,7 @@ func (g *XOGame) MonitorTimeout(bot telebot.API) {
 		case <-ticker.C:
 
 			now := time.Now()
-			player := g.players[g.CurrentPlayerIndex]
+			player := g.GetCurrentPlayer()
 			player.SpentTime += now.Sub(player.TurnStartedAt)
 			player.TurnStartedAt = time.Now()
 
@@ -105,28 +93,6 @@ func (g *XOGame) MonitorTimeout(bot telebot.API) {
 	}
 }
 
-func (g *XOGame) Players() []*consoleplayer.ConsolePlayer {
-	return g.players
-}
-
-func (g *XOGame) NextPlayer() {
-	if g.CurrentPlayerIndex == len(g.players)-1 {
-		g.CurrentPlayerIndex = 0
-	} else {
-		g.CurrentPlayerIndex += 1
-	}
-	g.players[g.CurrentPlayerIndex].TurnStartedAt = time.Now()
-
-}
-
-func (g *XOGame) MessageSig() (string, int64) {
-	return g.ViaMessageId, 0
-}
-
-func (g *XOGame) AddPlayer(player *consoleplayer.ConsolePlayer) {
-	g.players = append(g.players, player)
-}
-
 func (g *XOGame) SendJoinPanel(c telebot.Context) error {
 	sender := c.Sender()
 	g.AddPlayer(consoleplayer.NewConsolePlayer(sender.FirstName, int(sender.ID)))
@@ -142,7 +108,7 @@ func (g *XOGame) StartGame(bot telebot.API) error {
 		keybul.CreateInlineKeyboard(
 			keybul.CreateBotNameInlineButton(),
 			CreateTicBoardInlineButton(g.XOBoard),
-			g.CreatePlayersInlineButton(g.players, g.CurrentPlayerIndex),
+			g.CreatePlayersInlineButton(g.Players(), g.CurrentPlayerIndex),
 		),
 	)
 	if err != nil {
@@ -151,7 +117,7 @@ func (g *XOGame) StartGame(bot telebot.API) error {
 	go g.MonitorTimeout(bot)
 	_, err = g.Queries.CreateHub(context.Background(), database.CreateHubParams{
 		GameType: string(g.GameType),
-		TgID:     g.players[0].TgID,
+		TgID:     g.Players()[0].TgID,
 	})
 	return err
 }
@@ -169,7 +135,7 @@ func (g *XOGame) CallbackHandler(c telebot.Context) error {
 
 func (g *XOGame) XOJoinGameHandler(c telebot.Context) error {
 	sender := c.Callback().Sender
-	if sender.ID == int64(g.players[0].TgID) {
+	if sender.ID == int64(g.Players()[0].TgID) {
 		text := "خودت بازیو ساختی تو بازی هستی"
 		return c.RespondText(text)
 	}
@@ -188,7 +154,7 @@ func (g *XOGame) XOPlayHandler(c telebot.Context, callbackData string) error {
 		return fmt.Errorf("invalid ttt_play data")
 	}
 
-	if g.players[g.CurrentPlayerIndex].TgID != int(sender.ID) {
+	if g.GetCurrentPlayer().TgID != int(sender.ID) {
 		return c.RespondText("نوبت تو نیست!")
 	}
 
@@ -238,7 +204,7 @@ func (g *XOGame) EditDuringGameBoard(bot telebot.API) error {
 		keybul.CreateInlineKeyboard(
 			keybul.CreateBotNameInlineButton(),
 			CreateTicBoardInlineButton(g.XOBoard),
-			g.CreatePlayersInlineButton(g.players, g.CurrentPlayerIndex),
+			g.CreatePlayersInlineButton(g.Players(), g.CurrentPlayerIndex),
 		),
 	)
 

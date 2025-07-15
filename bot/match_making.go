@@ -97,7 +97,7 @@ func (app *Application) createRandomGame(gameType gametype.GameType, tickets []*
 		newXOGame.AddPlayer(playerOne)
 		newXOGame.AddPlayer(playerTwo)
 
-		newSession = NewGameSession(gameType, newXOGame)
+		newSession = NewGameSession(app.GameSessions, app.Bot, gameType, newXOGame)
 		app.AddGameSession(strconv.Itoa(playerOne.TgID), newSession)
 		app.AddGameSession(strconv.Itoa(playerTwo.TgID), newSession)
 
@@ -145,7 +145,7 @@ func (app *Application) inlineResultFeedbackHandler(c telebot.Context) error {
 	switch gametype.GameType(resultId) {
 	case gametype.XOGameType3X3:
 		newXOGame := xoconsole.NewXOGame(gametype.XOGameType3X3, app.Queries)
-		newGameSession := NewGameSession(gametype.XOGameType3X3, newXOGame)
+		newGameSession := NewGameSession(app.GameSessions, app.Bot, gametype.XOGameType3X3, newXOGame)
 
 		app.AddGameSession(messageID, newGameSession)
 
@@ -154,7 +154,7 @@ func (app *Application) inlineResultFeedbackHandler(c telebot.Context) error {
 
 	case gametype.XOGameType5X5:
 		newXOGame := xoconsole.NewXOGame(gametype.XOGameType5X5, app.Queries)
-		newGameSession := NewGameSession(gametype.XOGameType3X3, newXOGame)
+		newGameSession := NewGameSession(app.GameSessions, app.Bot, gametype.XOGameType3X3, newXOGame)
 
 		app.AddGameSession(messageID, newGameSession)
 

@@ -35,3 +35,7 @@ func (p *ConsolePlayer) SetMessageSig(messageID int) *ConsolePlayer {
 func (p *ConsolePlayer) MessageSig() (string, int64) {
 	return strconv.Itoa(p.MessageID), int64(p.TgID)
 }
+
+func (p *ConsolePlayer) Recipient() string {
+	return strconv.FormatInt(int64(p.TgID), 10)
+}

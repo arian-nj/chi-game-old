@@ -91,7 +91,7 @@ func (app *Application) ClearDeadGamesCron() {
 	for {
 		nowTime := time.Now()
 		for key, gameSession := range app.GameSessions.Sessions {
-			if nowTime.Sub(gameSession.CreatedAt) > DeleteGameSessionTime {
+			if nowTime.Sub(gameSession.CreatedAt) > gameSession.ExpireDuaration {
 				app.GameSessions.Mutex.Lock()
 				delete(app.GameSessions.Sessions, key)
 				app.GameSessions.Mutex.Unlock()

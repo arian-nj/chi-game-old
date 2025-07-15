@@ -51,8 +51,8 @@
 # 0.4.0
 [X] XO ai
 [] play with ai on matchmaking timeout
-[.] add timer for players not playing
-[] clean up and disconnect after game
+[X] add timer for players not playing
+[X] clean up and disconnect after game
 [] activate 5X5 XO
 
 
@@ -62,7 +62,7 @@
 	[-] seperate game stats
 
 
-[.] about and description text
+[X] about and description text
 
 [ ] make it panic safe
 

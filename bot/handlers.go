@@ -138,7 +138,7 @@ func (app *Application) textHandler(c telebot.Context) error {
 	app.GameSessions.Mutex.Lock()
 	gameSession, ok := app.GameSessions.Sessions[strconv.Itoa(senderID)]
 	app.GameSessions.Mutex.Unlock()
-	if ok && gameSession.ChatState {
+	if ok && gameSession.IsChatOn {
 		return gameSession.HandleChatMessage(c.Bot(), senderID, text)
 	}
 
@@ -260,11 +260,17 @@ func (app *Application) StopChatHandler(c telebot.Context) error {
 	app.GameSessions.Mutex.Lock()
 	gameSession, isFound := app.GameSessions.Sessions[strconv.Itoa(int(sender.ID))]
 	app.GameSessions.Mutex.Unlock()
+
 	if !isFound {
 		return c.RespondText("بازی فعالی نداری")
 	}
-	gameSession.ChatState = false
 
+	if gameSession.IsGameEnded {
+		gameSession.CleanAndDisconnect(app.GameSessions)
+		return nil
+	}
+
+	gameSession.IsChatOn = false
 	for _, player := range gameSession.GameState.Players() {
 		_, err := c.Bot().Send(&telebot.User{ID: int64(player.TgID)}, "⛔️چت قطع شد بازی ادامه داره", welcomeReplyKeyboard)
 		if err != nil {
