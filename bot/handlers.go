@@ -185,6 +185,25 @@ func (app *Application) openLocks() {
 	app.MatchMaking.Mutex.Unlock()
 }
 func (app *Application) PlayRandomXO3X3Handler(c telebot.Context) error {
+	return app.PlayRandomGameHandler(c, gametype.XOGameType3X3)
+}
+
+var (
+	CancelGameReplyKeyboard = &telebot.ReplyMarkup{
+		ReplyKeyboard: [][]telebot.ReplyButton{
+			{
+				{Text: CancelGameButtonText},
+			},
+		},
+		ResizeKeyboard: true,
+	}
+)
+
+func (app *Application) PlayRandomXO5X5Handler(c telebot.Context) error {
+	return app.PlayRandomGameHandler(c, gametype.XOGameType5X5)
+}
+
+func (app *Application) PlayRandomGameHandler(c telebot.Context, gameType gametype.GameType) error {
 	text := ""
 	sender := c.Sender()
 
@@ -207,24 +226,9 @@ func (app *Application) PlayRandomXO3X3Handler(c telebot.Context) error {
 		return err
 	}
 
-	newTicket := NewTicket(sender.FirstName, int(sender.ID), msg.ID, gametype.XOGameType3X3)
-	app.AddTicket(gametype.XOGameType3X3, newTicket)
+	newTicket := NewTicket(sender.FirstName, int(sender.ID), msg.ID, gameType)
+	app.AddTicket(gameType, newTicket)
 	return nil
-}
-
-var (
-	CancelGameReplyKeyboard = &telebot.ReplyMarkup{
-		ReplyKeyboard: [][]telebot.ReplyButton{
-			{
-				{Text: CancelGameButtonText},
-			},
-		},
-		ResizeKeyboard: true,
-	}
-)
-
-func (app *Application) PlayRandomXO5X5Handler(c telebot.Context) error {
-	return c.Send("چی بازی؟")
 }
 
 var (

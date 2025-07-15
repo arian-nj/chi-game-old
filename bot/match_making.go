@@ -92,8 +92,8 @@ func (app *Application) createRandomGame(gameType gametype.GameType, tickets []*
 
 	var newSession *GameSession
 	switch gameType {
-	case gametype.XOGameType3X3:
-		newXOGame := xoconsole.NewXOGame(gametype.XOGameType3X3, app.Queries)
+	case gametype.XOGameType3X3, gametype.XOGameType5X5:
+		newXOGame := xoconsole.NewXOGame(gameType, app.Queries)
 		newXOGame.AddPlayer(playerOne)
 		newXOGame.AddPlayer(playerTwo)
 
@@ -105,10 +105,12 @@ func (app *Application) createRandomGame(gameType gametype.GameType, tickets []*
 		if err != nil {
 			slog.Error("error in starting random xo match", "error", err)
 		}
+
 	default:
 		slog.Error("not possible")
 		return
 	}
+
 	for _, player := range newSession.GameState.Players() {
 		for _, oppPlayer := range newSession.GameState.Players() {
 			if player.TgID == oppPlayer.TgID {
