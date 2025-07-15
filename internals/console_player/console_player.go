@@ -2,6 +2,7 @@ package consoleplayer
 
 import (
 	"strconv"
+	"time"
 
 	"github.com/arian-nj/chibazi/internals/keybul"
 )
@@ -11,9 +12,16 @@ type ConsolePlayer struct {
 	Name string
 
 	MessageID int
+
+	SpentTime     time.Duration
+	TurnStartedAt time.Time
 }
 
-func NewPlayer(name string, tgID int) *ConsolePlayer {
+func NewConsolePlayer(name string, tgID int) *ConsolePlayer {
+	if len(name) > 20 {
+		name = name[:20]
+		name += "..."
+	}
 	return &ConsolePlayer{
 		Name: keybul.EscapeReserved(name),
 		TgID: tgID,

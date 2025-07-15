@@ -70,8 +70,8 @@ func (app *Application) MakeMatches() {
 }
 
 func (app *Application) createRandomGame(gameType gametype.GameType, tickets []*Ticket) {
-	playerOne := consoleplayer.NewPlayer(tickets[0].Name, tickets[0].UserID).SetMessageSig(tickets[0].MessageID)
-	playerTwo := consoleplayer.NewPlayer(tickets[1].Name, tickets[1].UserID).SetMessageSig(tickets[1].MessageID)
+	playerOne := consoleplayer.NewConsolePlayer(tickets[0].Name, tickets[0].UserID).SetMessageSig(tickets[0].MessageID)
+	playerTwo := consoleplayer.NewConsolePlayer(tickets[1].Name, tickets[1].UserID).SetMessageSig(tickets[1].MessageID)
 
 	for _, player := range []*consoleplayer.ConsolePlayer{playerOne, playerTwo} {
 

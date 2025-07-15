@@ -21,9 +21,9 @@ type AllSession struct {
 }
 
 type GameSession struct {
-	Gametype  gametype.GameType
 	ChatState bool
 
+	Gametype  gametype.GameType
 	GameState Game
 
 	CreatedAt time.Time

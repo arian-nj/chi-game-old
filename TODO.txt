@@ -51,18 +51,20 @@
 # 0.4.0
 [X] XO ai
 [] play with ai on matchmaking timeout
-[] activate 5X5 XO
-[] add timer for players not playing
+[.] add timer for players not playing
 [] clean up and disconnect after game
+[] activate 5X5 XO
 
 
-[ ] 0.5.0 statistics
+[X] 0.5.0 statistics
 	[X] check admin for /stat
-	[ ] add user stat
+	[X] add user stat
 	[-] seperate game stats
 
 
-[] about and description text
+[.] about and description text
+
+[ ] make it panic safe
 
 [] deploy
 
@@ -82,7 +84,6 @@
 
 [ ] store web loading time stats
 
-[ ] make it panic safe
 
 maybe add scroing to make it harder to use other bots
 

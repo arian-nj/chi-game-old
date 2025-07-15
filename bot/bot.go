@@ -89,10 +89,9 @@ func RunBot(commonapp *commonapp.CommonApp, ctx context.Context) {
 
 func (app *Application) ClearDeadGamesCron() {
 	for {
-		ExpireTime := 2 * time.Minute
 		nowTime := time.Now()
 		for key, gameSession := range app.GameSessions.Sessions {
-			if nowTime.Sub(gameSession.CreatedAt) > ExpireTime {
+			if nowTime.Sub(gameSession.CreatedAt) > DeleteGameSessionTime {
 				app.GameSessions.Mutex.Lock()
 				delete(app.GameSessions.Sessions, key)
 				app.GameSessions.Mutex.Unlock()
