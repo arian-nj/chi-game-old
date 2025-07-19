@@ -12,11 +12,16 @@ const (
 	develop ReleasMode = 1
 )
 
+type JWTConfig struct {
+	SecretKey []byte
+}
+
 type Config struct {
 	BotToken    string
 	ReleaseMode ReleasMode
 	DatabseUrl  string
 	BaseUrl     string
+	Jwt         JWTConfig
 }
 
 func ParseConfig() (*Config, error) {
@@ -58,7 +63,9 @@ func ParseConfig() (*Config, error) {
 		conf.BotToken = bot_token
 		conf.DatabseUrl = db_url
 	}
-
+	conf.Jwt = JWTConfig{
+		SecretKey: []byte("palfd34nm3n892n74riq3v4k235vq65b5q7n7nnw7nwsp8w5b4bq34v5bqb56q35v5b6n7opawrr"),
+	}
 	conf.BaseUrl = "https://192.168.0.107"
 	return &conf, nil
 }

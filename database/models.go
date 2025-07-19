@@ -15,7 +15,7 @@ type Hub struct {
 	TgID      int
 }
 
-type User struct {
+type TelegramUser struct {
 	ID        int
 	TgID      int
 	CreatedAt pgtype.Timestamp

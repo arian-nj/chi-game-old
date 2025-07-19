@@ -11,94 +11,78 @@ import (
 	"github.com/jackc/pgx/v5/pgtype"
 )
 
-const activeUser = `-- name: ActiveUser :exec
-UPDATE users SET is_active = TRUE
-WHERE (
-  tg_id = $1
-)
-`
-
-func (q *Queries) ActiveUser(ctx context.Context, tgID int) error {
-	_, err := q.db.Exec(ctx, activeUser, tgID)
-	return err
-}
-
-const countActiveUsers = `-- name: CountActiveUsers :one
-SELECT COUNT(*) FROM users
+const countActiveTgUsers = `-- name: CountActiveTgUsers :one
+SELECT COUNT(*) FROM telegram_users
 WHERE is_active = TRUE
 `
 
-func (q *Queries) CountActiveUsers(ctx context.Context) (int64, error) {
-	row := q.db.QueryRow(ctx, countActiveUsers)
+func (q *Queries) CountActiveTgUsers(ctx context.Context) (int64, error) {
+	row := q.db.QueryRow(ctx, countActiveTgUsers)
 	var count int64
 	err := row.Scan(&count)
 	return count, err
 }
 
-const countAllUsers = `-- name: CountAllUsers :one
-SELECT COUNT(*) FROM users
+const countAllTgUsers = `-- name: CountAllTgUsers :one
+SELECT COUNT(*) FROM telegram_users
 `
 
-func (q *Queries) CountAllUsers(ctx context.Context) (int64, error) {
-	row := q.db.QueryRow(ctx, countAllUsers)
+func (q *Queries) CountAllTgUsers(ctx context.Context) (int64, error) {
+	row := q.db.QueryRow(ctx, countAllTgUsers)
 	var count int64
 	err := row.Scan(&count)
 	return count, err
 }
 
-const countUsersCreatedBetween = `-- name: CountUsersCreatedBetween :one
-SELECT COUNT(*) FROM users
+const countUsersTgCreatedBetween = `-- name: CountUsersTgCreatedBetween :one
+SELECT COUNT(*) FROM telegram_users
 WHERE created_at >= $1 AND created_at <= $2
 `
 
-type CountUsersCreatedBetweenParams struct {
+type CountUsersTgCreatedBetweenParams struct {
 	CreatedAt   pgtype.Timestamp
 	CreatedAt_2 pgtype.Timestamp
 }
 
-func (q *Queries) CountUsersCreatedBetween(ctx context.Context, arg CountUsersCreatedBetweenParams) (int64, error) {
-	row := q.db.QueryRow(ctx, countUsersCreatedBetween, arg.CreatedAt, arg.CreatedAt_2)
+func (q *Queries) CountUsersTgCreatedBetween(ctx context.Context, arg CountUsersTgCreatedBetweenParams) (int64, error) {
+	row := q.db.QueryRow(ctx, countUsersTgCreatedBetween, arg.CreatedAt, arg.CreatedAt_2)
 	var count int64
 	err := row.Scan(&count)
 	return count, err
 }
 
-const createUser = `-- name: CreateUser :exec
-INSERT INTO users (tg_id) VALUES ($1) ON
+const createTgUser = `-- name: CreateTgUser :one
+INSERT INTO telegram_users (tg_id) VALUES ($1) ON
 	CONFLICT (tg_id) DO UPDATE
-	SET updated_at = NOW(), is_active = TRUE
+	SET updated_at = NOW(), is_active = TRUE RETURNING id, tg_id, created_at, is_active, updated_at
 `
 
-func (q *Queries) CreateUser(ctx context.Context, tgID int) error {
-	_, err := q.db.Exec(ctx, createUser, tgID)
-	return err
+func (q *Queries) CreateTgUser(ctx context.Context, tgID int) (TelegramUser, error) {
+	row := q.db.QueryRow(ctx, createTgUser, tgID)
+	var i TelegramUser
+	err := row.Scan(
+		&i.ID,
+		&i.TgID,
+		&i.CreatedAt,
+		&i.IsActive,
+		&i.UpdatedAt,
+	)
+	return i, err
 }
 
-const diactiveUser = `-- name: DiactiveUser :exec
-UPDATE users SET is_active = FALSE
-WHERE (
-  tg_id = $1
-)
+const getAllTgUsers = `-- name: GetAllTgUsers :many
+SELECT id, tg_id, created_at, is_active, updated_at FROM telegram_users
 `
 
-func (q *Queries) DiactiveUser(ctx context.Context, tgID int) error {
-	_, err := q.db.Exec(ctx, diactiveUser, tgID)
-	return err
-}
-
-const getAllUsers = `-- name: GetAllUsers :many
-SELECT id, tg_id, created_at, is_active, updated_at FROM users
-`
-
-func (q *Queries) GetAllUsers(ctx context.Context) ([]User, error) {
-	rows, err := q.db.Query(ctx, getAllUsers)
+func (q *Queries) GetAllTgUsers(ctx context.Context) ([]TelegramUser, error) {
+	rows, err := q.db.Query(ctx, getAllTgUsers)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
-	var items []User
+	var items []TelegramUser
 	for rows.Next() {
-		var i User
+		var i TelegramUser
 		if err := rows.Scan(
 			&i.ID,
 			&i.TgID,
@@ -116,14 +100,14 @@ func (q *Queries) GetAllUsers(ctx context.Context) ([]User, error) {
 	return items, nil
 }
 
-const getUser = `-- name: GetUser :one
-SELECT id, tg_id, created_at, is_active, updated_at FROM users
+const getTgUser = `-- name: GetTgUser :one
+SELECT id, tg_id, created_at, is_active, updated_at FROM telegram_users
 WHERE tg_id = $1
 `
 
-func (q *Queries) GetUser(ctx context.Context, tgID int) (User, error) {
-	row := q.db.QueryRow(ctx, getUser, tgID)
-	var i User
+func (q *Queries) GetTgUser(ctx context.Context, tgID int) (TelegramUser, error) {
+	row := q.db.QueryRow(ctx, getTgUser, tgID)
+	var i TelegramUser
 	err := row.Scan(
 		&i.ID,
 		&i.TgID,
@@ -134,17 +118,17 @@ func (q *Queries) GetUser(ctx context.Context, tgID int) (User, error) {
 	return i, err
 }
 
-const getUsersStatic = `-- name: GetUsersStatic :one
+const getTgUsersStatic = `-- name: GetTgUsersStatic :one
 SELECT
   COUNT(*) FILTER (WHERE is_active = TRUE) AS active_users,
   COUNT(*) AS total_users,
   COUNT(*) FILTER ( WHERE created_at >= NOW() - INTERVAL '1 day') AS users_created_last_24_hours,
   COUNT(*) FILTER ( WHERE created_at >= NOW() - INTERVAL '7 days') AS users_created_last_week,
   COUNT(*) FILTER ( WHERE created_at >= NOW() - INTERVAL '1 month') AS users_created_last_month
-FROM users
+FROM telegram_users
 `
 
-type GetUsersStaticRow struct {
+type GetTgUsersStaticRow struct {
 	ActiveUsers             int64
 	TotalUsers              int64
 	UsersCreatedLast24Hours int64
@@ -152,9 +136,9 @@ type GetUsersStaticRow struct {
 	UsersCreatedLastMonth   int64
 }
 
-func (q *Queries) GetUsersStatic(ctx context.Context) (GetUsersStaticRow, error) {
-	row := q.db.QueryRow(ctx, getUsersStatic)
-	var i GetUsersStaticRow
+func (q *Queries) GetTgUsersStatic(ctx context.Context) (GetTgUsersStaticRow, error) {
+	row := q.db.QueryRow(ctx, getTgUsersStatic)
+	var i GetTgUsersStaticRow
 	err := row.Scan(
 		&i.ActiveUsers,
 		&i.TotalUsers,
@@ -165,15 +149,31 @@ func (q *Queries) GetUsersStatic(ctx context.Context) (GetUsersStaticRow, error)
 	return i, err
 }
 
-const updateMixedUserStatuses = `-- name: UpdateMixedUserStatuses :exec
-UPDATE users
+const updateMixedTgUserStatuses = `-- name: UpdateMixedTgUserStatuses :exec
+
+UPDATE telegram_users
 SET is_active = CASE
   WHEN id = ANY ($1::bigint[]) THEN TRUE
   ELSE FALSE  
 END
 `
 
-func (q *Queries) UpdateMixedUserStatuses(ctx context.Context, dollar_1 []int) error {
-	_, err := q.db.Exec(ctx, updateMixedUserStatuses, dollar_1)
+// -- name: ActiveTgUser :exec
+// UPDATE telegram_users SET is_active = TRUE
+// WHERE (
+//
+//	tg_id = $1
+//
+// );
+//
+// -- name: DiactiveTgUser :exec
+// UPDATE telegram_users SET is_active = FALSE
+// WHERE (
+//
+//	tg_id = $1
+//
+// );
+func (q *Queries) UpdateMixedTgUserStatuses(ctx context.Context, dollar_1 []int) error {
+	_, err := q.db.Exec(ctx, updateMixedTgUserStatuses, dollar_1)
 	return err
 }

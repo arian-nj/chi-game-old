@@ -10,6 +10,7 @@ import (
 
 	consoleplayer "github.com/arian-nj/chibazi/internals/console_player"
 	gametype "github.com/arian-nj/chibazi/internals/game_type"
+	"github.com/arian-nj/chibazi/internals/utils"
 	"gopkg.in/telebot.v4"
 )
 
@@ -45,7 +46,10 @@ func NewGameSession(allSession *AllSession, bot *telebot.Bot, gameType gametype.
 		CreatedAt:       time.Now(),
 		ExpireDuaration: 2*time.Minute*2 + 30,
 	}
-	go gs.MonitorGame(allSession)
+
+	utils.RunBackgroundTask(func() {
+		gs.MonitorGame(allSession)
+	})
 
 	return gs
 }

@@ -14,6 +14,7 @@ import (
 	gametype "github.com/arian-nj/chibazi/internals/game_type"
 	keybul "github.com/arian-nj/chibazi/internals/keybul"
 	"github.com/arian-nj/chibazi/internals/random"
+	"github.com/arian-nj/chibazi/internals/utils"
 	"github.com/arian-nj/chibazi/internals/xo_core"
 	"gopkg.in/telebot.v4"
 )
@@ -114,10 +115,16 @@ func (g *XOGame) StartGame(bot telebot.API) error {
 	if err != nil {
 		return fmt.Errorf("error when starting xo game %w", err)
 	}
-	go g.MonitorTimeout(bot)
+	utils.RunBackgroundTask(func() {
+		g.MonitorTimeout(bot)
+	})
+	creatorId := 0
+	if g.ViaMessageId != "" {
+		creatorId = g.Players()[0].TgID
+	}
 	_, err = g.Queries.CreateHub(context.Background(), database.CreateHubParams{
 		GameType: string(g.GameType),
-		TgID:     g.Players()[0].TgID,
+		TgID:     creatorId,
 	})
 	return err
 }

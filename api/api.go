@@ -6,9 +6,6 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/arian-nj/chibazi/frontend"
-	"github.com/arian-nj/chibazi/pkg/response"
-
 	commonapp "github.com/arian-nj/chibazi/internals/common_app"
 )
 
@@ -20,20 +17,6 @@ func NewApplication(common *commonapp.CommonApp) *Application {
 	return &Application{
 		CommonApp: common,
 	}
-}
-func (app *Application) statusHandler(w http.ResponseWriter, r *http.Request) {
-	err := response.JSON(w, http.StatusOK, map[string]string{"status": "ok"})
-	if err != nil {
-		slog.Error(err.Error())
-	}
-}
-
-func (app *Application) createRouter() *http.ServeMux {
-	distFS := frontend.GetDistFS()
-	mux := http.NewServeMux()
-	mux.HandleFunc("/api/status", app.statusHandler)
-	mux.Handle("/web/", http.StripPrefix("/web/", http.FileServerFS(distFS)))
-	return mux
 }
 
 func RunApi(commonapp *commonapp.CommonApp, ctx context.Context) {

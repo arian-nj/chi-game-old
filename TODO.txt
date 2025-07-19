@@ -50,10 +50,10 @@
 
 # 0.4.0
 [X] XO ai
-[] play with ai on matchmaking timeout
 [X] add timer for players not playing
 [X] clean up and disconnect after game
-[] activate 5X5 XO
+[X] activate 5X5 XO
+[-] play with ai on matchmaking timeout
 
 
 [X] 0.5.0 statistics
@@ -64,19 +64,22 @@
 
 [X] about and description text
 
-[ ] make it panic safe
+[X] make it panic safe
 
-[] deploy
+[ ] add don't care random game
+
+[ ] start advertisement
 
 # 0.6.0 connect four
 
+# 0.7.0 user statistics
 
 
 [X] make api base
 [X] make front base embed in go
 [X] dev reverse proxy
-[ ] how sending and joining + implementation
 [ ] authenticate opened player
+[ ] how sending and joining + implementation
 [ ] websocket and basic data transfer
 [ ] dot box game logic
 [ ] basic dot box game

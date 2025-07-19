@@ -2,11 +2,15 @@ package bot
 
 import (
 	"context"
+	"fmt"
+	"log"
+	"runtime/debug"
 	"sync"
 	"time"
 
 	commonapp "github.com/arian-nj/chibazi/internals/common_app"
 	gametype "github.com/arian-nj/chibazi/internals/game_type"
+	"github.com/arian-nj/chibazi/internals/utils"
 
 	"golang.org/x/exp/slog"
 	"gopkg.in/telebot.v4"
@@ -50,7 +54,7 @@ func RunBot(commonapp *commonapp.CommonApp, ctx context.Context) {
 	}
 	b, err := telebot.NewBot(pref)
 	if err != nil {
-		slog.Error("new error %w", err)
+		slog.Error("new error %w", "error", err)
 		return
 	}
 	go func() {
@@ -62,6 +66,7 @@ func RunBot(commonapp *commonapp.CommonApp, ctx context.Context) {
 	app.Bot = b
 
 	b.Use(app.addUserMiddleware)
+	b.Use(panicRecover)
 
 	b.Handle(telebot.OnQuery, app.inlineQueryHandler)
 	b.Handle(telebot.OnInlineResult, app.inlineResultFeedbackHandler)
@@ -103,18 +108,35 @@ func (app *Application) ClearDeadGamesCron() {
 
 func (app *Application) addUserMiddleware(next telebot.HandlerFunc) telebot.HandlerFunc {
 	return func(c telebot.Context) error {
-		go func() {
+		utils.RunBackgroundTask(func() {
 			user := c.Sender()
 			if user == nil {
 				slog.Error("User is nil")
 				return
 			}
-			err := app.Queries.CreateUser(context.Background(), int(user.ID))
+			_, err := app.Queries.CreateTgUser(context.Background(), int(user.ID))
 			if err != nil {
 				slog.Error("Failed to create user", "err", err)
 				return
 			}
+		})
+		return next(c)
+	}
+}
+func panicRecover(next telebot.HandlerFunc) telebot.HandlerFunc {
+	return func(c telebot.Context) (err error) {
+		defer func() {
+			if r := recover(); r != nil {
+				// log.Printf("Recovered from panic: %v\n", r)
+				log.Printf("panic: %v\n%s", r, debug.Stack())
+
+				c.Send("An internal error occurred. Please try again later.")
+
+				// Set err so it appears as if the handler returned an error
+				err = fmt.Errorf("handler panic: %v", r)
+			}
 		}()
+
 		return next(c)
 	}
 }

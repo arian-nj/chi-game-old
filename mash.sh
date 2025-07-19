@@ -32,9 +32,11 @@ if [ -z "COMMAND" ]; then
 fi
 
 case $COMMAND in
+	front)
+		build_frontend
+		;;
 	run)
 		generate_sqlc
-		# build_frontend
 		echo "Starting Core API"
 		go run ./cmd/bot/.
 

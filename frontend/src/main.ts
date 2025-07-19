@@ -1,35 +1,39 @@
-import { Application, Assets, Sprite } from "pixi.js";
+import { GetEngine, setEngine } from "./app/getEngine";
+import { LoadScreen } from "./app/screens/LoadScreen";
+import { XoScreen } from "./app/screens/xo/XOScreen";
+import { userSettings } from "./app/utils/userSettings";
+import { CreationEngine } from "./engine/engine";
+/**
+ * Importing these modules will automatically register there plugins with the engine.
+ */
+import "@pixi/sound";
+// import WebApp from "@twa-dev/sdk";
+// import { ValidateInitdata } from "./auth/jwt";
+// import "@esotericsoftware/spine-pixi-v8";
+//
+// WebApp.ready();
+// (async () => {
+//   await ValidateInitdata(WebApp.initData);
+// })();
+//
+// Create a new creation engine instance
+const engine = new CreationEngine();
+setEngine(engine);
 
+globalThis.__PIXI_APP__ = engine;
 (async () => {
-  // Create a new application
-  const app = new Application();
-
-  // Initialize the application
-  await app.init({ background: "#1099bb", resizeTo: window });
-
-  // Append the application canvas to the document body
-  document.getElementById("pixi-container")!.appendChild(app.canvas);
-
-  // Load the bunny texture
-  const texture = await Assets.load("/web/assets/bunny.png");
-
-  // Create a bunny Sprite
-  const bunny = new Sprite(texture);
-
-  // Center the sprite's anchor point
-  bunny.anchor.set(0.5);
-
-  // Move the sprite to the center of the screen
-  bunny.position.set(app.screen.width / 2, app.screen.height / 2);
-
-  // Add the bunny to the stage
-  app.stage.addChild(bunny);
-
-  // Listen for animate update
-  app.ticker.add((time) => {
-    // Just for fun, let's rotate mr rabbit a little.
-    // * Delta is 1 if running at 100% performance *
-    // * Creates frame-independent transformation *
-    bunny.rotation += 0.1 * time.deltaTime;
+  // Initialize the creation engine instance
+  await engine.init({
+    background: "#1E1E1E",
+    resizeOptions: { minWidth: 768, minHeight: 1024, letterbox: false },
   });
+
+  // Initialize the user settings
+  userSettings.init();
+
+  // Show the load screen
+  await engine.navigation.showScreen(LoadScreen);
+  // Show the main screen once the load screen is dismissed
+  await engine.navigation.showScreen(XoScreen);
+  // await engine.navigation.showScreen(MainScreen);
 })();

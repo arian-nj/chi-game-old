@@ -94,17 +94,17 @@ func (app *Application) statHandler(c telebot.Context) error {
 		return err
 	}
 
-	allUsers, err := app.Queries.CountAllUsers(context.Background())
+	allUsers, err := app.Queries.CountAllTgUsers(context.Background())
 	if err != nil {
 		return err
 	}
 	now := time.Now()
-	newUsersLastHour, err := app.Queries.CountUsersCreatedBetween(context.Background(), database.CountUsersCreatedBetweenParams{
+	newUsersLastHour, err := app.Queries.CountUsersTgCreatedBetween(context.Background(), database.CountUsersTgCreatedBetweenParams{
 		CreatedAt:   pgtype.Timestamp{Time: now.Add(-time.Hour)},
 		CreatedAt_2: pgtype.Timestamp{Time: now},
 	})
 
-	newUsersLastDay, err := app.Queries.CountUsersCreatedBetween(context.Background(), database.CountUsersCreatedBetweenParams{
+	newUsersLastDay, err := app.Queries.CountUsersTgCreatedBetween(context.Background(), database.CountUsersTgCreatedBetweenParams{
 		CreatedAt:   pgtype.Timestamp{Time: now.Add(-(time.Duration(now.Hour()) + time.Duration(now.Minute()) + time.Duration(now.Second())))},
 		CreatedAt_2: pgtype.Timestamp{Time: now},
 	})
