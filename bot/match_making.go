@@ -4,14 +4,48 @@ import (
 	"fmt"
 	"log/slog"
 	"strconv"
+	"sync"
 	"time"
 
 	xoconsole "github.com/arian-nj/chibazi/games/xo_console"
 	consoleplayer "github.com/arian-nj/chibazi/internals/console_player"
 	gametype "github.com/arian-nj/chibazi/internals/game_type"
-	sharedapp "github.com/arian-nj/chibazi/internals/shared_app"
 	"gopkg.in/telebot.v4"
 )
+
+type MatchMaking struct {
+	WaitingPlayers map[gametype.GameType][]*Ticket
+	Mutex          sync.Mutex
+}
+
+type Ticket struct {
+	Name      string
+	UserID    int
+	MessageID int
+	GameType  gametype.GameType
+	Timestamp time.Time
+}
+
+func NewTicket(name string, userID, messageID int, gameType gametype.GameType) *Ticket {
+	return &Ticket{
+		UserID:    userID,
+		Name:      name,
+		MessageID: messageID,
+		GameType:  gameType,
+	}
+}
+
+func (app *Application) AddTicket(gameType gametype.GameType, newTicket *Ticket) {
+
+	queue := app.MatchMaking.WaitingPlayers[gameType]
+	app.MatchMaking.WaitingPlayers[gameType] = append(queue, newTicket)
+
+}
+
+func (app *Application) CheckIsAllowedToPlay(playerId int) bool {
+	_, isFound := app.GameSessions.Sessions[strconv.Itoa(playerId)]
+	return !isFound
+}
 
 func (app *Application) MakeMatches() {
 	defer app.MatchMaking.Mutex.Unlock()
@@ -25,17 +59,17 @@ func (app *Application) MakeMatches() {
 				ticketOne := ticketsList[0]
 				ticketTwo := ticketsList[1]
 				app.MatchMaking.WaitingPlayers[gameTypeKey] = ticketsList[2:]
-				app.createRandomGame(gameTypeKey, []*sharedapp.Ticket{ticketOne, ticketTwo})
+				app.createRandomGame(gameTypeKey, []*Ticket{ticketOne, ticketTwo})
 			}
 			app.MatchMaking.Mutex.Unlock()
 		}
-		if doFlag == false {
+		if !doFlag {
 			time.Sleep(100 * time.Millisecond)
 		}
 	}
 }
 
-func (app *Application) createRandomGame(gameType gametype.GameType, tickets []*sharedapp.Ticket) {
+func (app *Application) createRandomGame(gameType gametype.GameType, tickets []*Ticket) {
 	playerOne := consoleplayer.NewConsolePlayer(tickets[0].Name, tickets[0].UserID).SetMessageSig(tickets[0].MessageID)
 	playerTwo := consoleplayer.NewConsolePlayer(tickets[1].Name, tickets[1].UserID).SetMessageSig(tickets[1].MessageID)
 
@@ -56,14 +90,14 @@ func (app *Application) createRandomGame(gameType gametype.GameType, tickets []*
 		player.MessageID = msg.ID
 	}
 
-	var newSession *sharedapp.GameSession
+	var newSession *GameSession
 	switch gameType {
 	case gametype.XOGameType3X3, gametype.XOGameType5X5:
 		newXOGame := xoconsole.NewXOGame(gametype.XOGameType3X3, app.Queries)
 		newXOGame.AddPlayer(playerOne)
 		newXOGame.AddPlayer(playerTwo)
 
-		newSession = sharedapp.NewGameSession(app.GameSessions, app.Bot, gameType, newXOGame)
+		newSession = NewGameSession(app.GameSessions, app.Bot, gameType, newXOGame)
 		app.AddGameSession(strconv.Itoa(playerOne.TgID), newSession)
 		app.AddGameSession(strconv.Itoa(playerTwo.TgID), newSession)
 
@@ -113,7 +147,7 @@ func (app *Application) inlineResultFeedbackHandler(c telebot.Context) error {
 	switch gametype.GameType(resultId) {
 	case gametype.XOGameType3X3:
 		newXOGame := xoconsole.NewXOGame(gametype.XOGameType3X3, app.Queries)
-		newGameSession := sharedapp.NewGameSession(app.GameSessions, app.Bot, gametype.XOGameType3X3, newXOGame)
+		newGameSession := NewGameSession(app.GameSessions, app.Bot, gametype.XOGameType3X3, newXOGame)
 
 		app.AddGameSession(messageID, newGameSession)
 
@@ -122,7 +156,7 @@ func (app *Application) inlineResultFeedbackHandler(c telebot.Context) error {
 
 	case gametype.XOGameType5X5:
 		newXOGame := xoconsole.NewXOGame(gametype.XOGameType5X5, app.Queries)
-		newGameSession := sharedapp.NewGameSession(app.GameSessions, app.Bot, gametype.XOGameType3X3, newXOGame)
+		newGameSession := NewGameSession(app.GameSessions, app.Bot, gametype.XOGameType3X3, newXOGame)
 
 		app.AddGameSession(messageID, newGameSession)
 

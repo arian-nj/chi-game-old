@@ -11,7 +11,6 @@ import (
 	xoconsole "github.com/arian-nj/chibazi/games/xo_console"
 	gametype "github.com/arian-nj/chibazi/internals/game_type"
 	keybul "github.com/arian-nj/chibazi/internals/keybul"
-	sharedapp "github.com/arian-nj/chibazi/internals/shared_app"
 	"github.com/jackc/pgx/v5/pgtype"
 	"gopkg.in/telebot.v4"
 )
@@ -227,7 +226,7 @@ func (app *Application) PlayRandomGameHandler(c telebot.Context, gameType gamety
 		return err
 	}
 
-	newTicket := sharedapp.NewTicket(sender.FirstName, int(sender.ID), msg.ID, gameType)
+	newTicket := NewTicket(sender.FirstName, int(sender.ID), msg.ID, gameType)
 	app.AddTicket(gameType, newTicket)
 	return nil
 }

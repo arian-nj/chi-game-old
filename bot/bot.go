@@ -5,8 +5,10 @@ import (
 	"fmt"
 	"log"
 	"runtime/debug"
+	"sync"
 	"time"
 
+	gametype "github.com/arian-nj/chibazi/internals/game_type"
 	sharedapp "github.com/arian-nj/chibazi/internals/shared_app"
 	"github.com/arian-nj/chibazi/internals/utils"
 
@@ -16,15 +18,27 @@ import (
 
 type Application struct {
 	*sharedapp.SharedApp
+
+	GameSessions *AllSession
+	MatchMaking  *MatchMaking
 }
 
 func NewApplication(sharedApp *sharedapp.SharedApp) *Application {
 	return &Application{
 		SharedApp: sharedApp,
+
+		GameSessions: &AllSession{
+			Sessions: map[string]*GameSession{},
+			Mutex:    sync.Mutex{},
+		},
+		MatchMaking: &MatchMaking{
+			WaitingPlayers: map[gametype.GameType][]*Ticket{},
+			Mutex:          sync.Mutex{},
+		},
 	}
 }
 
-func (app *Application) AddGameSession(key string, gs *sharedapp.GameSession) {
+func (app *Application) AddGameSession(key string, gs *GameSession) {
 	app.GameSessions.Mutex.Lock()
 	defer app.GameSessions.Mutex.Unlock()
 
