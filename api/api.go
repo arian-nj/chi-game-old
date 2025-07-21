@@ -4,24 +4,31 @@ import (
 	"context"
 	"log/slog"
 	"net/http"
+	"sync"
 	"time"
 
-	sharedapp "github.com/arian-nj/chibazi/internals/shared_app"
+	"github.com/arian-nj/chibazi/database"
+	gamesessions "github.com/arian-nj/chibazi/game_sessions"
+	"github.com/arian-nj/chibazi/internals/config"
 )
 
-type Application struct {
-	*sharedapp.SharedApp
+type ApiApplication struct {
+	Config      *config.Config
+	Queries     *database.Queries
+	AllSessions *gamesessions.AllSession
 }
 
-func NewApplication(sharedApp *sharedapp.SharedApp) *Application {
-	return &Application{
-		SharedApp: sharedApp,
+func NewApiApplication(config *config.Config, queries *database.Queries, AllSession *gamesessions.AllSession) *ApiApplication {
+	return &ApiApplication{
+		Config:      config,
+		Queries:     queries,
+		AllSessions: AllSession,
 	}
 }
 
-func RunApi(sharedApp *sharedapp.SharedApp, ctx context.Context) {
-	defer sharedApp.Wg.Done()
-	app := NewApplication(sharedApp)
+func (app *ApiApplication) RunApi(ctx context.Context, wg *sync.WaitGroup) {
+	wg.Add(1)
+	defer wg.Done()
 	router := app.createRouter()
 
 	srv := &http.Server{

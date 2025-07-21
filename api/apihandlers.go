@@ -13,14 +13,14 @@ import (
 	"golang.org/x/time/rate"
 )
 
-func (app *Application) statusHandler(w http.ResponseWriter, r *http.Request) {
+func (app *ApiApplication) statusHandler(w http.ResponseWriter, r *http.Request) {
 	err := response.JSON(w, http.StatusOK, map[string]string{"status": "ok"})
 	if err != nil {
 		slog.Error(err.Error())
 	}
 }
 
-func (app *Application) websocketUpgrader(w http.ResponseWriter, r *http.Request) {
+func (app *ApiApplication) websocketUpgrader(w http.ResponseWriter, r *http.Request) {
 	conn, err := websocket.Accept(w, r, &websocket.AcceptOptions{
 		Subprotocols: []string{"echo"},
 	})

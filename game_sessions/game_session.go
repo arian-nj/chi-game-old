@@ -1,10 +1,9 @@
-package bot
+package gamesessions
 
 import (
 	"context"
 	"fmt"
 	"log/slog"
-	"strconv"
 	"sync"
 	"time"
 
@@ -23,6 +22,13 @@ type Game interface {
 type AllSession struct {
 	Sessions map[string]*GameSession
 	Mutex    sync.Mutex
+}
+
+func (allSession *AllSession) Add(key string, gs *GameSession) {
+	allSession.Mutex.Lock()
+	defer allSession.Mutex.Unlock()
+
+	allSession.Sessions[key] = gs
 }
 
 type GameSession struct {
@@ -92,20 +98,20 @@ func (gs *GameSession) MonitorGame(allSession *AllSession) {
 }
 
 func (gs *GameSession) CleanAndDisconnect(allSession *AllSession) {
-	if gs.IsChatOn {
-		text := "چت قطع شد"
-		for _, player := range gs.GameState.Players() {
-			_, err := gs.Bot.Send(player, text, welcomeReplyKeyboard)
-			if err != nil {
-				slog.Error("can't send chat ended message", "err", err)
-			}
-		}
-	}
-
-	allSession.Mutex.Lock()
-	defer allSession.Mutex.Unlock()
-
-	for _, player := range gs.GameState.Players() {
-		delete(allSession.Sessions, strconv.Itoa(player.TgID))
-	}
+	// if gs.IsChatOn {
+	// 	text := "چت قطع شد"
+	// 	for _, player := range gs.GameState.Players() {
+	// 		_, err := gs.Bot.Send(player, text, welcomeReplyKeyboard)
+	// 		if err != nil {
+	// 			slog.Error("can't send chat ended message", "err", err)
+	// 		}
+	// 	}
+	// }
+	//
+	// allSession.Mutex.Lock()
+	// defer allSession.Mutex.Unlock()
+	//
+	// for _, player := range gs.GameState.Players() {
+	// 	delete(allSession.Sessions, strconv.Itoa(player.TgID))
+	// }
 }

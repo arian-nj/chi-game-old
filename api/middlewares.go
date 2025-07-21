@@ -11,7 +11,7 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 )
 
-func (app *Application) Authenticate(next http.Handler) http.Handler {
+func (app *ApiApplication) Authenticate(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Add("Vary", "Authorization")
 
@@ -33,7 +33,7 @@ func (app *Application) Authenticate(next http.Handler) http.Handler {
 	})
 }
 
-func (app *Application) AuthenticateQuery(next http.Handler) http.Handler {
+func (app *ApiApplication) AuthenticateQuery(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		token := r.URL.Query().Get("auth_token")
 		if token != "" {
@@ -47,7 +47,7 @@ func (app *Application) AuthenticateQuery(next http.Handler) http.Handler {
 	})
 }
 
-func (app *Application) RequireAuthenticatedUser(next http.Handler) http.Handler {
+func (app *ApiApplication) RequireAuthenticatedUser(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		authenticatedUser := ContextGetAuthenticatedUser(r)
 
@@ -80,7 +80,7 @@ func ContextGetAuthenticatedUser(r *http.Request) *database.TelegramUser {
 	return user
 }
 
-func (app *Application) ValidateToken(w http.ResponseWriter, r *http.Request, tokenString string) *http.Request {
+func (app *ApiApplication) ValidateToken(w http.ResponseWriter, r *http.Request, tokenString string) *http.Request {
 	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (any, error) {
 		return app.Config.Jwt.SecretKey, nil
 	}, jwt.WithValidMethods([]string{jwt.SigningMethodHS256.Alg()}))

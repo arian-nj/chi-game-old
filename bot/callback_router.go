@@ -5,16 +5,16 @@ import (
 	"strconv"
 )
 
-func (app *Application) callbackRouter(c telebot.Context) error {
+func (app *BotApplication) callbackRouter(c telebot.Context) error {
 	callback := c.Callback()
 	messageId := c.Callback().MessageID
 	if messageId == "" {
 		messageId = strconv.Itoa(int(callback.Sender.ID))
 	}
 
-	app.GameSessions.Mutex.Lock()
-	gameSession, has_game := app.GameSessions.Sessions[messageId]
-	app.GameSessions.Mutex.Unlock()
+	app.AllSessions.Mutex.Lock()
+	gameSession, has_game := app.AllSessions.Sessions[messageId]
+	app.AllSessions.Mutex.Unlock()
 
 	if has_game {
 		return gameSession.GameState.CallbackHandler(c)

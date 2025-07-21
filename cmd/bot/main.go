@@ -5,44 +5,58 @@ import (
 	"log/slog"
 	"os"
 	"os/signal"
+	"sync"
 	"syscall"
 	"time"
 
 	"github.com/arian-nj/chibazi/api"
 	"github.com/arian-nj/chibazi/bot"
+	"github.com/arian-nj/chibazi/database"
 	"github.com/arian-nj/chibazi/db"
+	gamesessions "github.com/arian-nj/chibazi/game_sessions"
 	"github.com/arian-nj/chibazi/internals/config"
-	sharedapp "github.com/arian-nj/chibazi/internals/shared_app"
+	"github.com/jackc/pgx/v5/pgxpool"
 )
 
 func main() {
-	cfg, err := config.ParseConfig()
+	var (
+		Config      *config.Config
+		Queries     *database.Queries
+		Conn        *pgxpool.Pool
+		Wg          *sync.WaitGroup          = &sync.WaitGroup{}
+		AllSessions *gamesessions.AllSession = &gamesessions.AllSession{
+			Sessions: map[string]*gamesessions.GameSession{},
+			Mutex:    sync.Mutex{},
+		}
+	)
+
+	Config, err := config.ParseConfig()
 	if err != nil {
 		panic(err)
 	}
 
-	err = db.Migrate(cfg.DatabseUrl)
+	err = db.Migrate(Config.DatabseUrl)
 	if err != nil {
 		slog.Error("Failed to migrate database", "err", err)
 		return
 	}
-	sharedApp := sharedapp.NewSharedApp(cfg)
 
-	err = sharedApp.ConfigureDatabase()
+	Conn, err = pgxpool.New(context.Background(), Config.DatabseUrl)
 	if err != nil {
-		slog.Error("Failed to configure Database", "err", err)
+		slog.Error("can not make a new connection ", "err", err)
 		return
 	}
+	defer Conn.Close()
 
-	defer sharedApp.Conn.Close()
+	Queries = database.New(Conn)
 
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*2)
-	err = sharedApp.Conn.Ping(ctx)
+	err = Conn.Ping(ctx)
 	if err != nil {
 		slog.Error("Failed to connect to Database", "err", err)
+		cancel()
 		return
 	}
-	cancel()
 
 	slog.Info("Connected to Database")
 
@@ -51,13 +65,13 @@ func main() {
 	quit := make(chan os.Signal, 1)
 	signal.Notify(quit, os.Interrupt, syscall.SIGTERM)
 
-	sharedApp.Wg.Add(1)
-	go api.RunApi(sharedApp, parentCtx)
+	app := api.NewApiApplication(Config, Queries, AllSessions)
+	go app.RunApi(parentCtx, Wg)
 
-	sharedApp.Wg.Add(1)
-	go bot.RunBot(sharedApp, parentCtx)
+	botApp := bot.NewBotApplication(Config, Queries, AllSessions)
+	go botApp.RunBot(parentCtx, Wg)
 
 	<-quit
 	cancel()
-	sharedApp.Wg.Wait()
+	Wg.Wait()
 }

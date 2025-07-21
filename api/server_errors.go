@@ -12,7 +12,7 @@ import (
 	"github.com/arian-nj/chibazi/pkg/validator"
 )
 
-func (app *Application) ReportServerError(r *http.Request, err error) {
+func (app *ApiApplication) ReportServerError(r *http.Request, err error) {
 	var (
 		message = err.Error()
 		// method  = r.Method
@@ -26,7 +26,7 @@ func (app *Application) ReportServerError(r *http.Request, err error) {
 	slog.Error("report server error ", "err", message)
 	log.Println(trace)
 }
-func (app *Application) ReportError(err error) {
+func (app *ApiApplication) ReportError(err error) {
 	var (
 		message = err.Error()
 		trace   = string(debug.Stack())
@@ -38,7 +38,7 @@ func (app *Application) ReportError(err error) {
 	log.Println(trace)
 }
 
-func (app *Application) errorMessage(w http.ResponseWriter, r *http.Request, status int, message string, headers http.Header) {
+func (app *ApiApplication) errorMessage(w http.ResponseWriter, r *http.Request, status int, message string, headers http.Header) {
 	message = strings.ToUpper(message[:1]) + message[1:]
 
 	err := response.JSONWithHeaders(w, status, map[string]string{"Error": message}, headers)
@@ -48,45 +48,45 @@ func (app *Application) errorMessage(w http.ResponseWriter, r *http.Request, sta
 	}
 }
 
-func (app *Application) ServerError(w http.ResponseWriter, r *http.Request, err error) {
+func (app *ApiApplication) ServerError(w http.ResponseWriter, r *http.Request, err error) {
 	app.ReportServerError(r, err)
 
 	message := "The server encountered a problem and could not process your request"
 	app.errorMessage(w, r, http.StatusInternalServerError, message, nil)
 }
 
-func (app *Application) NotFound(w http.ResponseWriter, r *http.Request) {
+func (app *ApiApplication) NotFound(w http.ResponseWriter, r *http.Request) {
 	message := "The requested resource could not be found"
 	app.errorMessage(w, r, http.StatusNotFound, message, nil)
 }
 
-func (app *Application) MethodNotAllowed(w http.ResponseWriter, r *http.Request) {
+func (app *ApiApplication) MethodNotAllowed(w http.ResponseWriter, r *http.Request) {
 	message := fmt.Sprintf("The %s method is not supported for this resource", r.Method)
 	app.errorMessage(w, r, http.StatusMethodNotAllowed, message, nil)
 }
 
-func (app *Application) BadRequest(w http.ResponseWriter, r *http.Request, err error) {
+func (app *ApiApplication) BadRequest(w http.ResponseWriter, r *http.Request, err error) {
 	app.errorMessage(w, r, http.StatusBadRequest, err.Error(), nil)
 }
 
-func (app *Application) FailedValidation(w http.ResponseWriter, r *http.Request, v validator.Validator) {
+func (app *ApiApplication) FailedValidation(w http.ResponseWriter, r *http.Request, v validator.Validator) {
 	err := response.JSON(w, http.StatusUnprocessableEntity, v)
 	if err != nil {
 		app.ServerError(w, r, err)
 	}
 }
 
-func (app *Application) InvalidAuthenticationToken(w http.ResponseWriter, r *http.Request) {
+func (app *ApiApplication) InvalidAuthenticationToken(w http.ResponseWriter, r *http.Request) {
 	headers := make(http.Header)
 	headers.Set("WWW-Authenticate", "Bearer")
 
 	app.errorMessage(w, r, http.StatusUnauthorized, "Invalid authentication token", headers)
 }
 
-func (app *Application) AuthenticationRequired(w http.ResponseWriter, r *http.Request) {
+func (app *ApiApplication) AuthenticationRequired(w http.ResponseWriter, r *http.Request) {
 	app.errorMessage(w, r, http.StatusUnauthorized, "You must be authenticated to access this resource", nil)
 }
 
-func (app *Application) invalidAuthenticationCreds(w http.ResponseWriter, r *http.Request) {
+func (app *ApiApplication) invalidAuthenticationCreds(w http.ResponseWriter, r *http.Request) {
 	app.errorMessage(w, r, http.StatusUnauthorized, "Invalid authentication credentials", nil)
 }

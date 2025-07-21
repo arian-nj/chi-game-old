@@ -8,49 +8,41 @@ import (
 	"sync"
 	"time"
 
-	gametype "github.com/arian-nj/chibazi/internals/game_type"
-	sharedapp "github.com/arian-nj/chibazi/internals/shared_app"
-	"github.com/arian-nj/chibazi/internals/utils"
+	"log/slog"
 
-	"golang.org/x/exp/slog"
+	"github.com/arian-nj/chibazi/database"
+	gamesessions "github.com/arian-nj/chibazi/game_sessions"
+	"github.com/arian-nj/chibazi/internals/config"
+	gametype "github.com/arian-nj/chibazi/internals/game_type"
+	"github.com/arian-nj/chibazi/internals/utils"
 	"gopkg.in/telebot.v4"
 )
 
-type Application struct {
-	*sharedapp.SharedApp
-
-	GameSessions *AllSession
-	MatchMaking  *MatchMaking
+type BotApplication struct {
+	Config      *config.Config
+	Queries     *database.Queries
+	Bot         *telebot.Bot
+	AllSessions *gamesessions.AllSession
+	MatchMaking *MatchMaking
 }
 
-func NewApplication(sharedApp *sharedapp.SharedApp) *Application {
-	return &Application{
-		SharedApp: sharedApp,
+func NewBotApplication(conf *config.Config, queries *database.Queries, AllSession *gamesessions.AllSession) *BotApplication {
+	return &BotApplication{
+		Config:  conf,
+		Queries: queries,
 
-		GameSessions: &AllSession{
-			Sessions: map[string]*GameSession{},
-			Mutex:    sync.Mutex{},
-		},
 		MatchMaking: &MatchMaking{
 			WaitingPlayers: map[gametype.GameType][]*Ticket{},
 			Mutex:          sync.Mutex{},
 		},
 	}
 }
-
-func (app *Application) AddGameSession(key string, gs *GameSession) {
-	app.GameSessions.Mutex.Lock()
-	defer app.GameSessions.Mutex.Unlock()
-
-	app.GameSessions.Sessions[key] = gs
-}
-
-func RunBot(sahreApp *sharedapp.SharedApp, ctx context.Context) {
-	defer sahreApp.Wg.Done()
-	app := NewApplication(sahreApp)
+func (app *BotApplication) RunBot(ctx context.Context, wg *sync.WaitGroup) {
+	wg.Add(1)
+	defer wg.Done()
 
 	pref := telebot.Settings{
-		Token:  sahreApp.Config.BotToken,
+		Token:  app.Config.BotToken,
 		Poller: &telebot.LongPoller{Timeout: 10 * time.Second},
 	}
 	b, err := telebot.NewBot(pref)
@@ -93,21 +85,21 @@ func RunBot(sahreApp *sharedapp.SharedApp, ctx context.Context) {
 	b.Start()
 }
 
-func (app *Application) ClearDeadGamesCron() {
+func (app *BotApplication) ClearDeadGamesCron() {
 	for {
 		nowTime := time.Now()
-		for key, gameSession := range app.GameSessions.Sessions {
+		for key, gameSession := range app.AllSessions.Sessions {
 			if nowTime.Sub(gameSession.CreatedAt) > gameSession.ExpireDuaration {
-				app.GameSessions.Mutex.Lock()
-				delete(app.GameSessions.Sessions, key)
-				app.GameSessions.Mutex.Unlock()
+				app.AllSessions.Mutex.Lock()
+				delete(app.AllSessions.Sessions, key)
+				app.AllSessions.Mutex.Unlock()
 			}
 		}
 		time.Sleep(1 * time.Minute)
 	}
 }
 
-func (app *Application) addUserMiddleware(next telebot.HandlerFunc) telebot.HandlerFunc {
+func (app *BotApplication) addUserMiddleware(next telebot.HandlerFunc) telebot.HandlerFunc {
 	return func(c telebot.Context) error {
 		utils.RunBackgroundTask(func() {
 			user := c.Sender()

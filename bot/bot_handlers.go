@@ -15,7 +15,7 @@ import (
 	"gopkg.in/telebot.v4"
 )
 
-func (app *Application) inlineQueryHandler(c telebot.Context) error {
+func (app *BotApplication) inlineQueryHandler(c telebot.Context) error {
 	results := telebot.Results{}
 	// XO result
 	xoResult3x3 := &telebot.ArticleResult{
@@ -74,7 +74,7 @@ func (app *Application) inlineQueryHandler(c telebot.Context) error {
 	})
 }
 
-func (app *Application) statHandler(c telebot.Context) error {
+func (app *BotApplication) statHandler(c telebot.Context) error {
 	if c.Sender().ID != 1909090204 {
 		return app.textHandler(c)
 	}
@@ -123,11 +123,11 @@ func (app *Application) statHandler(c telebot.Context) error {
 	return c.Send(text, telebot.ModeMarkdownV2)
 }
 
-func (app *Application) welcomeHandler(c telebot.Context) error {
+func (app *BotApplication) welcomeHandler(c telebot.Context) error {
 	return c.Send(
 		`خوش اومدید 👋`, welcomeReplyKeyboard)
 }
-func (app *Application) textHandler(c telebot.Context) error {
+func (app *BotApplication) textHandler(c telebot.Context) error {
 	if !c.Message().Private() {
 		return nil
 	}
@@ -135,9 +135,9 @@ func (app *Application) textHandler(c telebot.Context) error {
 	text := c.Text()
 	senderID := int(c.Sender().ID)
 
-	app.GameSessions.Mutex.Lock()
-	gameSession, ok := app.GameSessions.Sessions[strconv.Itoa(senderID)]
-	app.GameSessions.Mutex.Unlock()
+	app.AllSessions.Mutex.Lock()
+	gameSession, ok := app.AllSessions.Sessions[strconv.Itoa(senderID)]
+	app.AllSessions.Mutex.Unlock()
 	if ok && gameSession.IsChatOn {
 		return gameSession.HandleChatMessage(c.Bot(), senderID, text)
 	}
@@ -158,7 +158,7 @@ var (
 	}
 )
 
-func (app *Application) PlayWithFriendsHandler(c telebot.Context) error {
+func (app *BotApplication) PlayWithFriendsHandler(c telebot.Context) error {
 	return c.Send(
 		`دکمه بازی با دوستان رو بزن تا تو هر چت یا گروهی با دوستات بازی کنی`, playWithFriendsInline)
 }
@@ -176,15 +176,15 @@ var (
 	}
 )
 
-func (app *Application) PlayWithRandomPlayerHandler(c telebot.Context) error {
+func (app *BotApplication) PlayWithRandomPlayerHandler(c telebot.Context) error {
 	return c.Send("چی بازی؟", WhatRandomGameReplyKeyboard)
 }
 
-func (app *Application) openLocks() {
-	app.GameSessions.Mutex.Unlock()
+func (app *BotApplication) openLocks() {
+	app.AllSessions.Mutex.Unlock()
 	app.MatchMaking.Mutex.Unlock()
 }
-func (app *Application) PlayRandomXO3X3Handler(c telebot.Context) error {
+func (app *BotApplication) PlayRandomXO3X3Handler(c telebot.Context) error {
 	return app.PlayRandomGameHandler(c, gametype.XOGameType3X3)
 }
 
@@ -199,15 +199,15 @@ var (
 	}
 )
 
-func (app *Application) PlayRandomXO5X5Handler(c telebot.Context) error {
+func (app *BotApplication) PlayRandomXO5X5Handler(c telebot.Context) error {
 	return app.PlayRandomGameHandler(c, gametype.XOGameType5X5)
 }
 
-func (app *Application) PlayRandomGameHandler(c telebot.Context, gameType gametype.GameType) error {
+func (app *BotApplication) PlayRandomGameHandler(c telebot.Context, gameType gametype.GameType) error {
 	text := ""
 	sender := c.Sender()
 
-	app.GameSessions.Mutex.Lock()
+	app.AllSessions.Mutex.Lock()
 	app.MatchMaking.Mutex.Lock()
 
 	if app.CheckIsAllowedToPlay(int(sender.ID)) == false {
@@ -250,7 +250,7 @@ var (
 	}
 )
 
-func (app *Application) CancelSearchingForGame(c telebot.Context) error {
+func (app *BotApplication) CancelSearchingForGame(c telebot.Context) error {
 	app.MatchMaking.Mutex.Lock()
 	defer app.MatchMaking.Mutex.Unlock()
 
@@ -258,19 +258,19 @@ func (app *Application) CancelSearchingForGame(c telebot.Context) error {
 	return c.Send("لغوش کردم 😔", WhatRandomGameReplyKeyboard)
 }
 
-func (app *Application) StopChatHandler(c telebot.Context) error {
+func (app *BotApplication) StopChatHandler(c telebot.Context) error {
 	sender := c.Sender()
 
-	app.GameSessions.Mutex.Lock()
-	gameSession, isFound := app.GameSessions.Sessions[strconv.Itoa(int(sender.ID))]
-	app.GameSessions.Mutex.Unlock()
+	app.AllSessions.Mutex.Lock()
+	gameSession, isFound := app.AllSessions.Sessions[strconv.Itoa(int(sender.ID))]
+	app.AllSessions.Mutex.Unlock()
 
 	if !isFound {
 		return c.RespondText("بازی فعالی نداری")
 	}
 
 	if gameSession.IsGameEnded {
-		gameSession.CleanAndDisconnect(app.GameSessions)
+		gameSession.CleanAndDisconnect(app.AllSessions)
 		return nil
 	}
 

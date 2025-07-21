@@ -8,7 +8,7 @@ import (
 	"github.com/go-chi/chi/v5"
 )
 
-func (app *Application) createRouter() *chi.Mux {
+func (app *ApiApplication) createRouter() *chi.Mux {
 	distFS := frontend.GetDistFS()
 	mux := chi.NewMux()
 

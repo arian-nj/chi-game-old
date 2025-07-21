@@ -30,7 +30,7 @@ type dummyValidate struct {
 	UserID int `json:"user_id"`
 }
 
-func (app *Application) dummyValidate(w http.ResponseWriter, r *http.Request) {
+func (app *ApiApplication) dummyValidate(w http.ResponseWriter, r *http.Request) {
 	input := &dummyValidate{}
 	request.DecodeJSON(w, r, input)
 	slog.Info("dummy auth", "userid", input.UserID)
@@ -51,7 +51,7 @@ func (app *Application) dummyValidate(w http.ResponseWriter, r *http.Request) {
 
 }
 
-func (app *Application) validateInitdata(w http.ResponseWriter, r *http.Request) {
+func (app *ApiApplication) validateInitdata(w http.ResponseWriter, r *http.Request) {
 	var input struct {
 		InitData string `json:"init_data"`
 	}
@@ -107,7 +107,7 @@ func (app *Application) validateInitdata(w http.ResponseWriter, r *http.Request)
 
 }
 
-func (app *Application) CreateBrandNewPerson(tgId int) (database.TelegramUser, error) {
+func (app *ApiApplication) CreateBrandNewPerson(tgId int) (database.TelegramUser, error) {
 	personRow, err := app.Queries.CreateTgUser(context.Background(), tgId)
 
 	if err != nil {

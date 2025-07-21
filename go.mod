@@ -9,7 +9,6 @@ require (
 	github.com/jackc/pgx/v5 v5.7.5
 	github.com/pressly/goose/v3 v3.24.3
 	golang.org/x/crypto v0.38.0
-	golang.org/x/exp v0.0.0-20250506013437-ce4c2cf36ca6
 	golang.org/x/time v0.0.0-20191024005414-555d28b269f0
 	gopkg.in/telebot.v4 v4.0.0-beta.5
 )
