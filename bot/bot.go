@@ -5,11 +5,9 @@ import (
 	"fmt"
 	"log"
 	"runtime/debug"
-	"sync"
 	"time"
 
-	commonapp "github.com/arian-nj/chibazi/internals/common_app"
-	gametype "github.com/arian-nj/chibazi/internals/game_type"
+	sharedapp "github.com/arian-nj/chibazi/internals/shared_app"
 	"github.com/arian-nj/chibazi/internals/utils"
 
 	"golang.org/x/exp/slog"
@@ -17,39 +15,28 @@ import (
 )
 
 type Application struct {
-	*commonapp.CommonApp
-
-	GameSessions *AllSession
-	MatchMaking  *MatchMaking
+	*sharedapp.SharedApp
 }
 
-func NewApplication(common *commonapp.CommonApp) *Application {
+func NewApplication(sharedApp *sharedapp.SharedApp) *Application {
 	return &Application{
-		CommonApp: common,
-		GameSessions: &AllSession{
-			Sessions: map[string]*GameSession{},
-			Mutex:    sync.Mutex{},
-		},
-		MatchMaking: &MatchMaking{
-			WaitingPlayers: map[gametype.GameType][]*Ticket{},
-			Mutex:          sync.Mutex{},
-		},
+		SharedApp: sharedApp,
 	}
 }
 
-func (app *Application) AddGameSession(key string, gs *GameSession) {
+func (app *Application) AddGameSession(key string, gs *sharedapp.GameSession) {
 	app.GameSessions.Mutex.Lock()
 	defer app.GameSessions.Mutex.Unlock()
 
 	app.GameSessions.Sessions[key] = gs
 }
 
-func RunBot(commonapp *commonapp.CommonApp, ctx context.Context) {
-	defer commonapp.Wg.Done()
-	app := NewApplication(commonapp)
+func RunBot(sahreApp *sharedapp.SharedApp, ctx context.Context) {
+	defer sahreApp.Wg.Done()
+	app := NewApplication(sahreApp)
 
 	pref := telebot.Settings{
-		Token:  commonapp.Config.BotToken,
+		Token:  sahreApp.Config.BotToken,
 		Poller: &telebot.LongPoller{Timeout: 10 * time.Second},
 	}
 	b, err := telebot.NewBot(pref)

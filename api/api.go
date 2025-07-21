@@ -6,22 +6,22 @@ import (
 	"net/http"
 	"time"
 
-	commonapp "github.com/arian-nj/chibazi/internals/common_app"
+	sharedapp "github.com/arian-nj/chibazi/internals/shared_app"
 )
 
 type Application struct {
-	*commonapp.CommonApp
+	*sharedapp.SharedApp
 }
 
-func NewApplication(common *commonapp.CommonApp) *Application {
+func NewApplication(sharedApp *sharedapp.SharedApp) *Application {
 	return &Application{
-		CommonApp: common,
+		SharedApp: sharedApp,
 	}
 }
 
-func RunApi(commonapp *commonapp.CommonApp, ctx context.Context) {
-	defer commonapp.Wg.Done()
-	app := NewApplication(commonapp)
+func RunApi(sharedApp *sharedapp.SharedApp, ctx context.Context) {
+	defer sharedApp.Wg.Done()
+	app := NewApplication(sharedApp)
 	router := app.createRouter()
 
 	srv := &http.Server{

@@ -78,12 +78,17 @@
 [X] make api base
 [X] make front base embed in go
 [X] dev reverse proxy
-[ ] authenticate opened player
-[ ] how sending and joining + implementation
-[ ] websocket and basic data transfer
-[ ] dot box game logic
-[ ] basic dot box game
-[ ] animation and polish
+[X] authenticate telegram opened player
+[X] dev (no telegram auth)
+[X] setting button (to learn animation)
+[X] play buttton + animation
+[ ] http server middleware
+[ ] send play ticket
+[ ] color pallete
+[ ] replace all motion with gsap
+[ ] websocket chat
+[ ] how to look? sending and joining + implementation
+[ ] ws basic data transfer
 
 [ ] store web loading time stats
 

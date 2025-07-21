@@ -23,3 +23,7 @@ export async function ValidateDymmy(userId: number) {
 
   sessionStorage.setItem("jwt_token", data.token);
 }
+
+export function GetJwtToken(): string | null {
+  return sessionStorage.getItem("jwt_token");
+}

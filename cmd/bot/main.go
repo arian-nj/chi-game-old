@@ -11,8 +11,8 @@ import (
 	"github.com/arian-nj/chibazi/api"
 	"github.com/arian-nj/chibazi/bot"
 	"github.com/arian-nj/chibazi/db"
-	commonapp "github.com/arian-nj/chibazi/internals/common_app"
 	"github.com/arian-nj/chibazi/internals/config"
+	sharedapp "github.com/arian-nj/chibazi/internals/shared_app"
 )
 
 func main() {
@@ -26,18 +26,18 @@ func main() {
 		slog.Error("Failed to migrate database", "err", err)
 		return
 	}
-	commonApp := commonapp.NewCommon(cfg)
+	sharedApp := sharedapp.NewSharedApp(cfg)
 
-	err = commonApp.ConfigureDatabase()
+	err = sharedApp.ConfigureDatabase()
 	if err != nil {
 		slog.Error("Failed to configure Database", "err", err)
 		return
 	}
 
-	defer commonApp.Conn.Close()
+	defer sharedApp.Conn.Close()
 
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*2)
-	err = commonApp.Conn.Ping(ctx)
+	err = sharedApp.Conn.Ping(ctx)
 	if err != nil {
 		slog.Error("Failed to connect to Database", "err", err)
 		return
@@ -51,13 +51,13 @@ func main() {
 	quit := make(chan os.Signal, 1)
 	signal.Notify(quit, os.Interrupt, syscall.SIGTERM)
 
-	commonApp.Wg.Add(1)
-	go api.RunApi(commonApp, parentCtx)
+	sharedApp.Wg.Add(1)
+	go api.RunApi(sharedApp, parentCtx)
 
-	commonApp.Wg.Add(1)
-	go bot.RunBot(commonApp, parentCtx)
+	sharedApp.Wg.Add(1)
+	go bot.RunBot(sharedApp, parentCtx)
 
 	<-quit
 	cancel()
-	commonApp.Wg.Wait()
+	sharedApp.Wg.Wait()
 }

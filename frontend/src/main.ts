@@ -1,8 +1,14 @@
-import { GetEngine, setEngine } from "./app/getEngine";
+import { gsap } from "gsap";
+import { PixiPlugin } from "gsap/PixiPlugin";
+import * as PIXI from "pixi.js";
+
+import { setEngine } from "./app/getEngine";
 import { LoadScreen } from "./app/screens/LoadScreen";
-import { XoScreen } from "./app/screens/xo/XOScreen";
+import { MainScreen } from "./app/screens/main/MainScreen";
 import { userSettings } from "./app/utils/userSettings";
+import { GetJwtToken, ValidateDymmy } from "./auth/jwt";
 import { CreationEngine } from "./engine/engine";
+
 /**
  * Importing these modules will automatically register there plugins with the engine.
  */
@@ -10,30 +16,47 @@ import "@pixi/sound";
 // import WebApp from "@twa-dev/sdk";
 // import { ValidateInitdata } from "./auth/jwt";
 // import "@esotericsoftware/spine-pixi-v8";
-//
+
 // WebApp.ready();
-// (async () => {
-//   await ValidateInitdata(WebApp.initData);
-// })();
-//
+
+async function ensureJwtToken() {
+  let token = GetJwtToken();
+  while (token == null) {
+    const userID = prompt("What is your user ID?", "1");
+    if (userID === null) break; // user canceled
+
+    await ValidateDymmy(Number(userID));
+    token = GetJwtToken();
+  }
+}
+
+ensureJwtToken();
 // Create a new creation engine instance
 const engine = new CreationEngine();
 setEngine(engine);
 
+declare global {
+  var __PIXI_APP__: CreationEngine;
+}
+
 globalThis.__PIXI_APP__ = engine;
+
 (async () => {
   // Initialize the creation engine instance
   await engine.init({
     background: "#1E1E1E",
     resizeOptions: { minWidth: 768, minHeight: 1024, letterbox: false },
   });
+  // .addEventListener("contextmenu", (e) => e.preventDefault());
 
+  gsap.registerPlugin(PixiPlugin);
+  PixiPlugin.registerPIXI(PIXI);
   // Initialize the user settings
   userSettings.init();
 
   // Show the load screen
   await engine.navigation.showScreen(LoadScreen);
   // Show the main screen once the load screen is dismissed
-  await engine.navigation.showScreen(XoScreen);
-  // await engine.navigation.showScreen(MainScreen);
+  // await engine.navigation.showScreen(XoScreen);
+  await engine.navigation.showScreen(MainScreen);
 })();

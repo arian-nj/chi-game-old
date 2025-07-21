@@ -46,6 +46,11 @@ case $COMMAND in
 	gensqlc)
 		generate_sqlc
 	;;
+	dev)
+		echo "serving dev frontend"
+		cd ./frontend/
+		npm run dev
+	;;
 
 	treafik)
 		sudo traefik \

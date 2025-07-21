@@ -1,7 +1,7 @@
 import { List } from "@pixi/ui";
 import { animate } from "motion";
 import type { Text } from "pixi.js";
-import { BlurFilter, Container, Sprite, Texture } from "pixi.js";
+import { BlurFilter, Color, Container, Sprite, Texture } from "pixi.js";
 
 import { GetEngine } from "../getEngine";
 import { Button } from "../ui/Button";
@@ -32,6 +32,7 @@ export class SettingsPopup extends Container {
   private bgmSlider: VolumeSlider;
   /** Slider that changes sound effects volume */
   private sfxSlider: VolumeSlider;
+  private mainColor: Color = new Color(0x273c8a);
 
   constructor() {
     super();
@@ -50,7 +51,7 @@ export class SettingsPopup extends Container {
     this.title = new Label({
       text: "Settings",
       style: {
-        fill: 0xec1561,
+        fill: this.mainColor,
         fontSize: 50,
       },
     });

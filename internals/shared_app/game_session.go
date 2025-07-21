@@ -1,4 +1,4 @@
-package bot
+package sharedapp
 
 import (
 	"context"
@@ -26,7 +26,8 @@ type AllSession struct {
 }
 
 type GameSession struct {
-	Bot         *telebot.Bot
+	Bot *telebot.Bot
+
 	IsChatOn    bool
 	IsGameEnded bool
 
