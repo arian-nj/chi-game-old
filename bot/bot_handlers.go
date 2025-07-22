@@ -11,6 +11,7 @@ import (
 	xoconsole "github.com/arian-nj/chibazi/games/xo_console"
 	gametype "github.com/arian-nj/chibazi/internals/game_type"
 	keybul "github.com/arian-nj/chibazi/internals/keybul"
+	matchmaking "github.com/arian-nj/chibazi/match_making"
 	"github.com/jackc/pgx/v5/pgtype"
 	"gopkg.in/telebot.v4"
 )
@@ -210,7 +211,7 @@ func (app *BotApplication) PlayRandomGameHandler(c telebot.Context, gameType gam
 	app.AllSessions.Mutex.Lock()
 	app.MatchMaking.Mutex.Lock()
 
-	if app.CheckIsAllowedToPlay(int(sender.ID)) == false {
+	if app.AllSessions.IsSessionEmpty(int(sender.ID)) == false {
 		app.openLocks()
 		return c.Send("بازی قبلیت باید تموم بشه")
 	}
@@ -226,8 +227,8 @@ func (app *BotApplication) PlayRandomGameHandler(c telebot.Context, gameType gam
 		return err
 	}
 
-	newTicket := NewTicket(sender.FirstName, int(sender.ID), msg.ID, gameType)
-	app.AddTicket(gameType, newTicket)
+	newTicket := matchmaking.NewTicket(sender.FirstName, int(sender.ID), msg.ID, gameType)
+	app.MatchMaking.AddTicket(gameType, newTicket)
 	return nil
 }
 

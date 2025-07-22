@@ -13,8 +13,8 @@ import (
 	"github.com/arian-nj/chibazi/database"
 	gamesessions "github.com/arian-nj/chibazi/game_sessions"
 	"github.com/arian-nj/chibazi/internals/config"
-	gametype "github.com/arian-nj/chibazi/internals/game_type"
 	"github.com/arian-nj/chibazi/internals/utils"
+	matchmaking "github.com/arian-nj/chibazi/match_making"
 	"gopkg.in/telebot.v4"
 )
 
@@ -23,24 +23,32 @@ type BotApplication struct {
 	Queries     *database.Queries
 	Bot         *telebot.Bot
 	AllSessions *gamesessions.AllSession
-	MatchMaking *MatchMaking
+	MatchMaking *matchmaking.MatchMaking
 }
 
-func NewBotApplication(conf *config.Config, queries *database.Queries, AllSession *gamesessions.AllSession) *BotApplication {
+func NewBotApplication(conf *config.Config, queries *database.Queries, AllSession *gamesessions.AllSession, mamatchmaking *matchmaking.MatchMaking) *BotApplication {
 	return &BotApplication{
-		Config:  conf,
-		Queries: queries,
-
-		MatchMaking: &MatchMaking{
-			WaitingPlayers: map[gametype.GameType][]*Ticket{},
-			Mutex:          sync.Mutex{},
-		},
+		Config:      conf,
+		Queries:     queries,
+		MatchMaking: mamatchmaking,
+		AllSessions: AllSession,
 	}
 }
-func (app *BotApplication) RunBot(ctx context.Context, wg *sync.WaitGroup) {
+
+func (app *BotApplication) RunBot(bot *telebot.Bot, ctx context.Context, wg *sync.WaitGroup) {
 	wg.Add(1)
 	defer wg.Done()
+	go func() {
+		<-ctx.Done()
+		slog.Info("Shutting down Bot ...")
+		bot.Stop()
+		slog.Info("Bot is shut down")
+	}()
 
+	bot.Start()
+}
+
+func (app *BotApplication) MakeBot() *telebot.Bot {
 	pref := telebot.Settings{
 		Token:  app.Config.BotToken,
 		Poller: &telebot.LongPoller{Timeout: 10 * time.Second},
@@ -48,14 +56,9 @@ func (app *BotApplication) RunBot(ctx context.Context, wg *sync.WaitGroup) {
 	b, err := telebot.NewBot(pref)
 	if err != nil {
 		slog.Error("new error %w", "error", err)
-		return
+		return nil
 	}
-	go func() {
-		<-ctx.Done()
-		slog.Info("Shutting down Bot ...")
-		b.Stop()
-		slog.Info("Bot is shut down")
-	}()
+
 	app.Bot = b
 
 	b.Use(app.addUserMiddleware)
@@ -80,23 +83,7 @@ func (app *BotApplication) RunBot(ctx context.Context, wg *sync.WaitGroup) {
 
 	b.Handle(telebot.OnText, app.textHandler)
 
-	go app.ClearDeadGamesCron()
-	go app.MakeMatches()
-	b.Start()
-}
-
-func (app *BotApplication) ClearDeadGamesCron() {
-	for {
-		nowTime := time.Now()
-		for key, gameSession := range app.AllSessions.Sessions {
-			if nowTime.Sub(gameSession.CreatedAt) > gameSession.ExpireDuaration {
-				app.AllSessions.Mutex.Lock()
-				delete(app.AllSessions.Sessions, key)
-				app.AllSessions.Mutex.Unlock()
-			}
-		}
-		time.Sleep(1 * time.Minute)
-	}
+	return b
 }
 
 func (app *BotApplication) addUserMiddleware(next telebot.HandlerFunc) telebot.HandlerFunc {

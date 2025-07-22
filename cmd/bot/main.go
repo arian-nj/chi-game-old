@@ -5,6 +5,7 @@ import (
 	"log/slog"
 	"os"
 	"os/signal"
+	"strconv"
 	"sync"
 	"syscall"
 	"time"
@@ -14,49 +15,68 @@ import (
 	"github.com/arian-nj/chibazi/database"
 	"github.com/arian-nj/chibazi/db"
 	gamesessions "github.com/arian-nj/chibazi/game_sessions"
+	xoconsole "github.com/arian-nj/chibazi/games/xo_console"
 	"github.com/arian-nj/chibazi/internals/config"
+	consoleplayer "github.com/arian-nj/chibazi/internals/console_player"
+	gametype "github.com/arian-nj/chibazi/internals/game_type"
+	matchmaking "github.com/arian-nj/chibazi/match_making"
 	"github.com/jackc/pgx/v5/pgxpool"
+	"gopkg.in/telebot.v4"
 )
 
-func main() {
-	var (
-		Config      *config.Config
-		Queries     *database.Queries
-		Conn        *pgxpool.Pool
-		Wg          *sync.WaitGroup          = &sync.WaitGroup{}
-		AllSessions *gamesessions.AllSession = &gamesessions.AllSession{
+// NOTE: use matchmaking as a package not to run code u fucking idiot
+type GlobalVars struct {
+	Config      *config.Config
+	Queries     *database.Queries
+	Conn        *pgxpool.Pool
+	Wg          *sync.WaitGroup
+	AllSessions *gamesessions.AllSession
+	MatchMaking *matchmaking.MatchMaking
+	Bot         *telebot.Bot
+}
+
+func NewGlobalVars() *GlobalVars {
+	return &GlobalVars{
+		AllSessions: &gamesessions.AllSession{
 			Sessions: map[string]*gamesessions.GameSession{},
 			Mutex:    sync.Mutex{},
-		}
-	)
+		},
+		Wg: &sync.WaitGroup{},
+	}
+}
 
-	Config, err := config.ParseConfig()
+func main() {
+	GlobalVars := NewGlobalVars()
+
+	var err error
+	GlobalVars.Config, err = config.ParseConfig()
 	if err != nil {
 		panic(err)
 	}
 
-	err = db.Migrate(Config.DatabseUrl)
+	err = db.Migrate(GlobalVars.Config.DatabseUrl)
 	if err != nil {
 		slog.Error("Failed to migrate database", "err", err)
 		return
 	}
 
-	Conn, err = pgxpool.New(context.Background(), Config.DatabseUrl)
+	GlobalVars.Conn, err = pgxpool.New(context.Background(), GlobalVars.Config.DatabseUrl)
 	if err != nil {
 		slog.Error("can not make a new connection ", "err", err)
 		return
 	}
-	defer Conn.Close()
+	defer GlobalVars.Conn.Close()
 
-	Queries = database.New(Conn)
+	GlobalVars.Queries = database.New(GlobalVars.Conn)
 
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*2)
-	err = Conn.Ping(ctx)
+	err = GlobalVars.Conn.Ping(ctx)
 	if err != nil {
 		slog.Error("Failed to connect to Database", "err", err)
 		cancel()
 		return
 	}
+	GlobalVars.MatchMaking = matchmaking.NewMatchMaking(GlobalVars.AllSessions, GlobalVars.Queries)
 
 	slog.Info("Connected to Database")
 
@@ -65,13 +85,84 @@ func main() {
 	quit := make(chan os.Signal, 1)
 	signal.Notify(quit, os.Interrupt, syscall.SIGTERM)
 
-	app := api.NewApiApplication(Config, Queries, AllSessions)
-	go app.RunApi(parentCtx, Wg)
+	app := api.NewApiApplication(GlobalVars.Config, GlobalVars.Queries, GlobalVars.AllSessions)
+	go app.RunApi(parentCtx, GlobalVars.Wg)
 
-	botApp := bot.NewBotApplication(Config, Queries, AllSessions)
-	go botApp.RunBot(parentCtx, Wg)
+	botApp := bot.NewBotApplication(GlobalVars.Config, GlobalVars.Queries, GlobalVars.AllSessions, GlobalVars.MatchMaking)
+	bot := botApp.MakeBot()
+	GlobalVars.Bot = bot
+	go botApp.RunBot(bot, parentCtx, GlobalVars.Wg)
+
+	go ClearDeadGamesCron(GlobalVars.AllSessions)
+
+	go GlobalVars.MaekeMatches()
 
 	<-quit
 	cancel()
-	Wg.Wait()
+	GlobalVars.Wg.Wait()
+}
+
+func ClearDeadGamesCron(allSessions *gamesessions.AllSession) {
+	for {
+		nowTime := time.Now()
+		for key, gameSession := range allSessions.Sessions {
+			if nowTime.Sub(gameSession.CreatedAt) > gameSession.ExpireDuaration {
+				allSessions.Mutex.Lock()
+				delete(allSessions.Sessions, key)
+				allSessions.Mutex.Unlock()
+			}
+		}
+		time.Sleep(1 * time.Minute)
+	}
+}
+
+func (gv *GlobalVars) MaekeMatches() {
+	defer gv.MatchMaking.Mutex.Unlock()
+	var doFlag = false
+	for {
+		doFlag = false
+		for gameTypeKey, ticketsList := range gv.MatchMaking.WaitingPlayers {
+			gv.MatchMaking.Mutex.Lock()
+			if len(ticketsList) >= 2 {
+				doFlag = true
+				ticketOne := ticketsList[0]
+				ticketTwo := ticketsList[1]
+				gv.MatchMaking.WaitingPlayers[gameTypeKey] = ticketsList[2:]
+				gv.createRandomGame(gameTypeKey, []*matchmaking.Ticket{ticketOne, ticketTwo})
+			}
+			gv.MatchMaking.Mutex.Unlock()
+		}
+		if !doFlag {
+			time.Sleep(100 * time.Millisecond)
+		}
+	}
+}
+
+func (gv *GlobalVars) createRandomGame(gameType gametype.GameType, tickets []*matchmaking.Ticket) {
+	playerOne := consoleplayer.NewConsolePlayer(tickets[0].Name, tickets[0].UserID).SetMessageSig(tickets[0].MessageID)
+	playerTwo := consoleplayer.NewConsolePlayer(tickets[1].Name, tickets[1].UserID).SetMessageSig(tickets[1].MessageID)
+	bot.ClearMatchmakingMessage([]*consoleplayer.ConsolePlayer{playerOne, playerTwo}, gv.Bot)
+
+	var newSession *gamesessions.GameSession
+	switch gameType {
+	case gametype.XOGameType3X3, gametype.XOGameType5X5:
+		newXOGame := xoconsole.NewXOGame(gametype.XOGameType3X3, gv.Queries)
+		newXOGame.AddPlayer(playerOne)
+		newXOGame.AddPlayer(playerTwo)
+
+		newSession = gamesessions.NewGameSession(gv.AllSessions, gv.Bot, gameType, newXOGame)
+		gv.AllSessions.Add(strconv.Itoa(playerOne.TgID), newSession)
+		gv.AllSessions.Add(strconv.Itoa(playerTwo.TgID), newSession)
+
+		err := newXOGame.StartGame(gv.Bot)
+		if err != nil {
+			slog.Error("error in starting random xo match", "error", err)
+		}
+
+	default:
+		slog.Error("not possible")
+		return
+	}
+	bot.SendFoundOpponentMessage(newSession.GameState.Players(), gv.Bot)
+
 }

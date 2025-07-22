@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"log/slog"
+	"strconv"
 	"sync"
 	"time"
 
@@ -22,6 +23,11 @@ type Game interface {
 type AllSession struct {
 	Sessions map[string]*GameSession
 	Mutex    sync.Mutex
+}
+
+func (allSessions *AllSession) IsSessionEmpty(playerId int) bool {
+	_, isFound := allSessions.Sessions[strconv.Itoa(playerId)]
+	return !isFound
 }
 
 func (allSession *AllSession) Add(key string, gs *GameSession) {

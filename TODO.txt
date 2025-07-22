@@ -82,7 +82,9 @@
 [X] dev (no telegram auth)
 [X] setting button (to learn animation)
 [X] play buttton + animation
-[ ] http server middleware
+[X] http server middleware
+[ ] make user seperate from telegram user
+[ ] sync conole and web game poc
 [ ] send play ticket
 [ ] color pallete
 [ ] replace all motion with gsap
@@ -97,8 +99,10 @@ maybe add scroing to make it harder to use other bots
 
 
 
+# 1.0.0
+[ ] log tickets in database for miss rate
+
 
 [-] implementing
 [ ] means that it is not implemented
 [X] means that it is implemented
-ll
