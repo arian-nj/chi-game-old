@@ -1,16 +1,17 @@
--- name: CreateHub :one
-INSERT INTO hubs (game_type, tg_id) VALUES ($1, $2) RETURNING *;
--- name: CountHubs :one
-Select Count(*) from hubs;
+-- name: CreateGameSession :one
+INSERT INTO game_sessions DEFAULT VALUES RETURNING *;
+
+-- name: CountGameSessions :one
+Select Count(*) from game_sessions;
 
 -- name: CountLastHourHub :one
 SELECT COUNT(*) AS hubs_last_hour
-FROM hubs
+FROM game_sessions
 WHERE created_at >= NOW() - INTERVAL '1 hour';
 
 -- name: CountLastDayHubs :one
-SELECT COUNT(*) AS hubs_today
-FROM hubs
+SELECT COUNT(*) AS games_today
+FROM game_sessions
 WHERE created_at >= date_trunc('day', NOW());
 
 --
@@ -31,4 +32,3 @@ WHERE created_at >= date_trunc('day', NOW());
 --  AND h.created_at < days.day + interval '1 day'
 -- GROUP BY days.day
 -- ORDER BY days.day DESC;
-

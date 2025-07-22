@@ -97,10 +97,7 @@ func (g *DotBoxGame) StartGame(c telebot.Context) error {
 	if err != nil {
 		return err
 	}
-	_, err = g.Queries.CreateHub(context.Background(), database.CreateHubParams{
-		GameType: string(gametype.DotBoxGameType),
-		TgID:     g.Players[0].TgID,
-	})
+	_, err = g.Queries.CreateGameSession(context.Background())
 	return err
 }
 

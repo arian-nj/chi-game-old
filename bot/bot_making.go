@@ -54,7 +54,7 @@ func (app *BotApplication) RemovePlayerFromMatchMaking(userID int) bool {
 
 	for gameType, tickets := range app.MatchMaking.WaitingPlayers {
 		for index, ticket := range tickets {
-			if ticket.UserID == int(userID) {
+			if ticket.TgID == int(userID) {
 				li := app.MatchMaking.WaitingPlayers[gameType]
 				app.MatchMaking.WaitingPlayers[gameType] = append(li[:index], li[index+1:]...)
 				return true

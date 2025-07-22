@@ -41,9 +41,9 @@ type Ticket struct {
 	Timestamp time.Time
 }
 
-func NewTicket(name string, userID, messageID int, gameType gametype.GameType) *Ticket {
+func NewTicket(name string, tgID, messageID int, gameType gametype.GameType) *Ticket {
 	return &Ticket{
-		TgID:      userID,
+		TgID:      tgID,
 		Name:      name,
 		MessageID: messageID,
 		GameType:  gameType,

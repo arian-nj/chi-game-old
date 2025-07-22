@@ -80,7 +80,7 @@ func (app *BotApplication) statHandler(c telebot.Context) error {
 		return app.textHandler(c)
 	}
 
-	allGamesCount, err := app.Queries.CountHubs(context.Background())
+	allGamesCount, err := app.Queries.CountGameSessions(context.Background())
 	if err != nil {
 		return err
 	}
@@ -136,10 +136,12 @@ func (app *BotApplication) textHandler(c telebot.Context) error {
 	text := c.Text()
 	senderID := int(c.Sender().ID)
 
+	// ensure game is in not Via Message
 	app.AllSessions.Mutex.Lock()
 	gameSession, ok := app.AllSessions.Sessions[strconv.Itoa(senderID)]
 	app.AllSessions.Mutex.Unlock()
-	if ok && gameSession.IsChatOn {
+
+	if ok {
 		return gameSession.HandleChatMessage(c.Bot(), senderID, text)
 	}
 
@@ -275,7 +277,7 @@ func (app *BotApplication) StopChatHandler(c telebot.Context) error {
 		return nil
 	}
 
-	gameSession.IsChatOn = false
+	gameSession.Chat.IsChatOn = false
 	for _, player := range gameSession.GameState.Players() {
 		_, err := c.Bot().Send(&telebot.User{ID: int64(player.TgID)}, "⛔️چت قطع شد بازی ادامه داره", welcomeReplyKeyboard)
 		if err != nil {

@@ -10,8 +10,8 @@ import (
 
 	"github.com/arian-nj/chibazi/database"
 	consolegame "github.com/arian-nj/chibazi/games/console_game"
-	consoleplayer "github.com/arian-nj/chibazi/internals/console_player"
 	gametype "github.com/arian-nj/chibazi/internals/game_type"
+	humanplayer "github.com/arian-nj/chibazi/internals/human_player"
 	keybul "github.com/arian-nj/chibazi/internals/keybul"
 	"github.com/arian-nj/chibazi/internals/random"
 	"github.com/arian-nj/chibazi/internals/utils"
@@ -96,7 +96,7 @@ func (g *XOGame) MonitorTimeout(bot telebot.API) {
 
 func (g *XOGame) SendJoinPanel(c telebot.Context) error {
 	sender := c.Sender()
-	g.AddPlayer(consoleplayer.NewConsolePlayer(sender.FirstName, int(sender.ID)))
+	g.AddPlayer(humanplayer.NewHumanPlayer(sender.FirstName, int(sender.ID)))
 	inlineKeyboard := keybul.CreateInlineKeyboard(
 		keybul.JoinGameInlineButtons,
 	)
@@ -118,14 +118,7 @@ func (g *XOGame) StartGame(bot telebot.API) error {
 	utils.RunBackgroundTask(func() {
 		g.MonitorTimeout(bot)
 	})
-	creatorId := 0
-	if g.ViaMessageId != "" {
-		creatorId = g.Players()[0].TgID
-	}
-	_, err = g.Queries.CreateHub(context.Background(), database.CreateHubParams{
-		GameType: string(g.GameType),
-		TgID:     creatorId,
-	})
+	_, err = g.Queries.CreateGameSession(context.Background())
 	return err
 }
 
@@ -146,7 +139,7 @@ func (g *XOGame) XOJoinGameHandler(c telebot.Context) error {
 		text := "خودت بازیو ساختی تو بازی هستی"
 		return c.RespondText(text)
 	}
-	g.AddPlayer(consoleplayer.NewConsolePlayer(sender.FirstName, int(sender.ID)))
+	g.AddPlayer(humanplayer.NewHumanPlayer(sender.FirstName, int(sender.ID)))
 	text := "اضافه شدی بازی شروع شد"
 	err := c.RespondText(text)
 	if err != nil {

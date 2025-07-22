@@ -6,8 +6,8 @@ import (
 	"log/slog"
 	"time"
 
-	consoleplayer "github.com/arian-nj/chibazi/internals/console_player"
 	gametype "github.com/arian-nj/chibazi/internals/game_type"
+	humanplayer "github.com/arian-nj/chibazi/internals/human_player"
 	"github.com/arian-nj/chibazi/internals/keybul"
 	"gopkg.in/telebot.v4"
 )
@@ -19,7 +19,7 @@ type ConsoleGame struct {
 
 	ViaMessageId string // Via Bots
 
-	players []*consoleplayer.ConsolePlayer
+	players []*humanplayer.HumanPlayer
 
 	LastEdit           time.Time
 	CurrentPlayerIndex int
@@ -33,7 +33,7 @@ func NewConsoleGame(gameType gametype.GameType, currentPlayerIndex int) *Console
 		Ctx:                ctx,
 		CurrentPlayerIndex: currentPlayerIndex,
 
-		players: []*consoleplayer.ConsolePlayer{},
+		players: []*humanplayer.HumanPlayer{},
 	}
 }
 
@@ -45,13 +45,13 @@ func (cg *ConsoleGame) GetContext() context.Context {
 	return cg.Ctx
 }
 
-func (cg *ConsoleGame) GetCurrentPlayer() *consoleplayer.ConsolePlayer {
+func (cg *ConsoleGame) GetCurrentPlayer() *humanplayer.HumanPlayer {
 	return cg.players[cg.CurrentPlayerIndex]
 }
-func (cg *ConsoleGame) Players() []*consoleplayer.ConsolePlayer {
+func (cg *ConsoleGame) Players() []*humanplayer.HumanPlayer {
 	return cg.players
 }
-func (g *ConsoleGame) AddPlayer(player *consoleplayer.ConsolePlayer) {
+func (g *ConsoleGame) AddPlayer(player *humanplayer.HumanPlayer) {
 	g.players = append(g.players, player)
 }
 

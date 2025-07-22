@@ -17,8 +17,8 @@ import (
 	gamesessions "github.com/arian-nj/chibazi/game_sessions"
 	xoconsole "github.com/arian-nj/chibazi/games/xo_console"
 	"github.com/arian-nj/chibazi/internals/config"
-	consoleplayer "github.com/arian-nj/chibazi/internals/console_player"
 	gametype "github.com/arian-nj/chibazi/internals/game_type"
+	humanplayer "github.com/arian-nj/chibazi/internals/human_player"
 	matchmaking "github.com/arian-nj/chibazi/match_making"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"gopkg.in/telebot.v4"
@@ -139,9 +139,9 @@ func (gv *GlobalVars) MaekeMatches() {
 }
 
 func (gv *GlobalVars) createRandomGame(gameType gametype.GameType, tickets []*matchmaking.Ticket) {
-	playerOne := consoleplayer.NewConsolePlayer(tickets[0].Name, tickets[0].UserID).SetMessageSig(tickets[0].MessageID)
-	playerTwo := consoleplayer.NewConsolePlayer(tickets[1].Name, tickets[1].UserID).SetMessageSig(tickets[1].MessageID)
-	bot.ClearMatchmakingMessage([]*consoleplayer.ConsolePlayer{playerOne, playerTwo}, gv.Bot)
+	playerOne := humanplayer.NewHumanPlayer(tickets[0].Name, tickets[0].TgID).SetMessageSig(tickets[0].MessageID)
+	playerTwo := humanplayer.NewHumanPlayer(tickets[1].Name, tickets[1].TgID).SetMessageSig(tickets[1].MessageID)
+	bot.ClearMatchmakingMessage([]*humanplayer.HumanPlayer{playerOne, playerTwo}, gv.Bot)
 
 	var newSession *gamesessions.GameSession
 	switch gameType {

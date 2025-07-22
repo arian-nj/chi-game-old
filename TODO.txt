@@ -83,15 +83,14 @@
 [X] setting button (to learn animation)
 [X] play buttton + animation
 [X] http server middleware
-[ ] make user seperate from telegram user
-[ ] sync conole and web game poc
+[ ] web socket Send and recieve in backend
+[ ] front send and recieve websocket
 [ ] send play ticket
+[ ] sync console and web game poc only chat
 [ ] color pallete
 [ ] replace all motion with gsap
-[ ] websocket chat
-[ ] how to look? sending and joining + implementation
-[ ] ws basic data transfer
-
+[ ] how to look? sending and joining + implementation transfer in via to web app
+[X] base xo ui
 [ ] store web loading time stats
 
 
@@ -101,6 +100,7 @@ maybe add scroing to make it harder to use other bots
 
 # 1.0.0
 [ ] log tickets in database for miss rate
+[ ] log who built game session (random from keyboard,random from web, via web ,via + creator)
 
 
 [-] implementing

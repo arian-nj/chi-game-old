@@ -3,14 +3,14 @@ package bot
 import (
 	"log/slog"
 
-	consoleplayer "github.com/arian-nj/chibazi/internals/console_player"
+	humanplayer "github.com/arian-nj/chibazi/internals/human_player"
 	"gopkg.in/telebot.v4"
 )
 
-func ClearMatchmakingMessage(players []*consoleplayer.ConsolePlayer, bot *telebot.Bot) {
+func ClearMatchmakingMessage(players []*humanplayer.HumanPlayer, bot *telebot.Bot) {
 	for _, player := range players {
 
-		go func(inPlayer consoleplayer.ConsolePlayer) {
+		go func(inPlayer humanplayer.HumanPlayer) {
 			err := bot.Delete(&inPlayer)
 			if err != nil {
 				slog.Error("can't delete match making message", "err", err)
@@ -27,7 +27,7 @@ func ClearMatchmakingMessage(players []*consoleplayer.ConsolePlayer, bot *telebo
 }
 
 // SendFoundOpponentMessage sends a message to all players that they have found an opponent
-func SendFoundOpponentMessage(players []*consoleplayer.ConsolePlayer, bot *telebot.Bot) {
+func SendFoundOpponentMessage(players []*humanplayer.HumanPlayer, bot *telebot.Bot) {
 	for _, player := range players {
 		for _, oppPlayer := range players {
 			if player.TgID == oppPlayer.TgID {

@@ -1,4 +1,4 @@
-package consoleplayer
+package humanplayer
 
 import (
 	"strconv"
@@ -7,7 +7,7 @@ import (
 	"github.com/arian-nj/chibazi/internals/keybul"
 )
 
-type ConsolePlayer struct {
+type HumanPlayer struct {
 	TgID int
 	Name string
 
@@ -17,25 +17,25 @@ type ConsolePlayer struct {
 	TurnStartedAt time.Time
 }
 
-func NewConsolePlayer(name string, tgID int) *ConsolePlayer {
+func NewHumanPlayer(name string, tgID int) *HumanPlayer {
 	if len(name) > 20 {
 		name = name[:20]
 		name += "..."
 	}
-	return &ConsolePlayer{
+	return &HumanPlayer{
 		Name: keybul.EscapeReserved(name),
 		TgID: tgID,
 	}
 }
 
-func (p *ConsolePlayer) SetMessageSig(messageID int) *ConsolePlayer {
+func (p *HumanPlayer) SetMessageSig(messageID int) *HumanPlayer {
 	p.MessageID = messageID
 	return p
 }
-func (p *ConsolePlayer) MessageSig() (string, int64) {
+func (p *HumanPlayer) MessageSig() (string, int64) {
 	return strconv.Itoa(p.MessageID), int64(p.TgID)
 }
 
-func (p *ConsolePlayer) Recipient() string {
+func (p *HumanPlayer) Recipient() string {
 	return strconv.FormatInt(int64(p.TgID), 10)
 }

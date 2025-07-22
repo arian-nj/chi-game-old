@@ -8,14 +8,14 @@ import (
 	"sync"
 	"time"
 
-	consoleplayer "github.com/arian-nj/chibazi/internals/console_player"
 	gametype "github.com/arian-nj/chibazi/internals/game_type"
+	humanplayer "github.com/arian-nj/chibazi/internals/human_player"
 	"github.com/arian-nj/chibazi/internals/utils"
 	"gopkg.in/telebot.v4"
 )
 
 type Game interface {
-	Players() []*consoleplayer.ConsolePlayer
+	Players() []*humanplayer.HumanPlayer
 	CallbackHandler(c telebot.Context) error
 	GetContext() context.Context
 }
@@ -39,11 +39,10 @@ func (allSession *AllSession) Add(key string, gs *GameSession) {
 
 type GameSession struct {
 	Bot         *telebot.Bot
-	IsChatOn    bool
 	IsGameEnded bool
-
-	Gametype  gametype.GameType
-	GameState Game
+	Chat        *Chat
+	Gametype    gametype.GameType
+	GameState   Game
 
 	CreatedAt       time.Time
 	ExpireDuaration time.Duration
@@ -51,11 +50,13 @@ type GameSession struct {
 
 func NewGameSession(allSession *AllSession, bot *telebot.Bot, gameType gametype.GameType, gameState Game) *GameSession {
 	gs := &GameSession{
-		Bot:             bot,
-		Gametype:        gameType,
-		GameState:       gameState,
-		IsChatOn:        true,
-		CreatedAt:       time.Now(),
+		Bot:       bot,
+		Gametype:  gameType,
+		GameState: gameState,
+		CreatedAt: time.Now(),
+		Chat: &Chat{
+			IsChatOn: true,
+		},
 		ExpireDuaration: 2*time.Minute*2 + 30,
 	}
 
@@ -65,29 +66,10 @@ func NewGameSession(allSession *AllSession, bot *telebot.Bot, gameType gametype.
 
 	return gs
 }
-
-func (g *GameSession) HandleChatMessage(bot telebot.API, senderID int, text string) error {
-	players := g.GameState.Players()
-	var senderPlayer *consoleplayer.ConsolePlayer
-	var recieverPlayer *consoleplayer.ConsolePlayer
-
-	for _, p := range players {
-		if p.TgID != senderID {
-			recieverPlayer = p
-		} else {
-			senderPlayer = p
-		}
-	}
-
-	_, err := bot.Send(&telebot.User{ID: int64(recieverPlayer.TgID)},
-		fmt.Sprintf("*_%s:_* %s", senderPlayer.Name, text), telebot.ModeMarkdownV2)
-	return err
-}
-
 func (gs *GameSession) MonitorGame(allSession *AllSession) {
 	<-gs.GameState.GetContext().Done()
 	gs.IsGameEnded = true
-	if gs.IsChatOn {
+	if gs.Chat.IsChatOn {
 		expDur := 30 * time.Second
 		gs.ExpireDuaration = time.Since(gs.CreatedAt) + expDur
 

@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"strconv"
 
-	consoleplayer "github.com/arian-nj/chibazi/internals/console_player"
+	humanplayer "github.com/arian-nj/chibazi/internals/human_player"
 	"github.com/arian-nj/chibazi/internals/xo_core"
 	"gopkg.in/telebot.v4"
 )
@@ -62,7 +62,7 @@ func CreateTicBoardInlineButton(board *xo_core.TicBoard) [][]telebot.InlineButto
 	return buttons
 }
 
-func (g *XOGame) CreatePlayersInlineButton(humanPlayers []*consoleplayer.ConsolePlayer, CurrentPlayerTurn int) [][]telebot.InlineButton {
+func (g *XOGame) CreatePlayersInlineButton(humanPlayers []*humanplayer.HumanPlayer, CurrentPlayerTurn int) [][]telebot.InlineButton {
 	buttons := make([][]telebot.InlineButton, 0)
 	for index, hplayer := range humanPlayers {
 

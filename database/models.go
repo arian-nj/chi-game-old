@@ -8,17 +8,22 @@ import (
 	"github.com/jackc/pgx/v5/pgtype"
 )
 
-type Hub struct {
+type GameSession struct {
 	ID        int
 	CreatedAt pgtype.Timestamp
-	GameType  string
-	TgID      int
+}
+
+type Person struct {
+	ID        int
+	Coins     int32
+	CreatedAt pgtype.Timestamp
 }
 
 type TelegramUser struct {
 	ID        int
 	TgID      int
-	CreatedAt pgtype.Timestamp
+	PersonID  pgtype.Int8
 	IsActive  pgtype.Bool
 	UpdatedAt pgtype.Timestamp
+	CreatedAt pgtype.Timestamp
 }

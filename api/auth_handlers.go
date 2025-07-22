@@ -108,13 +108,14 @@ func (app *ApiApplication) validateInitdata(w http.ResponseWriter, r *http.Reque
 }
 
 func (app *ApiApplication) CreateBrandNewPerson(tgId int) (database.TelegramUser, error) {
-	personRow, err := app.Queries.CreateTgUser(context.Background(), tgId)
+
+	tgUserRow, err := app.Queries.CreateTgUser(context.Background(), tgId)
 
 	if err != nil {
-		return personRow, err
+		return tgUserRow, err
 	}
 	// _, err = app.Queries.InsertUserStatistic(context.Background(), personRow.ID)
-	return personRow, err
+	return tgUserRow, err
 }
 func createToken(userId int) *jwt.Token {
 	claims := jwt.RegisteredClaims{
