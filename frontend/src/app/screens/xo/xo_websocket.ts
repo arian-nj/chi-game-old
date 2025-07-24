@@ -1,4 +1,4 @@
-export function connectSocket(url: string, protocol?: string | string[]) {
+export function ConnectSocket(url: string, protocol?: string | string[]) {
   const socket = new WebSocket(url, protocol);
   console.log(socket);
 
@@ -10,6 +10,7 @@ export function connectSocket(url: string, protocol?: string | string[]) {
 
   socket.onmessage = function (event) {
     alert(`[message] Data received from server: ${event.data}`);
+    socket.close(1000, "Normal Closure");
   };
 
   socket.onclose = function (event) {

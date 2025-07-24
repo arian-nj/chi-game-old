@@ -1,5 +1,5 @@
 export async function ValidateInitdata(initData: string) {
-  const res = await fetch("/api/validate-init/", {
+  const res = await fetch("/api/auth/validate-init/", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ init_data: initData }),
@@ -12,7 +12,7 @@ export async function ValidateInitdata(initData: string) {
 }
 
 export async function ValidateDymmy(userId: number) {
-  const res = await fetch("/api/validate-dummy/", {
+  const res = await fetch("/api/auth/validate-dummy/", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ user_id: userId }),

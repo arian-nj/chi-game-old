@@ -13,6 +13,7 @@ import (
 	"github.com/arian-nj/chibazi/database"
 	gamesessions "github.com/arian-nj/chibazi/game_sessions"
 	"github.com/arian-nj/chibazi/internals/config"
+	"github.com/arian-nj/chibazi/internals/keybul"
 	"github.com/arian-nj/chibazi/internals/utils"
 	matchmaking "github.com/arian-nj/chibazi/match_making"
 	"gopkg.in/telebot.v4"
@@ -71,15 +72,15 @@ func (app *BotApplication) MakeBot() *telebot.Bot {
 	b.Handle("/start", app.welcomeHandler)
 	b.Handle("/stat", app.statHandler)
 
-	b.Handle(PlayWithFriendsButtonText, app.PlayWithFriendsHandler)
-	b.Handle(PlayWithRandomPlayerText, app.PlayWithRandomPlayerHandler)
+	b.Handle(keybul.PlayWithFriendsButtonText, app.PlayWithFriendsHandler)
+	b.Handle(keybul.PlayWithRandomPlayerText, app.PlayWithRandomPlayerHandler)
 
-	b.Handle(Xo3x3ButtonText, app.PlayRandomXO3X3Handler)
-	b.Handle(Xo5x5ButtonText, app.PlayRandomXO5X5Handler)
+	b.Handle(keybul.Xo3x3ButtonText, app.PlayRandomXO3X3Handler)
+	b.Handle(keybul.Xo5x5ButtonText, app.PlayRandomXO5X5Handler)
 
-	b.Handle(CancelGameButtonText, app.CancelSearchingForGame)
+	b.Handle(keybul.CancelGameButtonText, app.CancelSearchingForGame)
 
-	b.Handle(StopChatButtonText, app.StopChatHandler)
+	b.Handle(keybul.StopChatButtonText, app.StopChatHandler)
 
 	b.Handle(telebot.OnText, app.textHandler)
 
@@ -120,23 +121,3 @@ func panicRecover(next telebot.HandlerFunc) telebot.HandlerFunc {
 		return next(c)
 	}
 }
-
-const (
-	PlayWithFriendsButtonText = "🎮 بازی تو پیوی یا گروه🫂"
-	PlayWithRandomPlayerText  = "🎲 بازی با ناشناس 🕹"
-)
-
-const (
-	Xo3x3ButtonText = "بازی دوز ۳ در ۳❌"
-	Xo5x5ButtonText = "بازی دوز ۵ در ۵⭕️"
-
-	CancelGameButtonText = "🔙 نگرد پشیمون شدم"
-)
-
-const (
-	MainKeyboardButtonText = "صفحه اصلی🏠"
-)
-
-const (
-	StopChatButtonText = "قطع چت ✂️"
-)

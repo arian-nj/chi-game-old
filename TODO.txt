@@ -83,9 +83,11 @@
 [X] setting button (to learn animation)
 [X] play buttton + animation
 [X] http server middleware
-[ ] web socket Send and recieve in backend
+[X] match making timeout
+[X] base ticket system
+[X] web socket Send and recieve in backend
 [ ] front send and recieve websocket
-[ ] send play ticket
+[X] send play ticket
 [ ] sync console and web game poc only chat
 [ ] color pallete
 [ ] replace all motion with gsap
@@ -93,7 +95,7 @@
 [X] base xo ui
 [ ] store web loading time stats
 
-
+[ ] set actual tg id in context middleware
 maybe add scroing to make it harder to use other bots
 
 

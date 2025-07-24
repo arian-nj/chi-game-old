@@ -1,7 +1,6 @@
 package xoconsole
 
 import (
-	"context"
 	"fmt"
 	"log/slog"
 	"strconv"
@@ -118,7 +117,6 @@ func (g *XOGame) StartGame(bot telebot.API) error {
 	utils.RunBackgroundTask(func() {
 		g.MonitorTimeout(bot)
 	})
-	_, err = g.Queries.CreateGameSession(context.Background())
 	return err
 }
 

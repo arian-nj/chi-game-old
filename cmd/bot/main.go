@@ -85,7 +85,7 @@ func main() {
 	quit := make(chan os.Signal, 1)
 	signal.Notify(quit, os.Interrupt, syscall.SIGTERM)
 
-	app := api.NewApiApplication(GlobalVars.Config, GlobalVars.Queries, GlobalVars.AllSessions)
+	app := api.NewApiApplication(GlobalVars.Config, GlobalVars.Queries, GlobalVars.AllSessions, GlobalVars.MatchMaking)
 	go app.RunApi(parentCtx, GlobalVars.Wg)
 
 	botApp := bot.NewBotApplication(GlobalVars.Config, GlobalVars.Queries, GlobalVars.AllSessions, GlobalVars.MatchMaking)
@@ -95,7 +95,7 @@ func main() {
 
 	go ClearDeadGamesCron(GlobalVars.AllSessions)
 
-	go GlobalVars.MaekeMatches()
+	go GlobalVars.MakeMatches()
 
 	<-quit
 	cancel()
@@ -116,7 +116,7 @@ func ClearDeadGamesCron(allSessions *gamesessions.AllSession) {
 	}
 }
 
-func (gv *GlobalVars) MaekeMatches() {
+func (gv *GlobalVars) MakeMatches() {
 	defer gv.MatchMaking.Mutex.Unlock()
 	var doFlag = false
 	for {
@@ -139,9 +139,8 @@ func (gv *GlobalVars) MaekeMatches() {
 }
 
 func (gv *GlobalVars) createRandomGame(gameType gametype.GameType, tickets []*matchmaking.Ticket) {
-	playerOne := humanplayer.NewHumanPlayer(tickets[0].Name, tickets[0].TgID).SetMessageSig(tickets[0].MessageID)
-	playerTwo := humanplayer.NewHumanPlayer(tickets[1].Name, tickets[1].TgID).SetMessageSig(tickets[1].MessageID)
-	bot.ClearMatchmakingMessage([]*humanplayer.HumanPlayer{playerOne, playerTwo}, gv.Bot)
+	playerOne := humanplayer.NewHumanPlayer(tickets[0].Name, tickets[0].TgID)
+	playerTwo := humanplayer.NewHumanPlayer(tickets[1].Name, tickets[1].TgID)
 
 	var newSession *gamesessions.GameSession
 	switch gameType {
@@ -158,11 +157,16 @@ func (gv *GlobalVars) createRandomGame(gameType gametype.GameType, tickets []*ma
 		if err != nil {
 			slog.Error("error in starting random xo match", "error", err)
 		}
+		_, err = gv.Queries.CreateGameSession(context.Background())
 
 	default:
 		slog.Error("not possible")
 		return
 	}
-	bot.SendFoundOpponentMessage(newSession.GameState.Players(), gv.Bot)
 
+	for _, ticket := range tickets {
+		ticket.MatchFound <- newSession
+	}
+
+	bot.SendFoundOpponentMessage(newSession.GameState.Players(), gv.Bot)
 }

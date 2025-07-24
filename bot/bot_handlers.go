@@ -153,8 +153,8 @@ var (
 	welcomeReplyKeyboard = &telebot.ReplyMarkup{
 		ReplyKeyboard: [][]telebot.ReplyButton{
 			{
-				{Text: PlayWithFriendsButtonText},
-				{Text: PlayWithRandomPlayerText},
+				{Text: keybul.PlayWithFriendsButtonText},
+				{Text: keybul.PlayWithRandomPlayerText},
 			},
 		},
 		ResizeKeyboard: true,
@@ -183,10 +183,6 @@ func (app *BotApplication) PlayWithRandomPlayerHandler(c telebot.Context) error 
 	return c.Send("چی بازی؟", WhatRandomGameReplyKeyboard)
 }
 
-func (app *BotApplication) openLocks() {
-	app.AllSessions.Mutex.Unlock()
-	app.MatchMaking.Mutex.Unlock()
-}
 func (app *BotApplication) PlayRandomXO3X3Handler(c telebot.Context) error {
 	return app.PlayRandomGameHandler(c, gametype.XOGameType3X3)
 }
@@ -195,7 +191,7 @@ var (
 	CancelGameReplyKeyboard = &telebot.ReplyMarkup{
 		ReplyKeyboard: [][]telebot.ReplyButton{
 			{
-				{Text: CancelGameButtonText},
+				{Text: keybul.CancelGameButtonText},
 			},
 		},
 		ResizeKeyboard: true,
@@ -210,28 +206,29 @@ func (app *BotApplication) PlayRandomGameHandler(c telebot.Context, gameType gam
 	text := ""
 	sender := c.Sender()
 
-	app.AllSessions.Mutex.Lock()
-	app.MatchMaking.Mutex.Lock()
-
 	if app.AllSessions.IsSessionEmpty(int(sender.ID)) == false {
-		app.openLocks()
 		return c.Send("بازی قبلیت باید تموم بشه")
 	}
 
-	if app.RemovePlayerFromMatchMaking(int(sender.ID)) {
+	if app.MatchMaking.RemovePlayerFromMatchMaking(int(sender.ID)) {
 		text += "قبلیو لغو کردم\n"
 	}
-	app.openLocks()
 
 	text += "دنبال حریفم"
 	msg, err := c.Bot().Send(sender, text, CancelGameReplyKeyboard)
 	if err != nil {
 		return err
 	}
+	newTicket := matchmaking.NewTicket(sender.FirstName, int(sender.ID), gameType)
+	app.MatchMaking.AddTicket(newTicket)
 
-	newTicket := matchmaking.NewTicket(sender.FirstName, int(sender.ID), msg.ID, gameType)
-	app.MatchMaking.AddTicket(gameType, newTicket)
-	return nil
+	select {
+	case <-newTicket.MatchFound:
+		return c.Bot().Delete(msg)
+	case <-time.After(90 * time.Second):
+		_, err = c.Bot().Edit(msg, "حریف پیدا نکردم")
+	}
+	return err
 }
 
 var (
@@ -239,14 +236,14 @@ var (
 		ReplyKeyboard: [][]telebot.ReplyButton{
 			{
 				{
-					Text: Xo3x3ButtonText,
+					Text: keybul.Xo3x3ButtonText,
 				},
 				{
-					Text: Xo5x5ButtonText,
+					Text: keybul.Xo5x5ButtonText,
 				},
 			},
 			{
-				{Text: MainKeyboardButtonText},
+				{Text: keybul.MainKeyboardButtonText},
 			},
 		},
 		ResizeKeyboard: true,
@@ -257,7 +254,7 @@ func (app *BotApplication) CancelSearchingForGame(c telebot.Context) error {
 	app.MatchMaking.Mutex.Lock()
 	defer app.MatchMaking.Mutex.Unlock()
 
-	app.RemovePlayerFromMatchMaking(int(c.Sender().ID))
+	app.MatchMaking.RemovePlayerFromMatchMaking(int(c.Sender().ID))
 	return c.Send("لغوش کردم 😔", WhatRandomGameReplyKeyboard)
 }
 

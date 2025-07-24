@@ -13,17 +13,17 @@ func (app *ApiApplication) createRouter() *chi.Mux {
 	mux := chi.NewMux()
 
 	mux.Get("/api/status", app.statusHandler)
-	mux.Post("/api/validate-init/", app.validateInitdata)
-	mux.Post("/api/validate-dummy/", app.dummyValidate)
+	mux.Post("/api/auth/validate-init/", app.validateInitdata)
+	mux.Post("/api/auth/validate-dummy/", app.dummyValidate)
+	// mux.Get("/api/auth/me/", app.getMe)
 
 	mux.Get("/api/game/xo/ws/", app.websocketUpgrader)
-	mux.Handle("/web/", http.StripPrefix("/web/", http.FileServerFS(distFS)))
+	mux.Handle("/web/*", http.StripPrefix("/web/", http.FileServerFS(distFS)))
 
 	mux.Group(func(authRouter chi.Router) {
-		authRouter.Use(app.Authenticate)
-		authRouter.Use(app.RequireAuthenticatedUser)
+		authRouter.Use(app.AuthenticateQuery)
 
-		mux.HandleFunc("GET /api/game/match_making/ticket", app.makeMatchMakingTicket)
+		authRouter.HandleFunc("GET /api/game/match_making/ticket", app.makeMatchMakingTicket)
 	})
 	return mux
 }

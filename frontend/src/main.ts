@@ -4,7 +4,6 @@ import * as PIXI from "pixi.js";
 
 import { setEngine } from "./app/getEngine";
 import { LoadScreen } from "./app/screens/LoadScreen";
-import { MainScreen } from "./app/screens/main/MainScreen";
 import { userSettings } from "./app/utils/userSettings";
 import { GetJwtToken, ValidateDymmy } from "./auth/jwt";
 import { CreationEngine } from "./engine/engine";
@@ -13,6 +12,7 @@ import { CreationEngine } from "./engine/engine";
  * Importing these modules will automatically register there plugins with the engine.
  */
 import "@pixi/sound";
+import { MainScreen } from "./app/screens/main/MainScreen";
 // import WebApp from "@twa-dev/sdk";
 // import { ValidateInitdata } from "./auth/jwt";
 // import "@esotericsoftware/spine-pixi-v8";
@@ -20,7 +20,7 @@ import "@pixi/sound";
 // WebApp.ready();
 
 async function ensureJwtToken() {
-  let token = GetJwtToken();
+  let token = null;
   while (token == null) {
     const userID = prompt("What is your user ID?", "1");
     if (userID === null) break; // user canceled

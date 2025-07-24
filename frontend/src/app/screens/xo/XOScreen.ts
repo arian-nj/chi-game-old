@@ -10,7 +10,7 @@ import {
 import { ChangeBackgroundColorAnimation } from "../../animateion/change_background";
 import { GetEngine } from "../../getEngine";
 import { lerp } from "../../../engine/utils/maths";
-import { connectSocket } from "./websocket";
+import { ConnectSocket } from "./xo_websocket";
 
 enum CellType {
   EmptyCell = "",
@@ -28,7 +28,7 @@ export class XoScreen extends Container {
 
   constructor() {
     super();
-    connectSocket("/api/game/xo/ws/", "echo");
+    ConnectSocket("/api/game/xo/ws/");
     ChangeBackgroundColorAnimation(this.bgColor, 1000);
 
     this.board = new XoBoard(3);

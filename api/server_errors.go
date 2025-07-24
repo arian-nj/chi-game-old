@@ -83,10 +83,6 @@ func (app *ApiApplication) InvalidAuthenticationToken(w http.ResponseWriter, r *
 	app.errorMessage(w, r, http.StatusUnauthorized, "Invalid authentication token", headers)
 }
 
-func (app *ApiApplication) AuthenticationRequired(w http.ResponseWriter, r *http.Request) {
-	app.errorMessage(w, r, http.StatusUnauthorized, "You must be authenticated to access this resource", nil)
-}
-
 func (app *ApiApplication) invalidAuthenticationCreds(w http.ResponseWriter, r *http.Request) {
 	app.errorMessage(w, r, http.StatusUnauthorized, "Invalid authentication credentials", nil)
 }

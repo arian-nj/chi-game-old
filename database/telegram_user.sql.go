@@ -54,7 +54,7 @@ func (q *Queries) CountUsersTgCreatedBetween(ctx context.Context, arg CountUsers
 const createTgUser = `-- name: CreateTgUser :one
 INSERT INTO telegram_users (tg_id) VALUES ($1) ON
 	CONFLICT (tg_id) DO UPDATE
-	SET updated_at = NOW(), is_active = TRUE RETURNING id, tg_id, person_id, is_active, updated_at, created_at
+	SET updated_at = NOW(), is_active = TRUE RETURNING id, tg_id, is_active, updated_at, created_at
 `
 
 func (q *Queries) CreateTgUser(ctx context.Context, tgID int) (TelegramUser, error) {
@@ -63,7 +63,6 @@ func (q *Queries) CreateTgUser(ctx context.Context, tgID int) (TelegramUser, err
 	err := row.Scan(
 		&i.ID,
 		&i.TgID,
-		&i.PersonID,
 		&i.IsActive,
 		&i.UpdatedAt,
 		&i.CreatedAt,
@@ -72,7 +71,7 @@ func (q *Queries) CreateTgUser(ctx context.Context, tgID int) (TelegramUser, err
 }
 
 const getAllTgUsers = `-- name: GetAllTgUsers :many
-SELECT id, tg_id, person_id, is_active, updated_at, created_at FROM telegram_users
+SELECT id, tg_id, is_active, updated_at, created_at FROM telegram_users
 `
 
 func (q *Queries) GetAllTgUsers(ctx context.Context) ([]TelegramUser, error) {
@@ -87,7 +86,6 @@ func (q *Queries) GetAllTgUsers(ctx context.Context) ([]TelegramUser, error) {
 		if err := rows.Scan(
 			&i.ID,
 			&i.TgID,
-			&i.PersonID,
 			&i.IsActive,
 			&i.UpdatedAt,
 			&i.CreatedAt,
@@ -103,7 +101,7 @@ func (q *Queries) GetAllTgUsers(ctx context.Context) ([]TelegramUser, error) {
 }
 
 const getTgUser = `-- name: GetTgUser :one
-SELECT id, tg_id, person_id, is_active, updated_at, created_at FROM telegram_users
+SELECT id, tg_id, is_active, updated_at, created_at FROM telegram_users
 WHERE tg_id = $1
 `
 
@@ -113,7 +111,6 @@ func (q *Queries) GetTgUser(ctx context.Context, tgID int) (TelegramUser, error)
 	err := row.Scan(
 		&i.ID,
 		&i.TgID,
-		&i.PersonID,
 		&i.IsActive,
 		&i.UpdatedAt,
 		&i.CreatedAt,

@@ -32,27 +32,47 @@ const (
 )
 
 type Ticket struct {
-	Name      string
-	UserID    int
-	TgID      int
-	MessageID int
-	Platform  PlatformType
-	GameType  gametype.GameType
+	Name   string
+	UserID int
+	TgID   int
+
+	Platform PlatformType
+	GameType gametype.GameType
+
+	MatchFound chan *gamesessions.GameSession
+
 	Timestamp time.Time
 }
 
-func NewTicket(name string, tgID, messageID int, gameType gametype.GameType) *Ticket {
+func NewTicket(name string, tgID int, gameType gametype.GameType) *Ticket {
 	return &Ticket{
-		TgID:      tgID,
-		Name:      name,
-		MessageID: messageID,
-		GameType:  gameType,
+		TgID:       tgID,
+		Name:       name,
+		GameType:   gameType,
+		MatchFound: make(chan *gamesessions.GameSession, 1),
 	}
 }
 
-func (mm *MatchMaking) AddTicket(gameType gametype.GameType, newTicket *Ticket) {
-	queue := mm.WaitingPlayers[gameType]
-	mm.WaitingPlayers[gameType] = append(queue, newTicket)
+func (mm *MatchMaking) AddTicket(newTicket *Ticket) {
+	mm.Mutex.Lock()
+	defer mm.Mutex.Unlock()
+	queue := mm.WaitingPlayers[newTicket.GameType]
+	mm.WaitingPlayers[newTicket.GameType] = append(queue, newTicket)
+}
+func (mm *MatchMaking) RemovePlayerFromMatchMaking(userID int) bool {
+	mm.Mutex.Lock()
+	defer mm.Mutex.Unlock()
+
+	for gameType, tickets := range mm.WaitingPlayers {
+		for index, ticket := range tickets {
+			if ticket.TgID == int(userID) {
+				li := mm.WaitingPlayers[gameType]
+				mm.WaitingPlayers[gameType] = append(li[:index], li[index+1:]...)
+				return true
+			}
+		}
+	}
+	return false
 }
 
 //

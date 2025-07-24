@@ -48,7 +48,6 @@ func (app *ApiApplication) dummyValidate(w http.ResponseWriter, r *http.Request)
 		app.ServerError(w, r, err)
 		return
 	}
-
 }
 
 func (app *ApiApplication) validateInitdata(w http.ResponseWriter, r *http.Request) {

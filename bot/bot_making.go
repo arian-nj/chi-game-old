@@ -15,15 +15,6 @@ func FoundOpponentText(oppName string) string {
 	return text
 }
 
-var StopChatReplyKeyboard = &telebot.ReplyMarkup{
-	ReplyKeyboard: [][]telebot.ReplyButton{
-		{
-			{Text: StopChatButtonText},
-		},
-	},
-	ResizeKeyboard: true,
-}
-
 func (app *BotApplication) inlineResultFeedbackHandler(c telebot.Context) error {
 	resultId := c.InlineResult().ResultID
 	messageID := c.InlineResult().MessageID
@@ -48,18 +39,4 @@ func (app *BotApplication) inlineResultFeedbackHandler(c telebot.Context) error 
 		return newXOGame.SendJoinPanel(c)
 	}
 	return c.RespondAlert("این بازیرو ندارم!")
-}
-
-func (app *BotApplication) RemovePlayerFromMatchMaking(userID int) bool {
-
-	for gameType, tickets := range app.MatchMaking.WaitingPlayers {
-		for index, ticket := range tickets {
-			if ticket.TgID == int(userID) {
-				li := app.MatchMaking.WaitingPlayers[gameType]
-				app.MatchMaking.WaitingPlayers[gameType] = append(li[:index], li[index+1:]...)
-				return true
-			}
-		}
-	}
-	return false
 }

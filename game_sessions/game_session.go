@@ -26,6 +26,8 @@ type AllSession struct {
 }
 
 func (allSessions *AllSession) IsSessionEmpty(playerId int) bool {
+	allSessions.Mutex.Lock()
+	defer allSessions.Mutex.Unlock()
 	_, isFound := allSessions.Sessions[strconv.Itoa(playerId)]
 	return !isFound
 }

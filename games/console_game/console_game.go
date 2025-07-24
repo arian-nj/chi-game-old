@@ -75,6 +75,13 @@ func (g *ConsoleGame) Edit(bot telebot.API, msg telebot.Editable, text string, k
 		return nil
 	} else {
 		for _, p := range g.Players() {
+			if p.MessageID == 0 {
+				msg, err := bot.Send(p, "game")
+				if err != nil {
+					slog.Error("can't send player message ", "error", err)
+				}
+				p.SetMessageSig(msg.ID)
+			}
 			err := keybul.EditGameMessage(bot, p, text, keyboard)
 			if err != nil {
 				slog.Error("can't edit player message ", "error", err)

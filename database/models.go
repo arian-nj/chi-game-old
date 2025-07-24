@@ -13,16 +13,9 @@ type GameSession struct {
 	CreatedAt pgtype.Timestamp
 }
 
-type Person struct {
-	ID        int
-	Coins     int32
-	CreatedAt pgtype.Timestamp
-}
-
 type TelegramUser struct {
 	ID        int
 	TgID      int
-	PersonID  pgtype.Int8
 	IsActive  pgtype.Bool
 	UpdatedAt pgtype.Timestamp
 	CreatedAt pgtype.Timestamp

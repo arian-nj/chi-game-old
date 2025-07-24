@@ -1,6 +1,6 @@
 import { Container, FederatedPointerEvent, Sprite, Text } from "pixi.js";
 import { gsap } from "gsap";
-import { Signal } from "../../../engine/signals/signales";
+import { Signal } from "../../../engine/signals/signals";
 
 const defaultScale = 1;
 const bigScale = 1.1;

@@ -10,19 +10,22 @@ import (
 	"github.com/arian-nj/chibazi/database"
 	gamesessions "github.com/arian-nj/chibazi/game_sessions"
 	"github.com/arian-nj/chibazi/internals/config"
+	matchmaking "github.com/arian-nj/chibazi/match_making"
 )
 
 type ApiApplication struct {
 	Config      *config.Config
 	Queries     *database.Queries
 	AllSessions *gamesessions.AllSession
+	MatchMaking *matchmaking.MatchMaking
 }
 
-func NewApiApplication(config *config.Config, queries *database.Queries, AllSession *gamesessions.AllSession) *ApiApplication {
+func NewApiApplication(config *config.Config, queries *database.Queries, AllSession *gamesessions.AllSession, matchMaking *matchmaking.MatchMaking) *ApiApplication {
 	return &ApiApplication{
 		Config:      config,
 		Queries:     queries,
 		AllSessions: AllSession,
+		MatchMaking: matchMaking,
 	}
 }
 

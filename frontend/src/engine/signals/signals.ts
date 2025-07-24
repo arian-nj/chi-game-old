@@ -1,4 +1,4 @@
-class Signal<T = void> {
+export class Signal<T = void> {
   private listeners: ((data: T) => void)[] = [];
 
   public Connect(listener: (data: T) => void) {
