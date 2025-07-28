@@ -1,16 +1,19 @@
 export function ConnectSocket(url: string, protocol?: string | string[]) {
   const socket = new WebSocket(url, protocol);
-  console.log(socket);
 
   socket.onopen = function (_e: Event) {
-    alert("[open] Connection established");
+    console.log("[open] Connection established");
     console.log(_e);
-    socket.send("My name is John");
   };
 
   socket.onmessage = function (event) {
-    alert(`[message] Data received from server: ${event.data}`);
-    socket.close(1000, "Normal Closure");
+    try {
+      const data = JSON.parse(event.data);
+      console.log(data);
+    } catch (err) {
+      console.error("[WebSocket] Failed to parse message:", event.data);
+    }
+    // socket.close(1000, "Normal Closure");
   };
 
   socket.onclose = function (event) {

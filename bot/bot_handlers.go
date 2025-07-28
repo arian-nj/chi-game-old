@@ -137,12 +137,9 @@ func (app *BotApplication) textHandler(c telebot.Context) error {
 	senderID := int(c.Sender().ID)
 
 	// ensure game is in not Via Message
-	app.AllSessions.Mutex.Lock()
-	gameSession, ok := app.AllSessions.Sessions[strconv.Itoa(senderID)]
-	app.AllSessions.Mutex.Unlock()
-
+	gameSession, ok := app.AllSessions.Get(strconv.Itoa(senderID))
 	if ok {
-		return gameSession.HandleChatMessage(c.Bot(), senderID, text)
+		return gameSession.HandleBotChatMessage(c.Bot(), senderID, text)
 	}
 
 	return c.Send(

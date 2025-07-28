@@ -100,13 +100,31 @@ func (q *Queries) GetAllTgUsers(ctx context.Context) ([]TelegramUser, error) {
 	return items, nil
 }
 
-const getTgUser = `-- name: GetTgUser :one
+const getTgUserBtTgID = `-- name: GetTgUserBtTgID :one
 SELECT id, tg_id, is_active, updated_at, created_at FROM telegram_users
 WHERE tg_id = $1
 `
 
-func (q *Queries) GetTgUser(ctx context.Context, tgID int) (TelegramUser, error) {
-	row := q.db.QueryRow(ctx, getTgUser, tgID)
+func (q *Queries) GetTgUserBtTgID(ctx context.Context, tgID int) (TelegramUser, error) {
+	row := q.db.QueryRow(ctx, getTgUserBtTgID, tgID)
+	var i TelegramUser
+	err := row.Scan(
+		&i.ID,
+		&i.TgID,
+		&i.IsActive,
+		&i.UpdatedAt,
+		&i.CreatedAt,
+	)
+	return i, err
+}
+
+const getTgUserByID = `-- name: GetTgUserByID :one
+SELECT id, tg_id, is_active, updated_at, created_at FROM telegram_users
+WHERE id = $1
+`
+
+func (q *Queries) GetTgUserByID(ctx context.Context, id int) (TelegramUser, error) {
+	row := q.db.QueryRow(ctx, getTgUserByID, id)
 	var i TelegramUser
 	err := row.Scan(
 		&i.ID,

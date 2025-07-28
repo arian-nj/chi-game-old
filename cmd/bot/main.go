@@ -18,7 +18,6 @@ import (
 	xoconsole "github.com/arian-nj/chibazi/games/xo_console"
 	"github.com/arian-nj/chibazi/internals/config"
 	gametype "github.com/arian-nj/chibazi/internals/game_type"
-	humanplayer "github.com/arian-nj/chibazi/internals/human_player"
 	matchmaking "github.com/arian-nj/chibazi/match_making"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"gopkg.in/telebot.v4"
@@ -89,7 +88,11 @@ func main() {
 	go app.RunApi(parentCtx, GlobalVars.Wg)
 
 	botApp := bot.NewBotApplication(GlobalVars.Config, GlobalVars.Queries, GlobalVars.AllSessions, GlobalVars.MatchMaking)
-	bot := botApp.MakeBot()
+	bot, err := botApp.MakeBot()
+	if err != nil {
+		slog.Error("Failed to make bot", "err", err)
+		return
+	}
 	GlobalVars.Bot = bot
 	go botApp.RunBot(bot, parentCtx, GlobalVars.Wg)
 
@@ -139,30 +142,35 @@ func (gv *GlobalVars) MakeMatches() {
 }
 
 func (gv *GlobalVars) createRandomGame(gameType gametype.GameType, tickets []*matchmaking.Ticket) {
-	playerOne := humanplayer.NewHumanPlayer(tickets[0].Name, tickets[0].TgID)
-	playerTwo := humanplayer.NewHumanPlayer(tickets[1].Name, tickets[1].TgID)
-
 	var newSession *gamesessions.GameSession
+
 	switch gameType {
+
 	case gametype.XOGameType3X3, gametype.XOGameType5X5:
 		newXOGame := xoconsole.NewXOGame(gametype.XOGameType3X3, gv.Queries)
-		newXOGame.AddPlayer(playerOne)
-		newXOGame.AddPlayer(playerTwo)
-
 		newSession = gamesessions.NewGameSession(gv.AllSessions, gv.Bot, gameType, newXOGame)
-		gv.AllSessions.Add(strconv.Itoa(playerOne.TgID), newSession)
-		gv.AllSessions.Add(strconv.Itoa(playerTwo.TgID), newSession)
-
-		err := newXOGame.StartGame(gv.Bot)
-		if err != nil {
-			slog.Error("error in starting random xo match", "error", err)
-		}
-		_, err = gv.Queries.CreateGameSession(context.Background())
 
 	default:
-		slog.Error("not possible")
+		slog.Error("not possible random game")
+		return
+
+	}
+
+	playerOne := gamesessions.NewSessionPlayer(tickets[0].TgID, tickets[0].Name)
+	playerTwo := gamesessions.NewSessionPlayer(tickets[1].TgID, tickets[1].Name)
+
+	newSession.AddPlayer(playerOne)
+	newSession.AddPlayer(playerTwo)
+
+	gv.AllSessions.Add(strconv.Itoa(playerOne.TgID), newSession)
+	gv.AllSessions.Add(strconv.Itoa(playerTwo.TgID), newSession)
+
+	err := newSession.StartGame()
+	if err != nil {
+		slog.Error("error in starting random xo match", "error", err)
 		return
 	}
+	_, err = gv.Queries.CreateGameSession(context.Background())
 
 	for _, ticket := range tickets {
 		ticket.MatchFound <- newSession

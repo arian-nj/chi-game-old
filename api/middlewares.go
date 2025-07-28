@@ -81,7 +81,7 @@ func ContextGetAuthenticatedUser(queries *database.Queries, r *http.Request) (*d
 
 	var user database.TelegramUser
 	var err error
-	user, err = queries.GetTgUser(r.Context(), reqConUser.UserID)
+	user, err = queries.GetTgUserByID(r.Context(), reqConUser.UserID)
 
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {

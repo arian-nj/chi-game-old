@@ -1,0 +1,57 @@
+import { Container, Point } from "pixi.js";
+import { GetEngine } from "../../getEngine";
+
+export class InputBox extends Container {
+	private sizeRatio: Point;
+	private htmlInput: HTMLInputElement;
+	private placeholder: string;
+
+	constructor(placeholder = "Enter text...", sizeRatio: Point = new Point(0.8, 0.1)) {
+		super();
+		this.htmlInput = document.createElement('input');
+		this.sizeRatio = sizeRatio;
+		this.placeholder = placeholder;
+
+		console.log(this.placeholder)
+		this.htmlInput.type = 'text';
+		this.htmlInput.placeholder = placeholder;
+
+		// Style the input
+		this.htmlInput.style.position = 'sticky';
+		this.htmlInput.style.fontSize = '24px';
+		// this.htmlInput.style.padding = '8px';
+		this.htmlInput.style.borderRadius = '8px';
+		this.htmlInput.style.border = 'none';
+		this.htmlInput.style.outline = 'none';
+		this.htmlInput.style.background = '#333';
+		this.htmlInput.style.color = '#fff';
+
+		// Append to DOM
+		document.body.appendChild(this.htmlInput);
+	}
+
+	public resize(width: number, height: number) {
+		const boxWidth = width * this.sizeRatio.x;
+		const boxHeight = height * this.sizeRatio.y;
+
+		this.position.set(width / 2, height - boxHeight);
+
+		const canvasRect = GetEngine().canvas.getBoundingClientRect();
+
+		const left = canvasRect.left + (width - boxWidth) / 2;
+
+		let top = canvasRect.top + height - boxHeight - 10;
+
+		const maxTop = window.innerHeight - boxHeight - 10;
+		top = Math.min(top, maxTop);
+
+		this.htmlInput.style.width = `${boxWidth}px`;
+		this.htmlInput.style.height = `${boxHeight}px`;
+		// this.htmlInput.style.left = `${left}px`;
+		this.htmlInput.style.bottom = `${0}px`;
+	}
+	public destroy(options?: any) {
+		super.destroy(options);
+		this.htmlInput.remove();
+	}
+}

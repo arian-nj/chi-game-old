@@ -68,7 +68,7 @@ func (app *ApiApplication) validateInitdata(w http.ResponseWriter, r *http.Reque
 		return
 	}
 
-	botUserRow, err := app.Queries.GetTgUser(r.Context(), int(user.ID))
+	botUserRow, err := app.Queries.GetTgUserBtTgID(r.Context(), int(user.ID))
 	if err != nil {
 		app.ServerError(w, r, err)
 		return
@@ -82,7 +82,7 @@ func (app *ApiApplication) validateInitdata(w http.ResponseWriter, r *http.Reque
 			return
 		}
 	} else {
-		tgUserRow, err = app.Queries.GetTgUser(r.Context(), int(botUserRow.TgID))
+		tgUserRow, err = app.Queries.GetTgUserByID(r.Context(), int(botUserRow.ID))
 		if err != nil {
 			app.ServerError(w, r, err)
 			return

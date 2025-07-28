@@ -95,7 +95,13 @@
 [X] base xo ui
 [ ] store web loading time stats
 
+## WARNINGS
+[ ] Clean and Disconnect Session
 [ ] set actual tg id in context middleware
+[ ] Remove Game.Players()?
+[ ] Limit Chat Message Length
+[ ] Limit Chat Message burst for telegram bot 1per 1s ?
+[ ] duplicate ticket sending
 maybe add scroing to make it harder to use other bots
 
 

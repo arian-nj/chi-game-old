@@ -49,15 +49,14 @@ func (app *BotApplication) RunBot(bot *telebot.Bot, ctx context.Context, wg *syn
 	bot.Start()
 }
 
-func (app *BotApplication) MakeBot() *telebot.Bot {
+func (app *BotApplication) MakeBot() (*telebot.Bot, error) {
 	pref := telebot.Settings{
 		Token:  app.Config.BotToken,
 		Poller: &telebot.LongPoller{Timeout: 10 * time.Second},
 	}
 	b, err := telebot.NewBot(pref)
 	if err != nil {
-		slog.Error("new error %w", "error", err)
-		return nil
+		return nil, err
 	}
 
 	app.Bot = b
@@ -84,7 +83,7 @@ func (app *BotApplication) MakeBot() *telebot.Bot {
 
 	b.Handle(telebot.OnText, app.textHandler)
 
-	return b
+	return b, nil
 }
 
 func (app *BotApplication) addUserMiddleware(next telebot.HandlerFunc) telebot.HandlerFunc {

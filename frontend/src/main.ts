@@ -13,6 +13,7 @@ import { CreationEngine } from "./engine/engine";
  */
 import "@pixi/sound";
 import { MainScreen } from "./app/screens/main/MainScreen";
+import { GameSessionsScreen } from "./app/screens/game_sessions/GameSessionsScreen";
 // import WebApp from "@twa-dev/sdk";
 // import { ValidateInitdata } from "./auth/jwt";
 // import "@esotericsoftware/spine-pixi-v8";
@@ -54,9 +55,11 @@ globalThis.__PIXI_APP__ = engine;
   // Initialize the user settings
   userSettings.init();
 
-  // Show the load screen
+  const path = window.location.pathname;
   await engine.navigation.showScreen(LoadScreen);
-  // Show the main screen once the load screen is dismissed
-  // await engine.navigation.showScreen(XoScreen);
-  await engine.navigation.showScreen(MainScreen);
+  if (path.endsWith("/web/")) {
+    await engine.navigation.showScreen(MainScreen);
+  } else if (path.endsWith("/web/game_sessions/")) {
+    await engine.navigation.showScreen(GameSessionsScreen);
+  }
 })();

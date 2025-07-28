@@ -1,6 +1,12 @@
--- name: GetTgUser :one
+-- name: GetTgUserByID :one
+SELECT * FROM telegram_users
+WHERE id = $1;
+
+
+-- name: GetTgUserBtTgID :one
 SELECT * FROM telegram_users
 WHERE tg_id = $1;
+
 
 -- name: GetAllTgUsers :many
 SELECT * FROM telegram_users;
