@@ -1,26 +1,47 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useState } from "react";
+import { GetJwtToken } from "./App";
+import Chat from "./Chat";
+import { GameSessionSocket } from "./SessionSocket";
 
 export default function GameSession() {
-	const connection = useRef<WebSocket | null>(null)
+	const [socket, setSocket] = useState<GameSessionSocket | null>(null);
 
 	useEffect(() => {
-		const socket = new WebSocket("ws://127.0.0.1:800")
+		const token = GetJwtToken();
+		const wsUrl = `/api/game_session/?auth_token=${token}`;
+		const controller = new AbortController();
 
-		socket.onopen = (_event: any) => {
-			console.log("Connection established")
-		}
-
-		socket.onmessage = (event: any) => {
-			console.log("Message got", event.data)
-		}
-
-		socket.onclose = () => {
-			console.log('WebSocket closed');
+		const checkSessionAvailability = async () => {
+			try {
+				const res = await fetch(wsUrl + "&noconn=false", { signal: controller.signal });
+				if (!res.ok) {
+					const msg = res.status === 404
+						? "Session not available"
+						: "Unexpected error";
+					throw new Error(`${msg}: ${res.status}`);
+				}
+			} catch (err: any) {
+				console.error("Unable to start session:", err);
+				alert("Error: " + err.message);
+			}
 		};
-		connection.current = socket
+
+		const connectWebSocket = () => {
+			const conn = new GameSessionSocket(wsUrl);
+			setSocket(conn)
+		};
+
+		checkSessionAvailability().then(connectWebSocket);
 
 		return () => {
-			connection.current?.close()
-		}
-	})
+			controller.abort();
+			socket?.close()
+		};
+	}, []);
+
+	return <>
+		<h1>Game Session</h1>
+		{socket ? <Chat sessionSocket={socket} /> : <h2>socket is null</h2>}
+	</>
 }
+

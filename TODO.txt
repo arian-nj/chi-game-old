@@ -86,11 +86,14 @@
 [X] match making timeout
 [X] base ticket system
 [X] web socket Send and recieve in backend
-[ ] front send and recieve websocket
-[X] send play ticket
-[ ] sync console and web game poc only chat
+[X] change to react
+[X] dummy auth
+[X] front send and recieve websocket
+[X] poc only chat
+[ ] better chat implementation
+[ ] send web to bot and bot to web
+[ ] Log Chats
 [ ] color pallete
-[ ] replace all motion with gsap
 [ ] how to look? sending and joining + implementation transfer in via to web app
 [X] base xo ui
 [ ] store web loading time stats

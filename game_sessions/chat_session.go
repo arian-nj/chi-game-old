@@ -2,6 +2,7 @@ package gamesessions
 
 import (
 	"fmt"
+	"log/slog"
 
 	"github.com/arian-nj/chibazi/internals/socket"
 	"gopkg.in/telebot.v4"
@@ -26,9 +27,19 @@ func (gs *GameSession) HandleBotChatMessage(bot telebot.API, senderID int, text 
 		}
 	}
 
-	_, err := bot.Send(&telebot.User{ID: int64(recieverPlayer.TgID)},
-		fmt.Sprintf("*_%s:_* %s", senderPlayer.Name, text), telebot.ModeMarkdownV2)
-	return err
+	err := SendChatMessageInBot(bot, recieverPlayer.TgID, text, senderPlayer.Name)
+	if err != nil {
+		slog.Error("can't send chat message from bot", "error", err)
+	}
+	if recieverPlayer.Socket != nil {
+		em := socket.EventMessage(text)
+		err := recieverPlayer.Socket.SendEvent(socket.NewEvent(ChatType, &em))
+		if err != nil {
+			slog.Error("can't send chat message to socker", "error", err)
+		}
+	}
+
+	return nil
 }
 
 func (gs *GameSession) HandleWebChatMessage(newSessionEvent *SessionEvent) error {
@@ -47,6 +58,26 @@ func (gs *GameSession) HandleWebChatMessage(newSessionEvent *SessionEvent) error
 			recieverPlayer = p
 		}
 	}
-	_ = senderPlayer
-	return recieverPlayer.Socket.SendEvent(socket.NewEvent(ChatType, newSessionEvent.Event.Data))
+
+	chatMessage := newSessionEvent.Event.Data
+	if recieverPlayer.Socket != nil {
+		return recieverPlayer.Socket.SendEvent(socket.NewEvent(ChatType, chatMessage))
+	}
+
+	err := SendChatMessageInBot(gs.Bot, recieverPlayer.TgID, string(*chatMessage), senderPlayer.Name)
+	if err != nil {
+		slog.Error("can't send bot message from got from socket to reciever ", "error", err)
+	}
+
+	err = SendChatMessageInBot(gs.Bot, senderPlayer.TgID, string(*chatMessage), senderPlayer.Name)
+	if err != nil {
+		slog.Error("can't send bot message from got from socket to sender", "error", err)
+	}
+	return nil
+}
+
+func SendChatMessageInBot(bot telebot.API, toId int, text string, senderName string) error {
+	_, err := bot.Send(&telebot.User{ID: int64(toId)},
+		fmt.Sprintf("*_%s:_* %s", senderName, text), telebot.ModeMarkdownV2)
+	return err
 }

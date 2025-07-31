@@ -91,7 +91,7 @@ func main() {
 	bot, err := botApp.MakeBot()
 	if err != nil {
 		slog.Error("Failed to make bot", "err", err)
-		return
+		// return
 	}
 	GlobalVars.Bot = bot
 	go botApp.RunBot(bot, parentCtx, GlobalVars.Wg)

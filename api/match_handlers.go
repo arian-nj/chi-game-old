@@ -27,7 +27,7 @@ func (app *ApiApplication) makeMatchMakingTicket(w http.ResponseWriter, r *http.
 	}
 	defer conn.CloseNow()
 
-	sokcetClient := socket.NewSocketClient(conn)
+	socketClient := socket.NewSocketClient(conn)
 
 	NewTicket := matchmaking.NewTicket("Player Name", tgUser.TgID, gametype.XOGameType3X3)
 	app.MatchMaking.AddTicket(NewTicket)
@@ -36,9 +36,9 @@ func (app *ApiApplication) makeMatchMakingTicket(w http.ResponseWriter, r *http.
 
 	select {
 	case <-NewTicket.MatchFound:
-		sokcetClient.Write("found")
+		socketClient.Write("found")
 	case <-ticker.C:
-		sokcetClient.Write("timeout")
+		socketClient.Write("timeout")
 	}
 
 	slog.Error("ended")

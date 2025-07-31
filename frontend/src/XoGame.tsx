@@ -2,7 +2,7 @@ import { useState } from "react";
 
 
 type SquareProps = {
-	value: any;
+	value: string;
 	onSquareClick: () => void
 };
 

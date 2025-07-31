@@ -20,6 +20,12 @@ func (app *ApiApplication) gameSessionWS(w http.ResponseWriter, r *http.Request)
 	gameSession, found := app.AllSessions.Get(strconv.Itoa(tgUser.TgID))
 	if found == false {
 		app.NotFound(w, r)
+		slog.Info("not found")
+		return
+	}
+
+	noconnct := r.URL.Query().Get("noconn")
+	if noconnct != "" {
 		return
 	}
 
@@ -40,6 +46,7 @@ func (app *ApiApplication) gameSessionWS(w http.ResponseWriter, r *http.Request)
 			break
 		}
 	}
+	sessionPlayer.Socket = socketClient
 
 	for {
 		select {
@@ -56,10 +63,12 @@ func (app *ApiApplication) gameSessionWS(w http.ResponseWriter, r *http.Request)
 					slog.Error("failed to read from socket", "addr", r.RemoteAddr, "err", err)
 				}
 				socketClient.Cancel()
+				slog.Error("error listening ", "error", err)
 				return
 			}
 
 			newSessionEvent := gamesessions.NewSessionEvent(sessionPlayer, newEvent)
+			slog.Info("new event")
 			gameSession.MsgChnl <- newSessionEvent
 		}
 	}

@@ -61,6 +61,7 @@ func NewGameSession(allSession *AllSession, bot *telebot.Bot, gameType gametype.
 		},
 		Players:         []*SessionPlayer{},
 		ExpireDuaration: 2*time.Minute*2 + 30,
+		MsgChnl:         make(chan *SessionEvent, 10),
 	}
 
 	utils.RunBackgroundTask(func() {
@@ -88,29 +89,33 @@ func (gs *GameSession) AddPlayer(player *SessionPlayer) {
 }
 
 func (gs *GameSession) MonitorGame(allSession *AllSession) {
-	select {
-	case newSEvent := <-gs.MsgChnl:
-		switch newSEvent.Event.Type {
-		case ChatType:
-			gs.HandleWebChatMessage(newSEvent)
-		}
-	case <-gs.GameState.GetContext().Done():
-		gs.IsGameEnded = true
-		if gs.Chat.IsChatOn {
-			expDur := 30 * time.Second
-			gs.ExpireDuaration = time.Since(gs.CreatedAt) + expDur
+	for {
+		select {
+		case newSEvent := <-gs.MsgChnl:
 
-			text := fmt.Sprintf("چت تا %d ثانیه دیگه بسته میشه", int(expDur.Seconds()))
-			for _, player := range gs.GameState.Players() {
-				_, err := gs.Bot.Send(player, text)
-				if err != nil {
-					slog.Error("can't send end game chat message", "err", err)
-				}
+			slog.Info("new msg")
+			switch newSEvent.Event.Type {
+			case ChatType:
+				slog.Info("new chat data")
+				gs.HandleWebChatMessage(newSEvent)
 			}
-			time.Sleep(gs.ExpireDuaration)
-		}
-		gs.CleanAndDisconnect(allSession)
+		case <-gs.GameState.GetContext().Done():
+			gs.IsGameEnded = true
+			if gs.Chat.IsChatOn {
+				expDur := 30 * time.Second
+				gs.ExpireDuaration = time.Since(gs.CreatedAt) + expDur
 
+				text := fmt.Sprintf("چت تا %d ثانیه دیگه بسته میشه", int(expDur.Seconds()))
+				for _, player := range gs.GameState.Players() {
+					_, err := gs.Bot.Send(player, text)
+					if err != nil {
+						slog.Error("can't send end game chat message", "err", err)
+					}
+				}
+				time.Sleep(gs.ExpireDuaration)
+			}
+			gs.CleanAndDisconnect(allSession)
+		}
 	}
 }
 

@@ -1,6 +1,12 @@
 import { useState } from "react";
+import type { GameSessionSocket } from "./SessionSocket";
 
-export default function Chat() {
+type ChatProps = {
+	sessionSocket: GameSessionSocket;
+};
+
+export default function Chat({ sessionSocket }: ChatProps) {
+
 	const [message, setMessage] = useState("");
 
 	const handleInput = (e: React.FormEvent<HTMLTextAreaElement>) => {
@@ -10,14 +16,16 @@ export default function Chat() {
 	const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
 		e.preventDefault();
 		console.log("Submitted message:", message);
+		sessionSocket.SendChatMessage(message)
 		setMessage("");
 	}
 
-	return <>
+	return <div className="fixed bottom-0 left-0 w-full bg-white dark:bg-gray-800 border-t border-gray-300 dark:border-gray-700">
 		<form onSubmit={handleSubmit}>
 			<label htmlFor="chat" className="sr-only">Your message</label>
-			<div className="flex items-center px-3 py-2 rounded-lg bg-gray-50 dark:bg-gray-700">
+			<div className="flex items-center px-3 py-2 rounded-t-lg bg-gray-50 dark:bg-gray-700">
 				<textarea
+					dir={detectDirection(message)}
 					id="chat" rows={1}
 					value={message}
 					onInput={handleInput}
@@ -32,5 +40,14 @@ export default function Chat() {
 				</button>
 			</div>
 		</form>
-	</>
+	</div>
 }
+
+function detectDirection(text: string): "rtl" | "ltr" {
+	const firstStrongChar = text.match(/[\u0591-\u07FF\uFB1D-\uFDFD\uFE70-\uFEFC\w]/);
+	if (!firstStrongChar) return "ltr"; // default
+	const char = firstStrongChar[0];
+	return /[\u0591-\u07FF\uFB1D-\uFDFD\uFE70-\uFEFC]/.test(char) ? "rtl" : "ltr";
+}
+
+

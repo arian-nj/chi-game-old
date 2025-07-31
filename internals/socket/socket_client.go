@@ -17,6 +17,16 @@ type Socket struct {
 	Cancel  context.CancelFunc
 }
 
+func NewSocketClient(conn *websocket.Conn) *Socket {
+	ctx, cancel := context.WithCancel(context.Background())
+	return &Socket{
+		Conn:    conn,
+		limiter: rate.NewLimiter(rate.Every(time.Millisecond*100), 10),
+		Ctx:     ctx,
+		Cancel:  cancel,
+	}
+}
+
 type EventMessage string
 
 type EventType string
@@ -30,16 +40,6 @@ func NewEvent(Etype EventType, data *EventMessage) *Event {
 	return &Event{
 		Type: Etype,
 		Data: data,
-	}
-}
-
-func NewSocketClient(conn *websocket.Conn) *Socket {
-	ctx, cancel := context.WithCancel(context.Background())
-	return &Socket{
-		Conn:    conn,
-		limiter: rate.NewLimiter(rate.Every(time.Millisecond*100), 10),
-		Ctx:     ctx,
-		Cancel:  cancel,
 	}
 }
 

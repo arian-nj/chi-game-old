@@ -20,8 +20,7 @@ generate_sqlc() {
 build_frontend() {
 	echo "Building frontend"
 	cd ./frontend/
-	npx eslint . --fix
-	npm run build
+	npm run devbu
 	cd ..
 }
 
