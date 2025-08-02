@@ -8,8 +8,8 @@ import (
 type ReleasMode int
 
 const (
-	release ReleasMode = 0
-	develop ReleasMode = 1
+	Release ReleasMode = 0
+	Develop ReleasMode = 1
 )
 
 type JWTConfig struct {
@@ -33,7 +33,7 @@ func ParseConfig() (*Config, error) {
 	}
 
 	if release_mode == "release" {
-		conf.ReleaseMode = release
+		conf.ReleaseMode = Release
 
 		bot_token := os.Getenv("RELEASE_BOT_TOKEN")
 		if bot_token == "" {
@@ -48,7 +48,7 @@ func ParseConfig() (*Config, error) {
 		conf.DatabseUrl = db_url
 
 	} else {
-		conf.ReleaseMode = develop
+		conf.ReleaseMode = Develop
 
 		bot_token := os.Getenv("DEV_BOT_TOKEN")
 		if bot_token == "" {

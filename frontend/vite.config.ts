@@ -5,11 +5,20 @@ import { tanstackRouter } from '@tanstack/router-plugin/vite'
 
 // https://vite.dev/config/
 export default defineConfig({
-	plugins: [tanstackRouter({
-		target: 'react',
-		autoCodeSplitting: true,
-	}),
-	react(), tailwindcss()],
+	server: {
+		proxy: {
+			'/api': 'http://localhost:8383'
+		}
+	},
+	plugins: [
+		tanstackRouter({
+			target: 'react',
+			autoCodeSplitting: true,
+		}),
+		react(),
+		tailwindcss()],
+
+	assetsInclude: ['**/*.lottie'], // 👈 This line tells Vite not to parse .lottie files
 	// base: "/web/",
 
 })

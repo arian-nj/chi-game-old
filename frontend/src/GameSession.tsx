@@ -1,13 +1,13 @@
 import { useEffect, useState } from "react";
-import { GetJwtToken } from "./App";
 import Chat from "./Chat";
 import { GameSessionSocket } from "./SessionSocket";
+import { GetJwtToken } from "./lib/auth";
 
 export default function GameSession() {
 	const [socket, setSocket] = useState<GameSessionSocket | null>(null);
 
 	useEffect(() => {
-		const token = GetJwtToken();
+		const token = GetJwtToken()
 		const wsUrl = `/api/game_session/?auth_token=${token}`;
 		const controller = new AbortController();
 

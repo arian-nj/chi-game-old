@@ -34,6 +34,12 @@ func (app *ApiApplication) dummyValidate(w http.ResponseWriter, r *http.Request)
 	input := &dummyValidate{}
 	request.DecodeJSON(w, r, input)
 	slog.Info("dummy auth", "userid", input.UserID)
+	_, err := app.Queries.GetTgUserByID(r.Context(), input.UserID)
+	if err != nil {
+		app.NotFound(w, r)
+		return
+	}
+
 	token := createToken(input.UserID)
 	tokenString, err := token.SignedString(app.Config.Jwt.SecretKey)
 	if err != nil {

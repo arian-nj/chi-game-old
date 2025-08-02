@@ -54,22 +54,21 @@ func (app *ApiApplication) gameSessionWS(w http.ResponseWriter, r *http.Request)
 			slog.Info("socket context cancelled", "addr", r.RemoteAddr)
 			return
 		default:
-			newEvent, err := socketClient.ListenToSocket()
-
-			if err != nil {
-				if websocket.CloseStatus(err) == websocket.StatusNormalClosure {
-					slog.Info("connection closed normally", "addr", r.RemoteAddr)
-				} else {
-					slog.Error("failed to read from socket", "addr", r.RemoteAddr, "err", err)
-				}
-				socketClient.Cancel()
-				slog.Error("error listening ", "error", err)
-				return
-			}
-
-			newSessionEvent := gamesessions.NewSessionEvent(sessionPlayer, newEvent)
-			slog.Info("new event")
-			gameSession.MsgChnl <- newSessionEvent
+			// newEvent, err := socketClient.Listen(r)
+			// if err != nil {
+			// 	if websocket.CloseStatus(err) == websocket.StatusNormalClosure {
+			// 		slog.Info("connection closed normally", "addr", r.RemoteAddr)
+			// 	} else {
+			// 		slog.Error("failed to read from socket", "addr", r.RemoteAddr, "err", err)
+			// 	}
+			// 	socketClient.Cancel()
+			// 	slog.Error("error listening ", "error", err)
+			// 	return
+			// }
+			//
+			// newSessionEvent := gamesessions.NewSessionEvent(sessionPlayer, newEvent)
+			// slog.Info("new event")
+			// gameSession.MsgChnl <- newSessionEvent
 		}
 	}
 

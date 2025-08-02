@@ -33,7 +33,7 @@ func (gs *GameSession) HandleBotChatMessage(bot telebot.API, senderID int, text 
 	}
 	if recieverPlayer.Socket != nil {
 		em := socket.EventMessage(text)
-		err := recieverPlayer.Socket.SendEvent(socket.NewEvent(ChatType, &em))
+		err := recieverPlayer.Socket.SendEvent(socket.NewEvent(ChatType, em))
 		if err != nil {
 			slog.Error("can't send chat message to socker", "error", err)
 		}
@@ -64,12 +64,12 @@ func (gs *GameSession) HandleWebChatMessage(newSessionEvent *SessionEvent) error
 		return recieverPlayer.Socket.SendEvent(socket.NewEvent(ChatType, chatMessage))
 	}
 
-	err := SendChatMessageInBot(gs.Bot, recieverPlayer.TgID, string(*chatMessage), senderPlayer.Name)
+	err := SendChatMessageInBot(gs.Bot, recieverPlayer.TgID, string(chatMessage), senderPlayer.Name)
 	if err != nil {
 		slog.Error("can't send bot message from got from socket to reciever ", "error", err)
 	}
 
-	err = SendChatMessageInBot(gs.Bot, senderPlayer.TgID, string(*chatMessage), senderPlayer.Name)
+	err = SendChatMessageInBot(gs.Bot, senderPlayer.TgID, string(chatMessage), senderPlayer.Name)
 	if err != nil {
 		slog.Error("can't send bot message from got from socket to sender", "error", err)
 	}

@@ -1,6 +1,7 @@
 import { useQuery, type QueryFunctionContext } from "@tanstack/react-query";
 import GameSession from "./GameSession";
 import { useEffect, useState } from "react";
+import { GetJwtToken } from "./lib/auth";
 
 export default function App() {
 	const [token, setToken] = useState<string | null>(GetJwtToken());
@@ -39,12 +40,6 @@ function Auth({ onAuthSuccess }: AuthProps) {
 	// `data` already handled in useEffect
 	return <p>Validated</p>;
 }
-
-export function GetJwtToken(): string | null {
-	return sessionStorage.getItem("jwt_token");
-}
-
-
 type AuthResponse = { token: string };
 
 async function ValidateDummy({ queryKey }: QueryFunctionContext<[string, number]>): Promise<AuthResponse> {
