@@ -94,7 +94,7 @@ func main() {
 		// return
 	}
 	GlobalVars.Bot = bot
-	go botApp.RunBot(bot, parentCtx, GlobalVars.Wg)
+	// go botApp.RunBot(bot, parentCtx, GlobalVars.Wg)
 
 	go ClearDeadGamesCron(GlobalVars.AllSessions)
 

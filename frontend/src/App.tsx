@@ -9,6 +9,7 @@ export default function App() {
 
 	return token == null ? <Auth onAuthSuccess={setToken} /> : <GameSession />;
 };
+
 type AuthProps = {
 	onAuthSuccess: (token: string) => void;
 };

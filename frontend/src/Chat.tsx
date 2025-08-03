@@ -49,5 +49,3 @@ function detectDirection(text: string): "rtl" | "ltr" {
 	const char = firstStrongChar[0];
 	return /[\u0591-\u07FF\uFB1D-\uFDFD\uFE70-\uFEFC]/.test(char) ? "rtl" : "ltr";
 }
-
-

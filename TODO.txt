@@ -99,8 +99,7 @@
 [X] game selector
 [X] match making front
 [X] math making in web
-[ ] renew jwt token automaticly
-[ ] ugly functional chat
+[X] ugly functional chat (beautiful unfunctional chat) 
 [ ] better chat implementation
 [ ] send web to bot and bot to web?
 [ ] Log Chats
@@ -108,6 +107,7 @@
 [ ] how to look? sending and joining + implementation transfer in via to web app
 [X] base xo ui
 [ ] store web loading time stats
+[ ] renew jwt token automaticly
 
 ## WARNINGS
 [ ] Clean and Disconnect Session

@@ -20,10 +20,98 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 )
 
-const JWTExpiryDuration = 10 * time.Minute
+const JWTExpiryDuration = 1 * time.Hour
 
 type JWTTokenOutput struct {
 	Token string `json:"token"`
+}
+
+func createToken(userId int) *jwt.Token {
+	claims := jwt.RegisteredClaims{
+		Subject:   strconv.Itoa(userId),
+		ExpiresAt: jwt.NewNumericDate(time.Now().Add(JWTExpiryDuration)),
+		NotBefore: jwt.NewNumericDate(time.Now()),
+		IssuedAt:  jwt.NewNumericDate(time.Now()),
+	}
+
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+	return token
+}
+
+func (app *ApiApplication) ValidateToken(w http.ResponseWriter, r *http.Request, tokenString string) *http.Request {
+	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (any, error) {
+		return app.Config.Jwt.SecretKey, nil
+	}, jwt.WithValidMethods([]string{jwt.SigningMethodHS256.Alg()}))
+	if err != nil {
+		slog.Error("error parsing token", "err", err)
+		app.InvalidAuthenticationToken(w, r)
+		return nil
+	}
+
+	expireAt, err := token.Claims.GetExpirationTime()
+	if err != nil {
+		slog.Error("error getting expiration time", "err", err)
+		app.ServerError(w, r, err)
+		return nil
+	}
+	if expireAt.Time.Unix() < time.Now().Unix() {
+		slog.Error("token expired", "expireAt", expireAt)
+		app.InvalidAuthenticationToken(w, r)
+		return nil
+	}
+
+	notBefore, err := token.Claims.GetNotBefore()
+	if err != nil {
+		slog.Error("error getting not before", "err", err)
+		app.ServerError(w, r, err)
+		return nil
+	}
+
+	if notBefore.Time.Unix() > time.Now().Unix() {
+		slog.Error("token not before is in the future", "notBefore", notBefore)
+		app.InvalidAuthenticationToken(w, r)
+		return nil
+	}
+	sub, err := token.Claims.GetSubject()
+	if err != nil {
+		slog.Error("error getting subject", "err", err)
+		app.ServerError(w, r, err)
+		return nil
+	}
+
+	userID, err := strconv.Atoi(sub)
+	if err != nil {
+		slog.Error("error converting subject to int", "err", err)
+		app.invalidAuthenticationCreds(w, r)
+		return nil
+	}
+	// if user.ID == 0 {
+	// 	app.InvalidAuthenticationToken(w, r)
+	// }
+	return ContextSetAuthenticatedUser(r, &ReqContextUser{UserID: userID})
+}
+
+func (app *ApiApplication) refreshToken(w http.ResponseWriter, r *http.Request) {
+	tgUser, err := ContextGetAuthenticatedUser(app.Queries, r)
+	if err != nil {
+		app.ServerError(w, r, err)
+		return
+	}
+
+	newToken := createToken(tgUser.ID)
+	tokenString, err := newToken.SignedString(app.Config.Jwt.SecretKey)
+	if err != nil {
+		app.ServerError(w, r, err)
+		return
+	}
+
+	err = response.JSON(w, http.StatusOK, JWTTokenOutput{
+		Token: tokenString,
+	})
+	if err != nil {
+		app.ServerError(w, r, err)
+		return
+	}
 }
 
 type dummyValidate struct {
@@ -121,17 +209,6 @@ func (app *ApiApplication) CreateBrandNewPerson(tgId int) (database.TelegramUser
 	}
 	// _, err = app.Queries.InsertUserStatistic(context.Background(), personRow.ID)
 	return tgUserRow, err
-}
-func createToken(userId int) *jwt.Token {
-	claims := jwt.RegisteredClaims{
-		Subject:   strconv.Itoa(userId),
-		ExpiresAt: jwt.NewNumericDate(time.Now().Add(JWTExpiryDuration)),
-		NotBefore: jwt.NewNumericDate(time.Now()),
-		IssuedAt:  jwt.NewNumericDate(time.Now()),
-	}
-
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	return token
 }
 
 type WebAppUser struct {

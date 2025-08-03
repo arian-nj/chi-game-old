@@ -34,7 +34,7 @@ func (app *ApiApplication) createRouter() *chi.Mux {
 
 	mux.Group(func(authRouter chi.Router) {
 		authRouter.Use(app.AuthenticateQuery)
-
+		authRouter.Get("/api/auth/refresh", app.refreshToken)
 		authRouter.Get("/api/game_session/", app.gameSessionWS)
 		authRouter.Get("/api/match_making/ticket/", app.makeMatchMakingTicket)
 	})

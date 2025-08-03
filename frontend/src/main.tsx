@@ -22,7 +22,7 @@ if (!rootElement.innerHTML) {
 	root.render(
 		<StrictMode>
 			<QueryClientProvider client={queryClient}>
-				<ReactQueryDevtools />
+				<ReactQueryDevtools buttonPosition='top-left' />
 				<RouterProvider router={router} />
 			</QueryClientProvider>
 		</StrictMode>,

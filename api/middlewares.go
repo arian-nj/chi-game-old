@@ -3,14 +3,10 @@ package api
 import (
 	"context"
 	"errors"
-	"log/slog"
 	"net/http"
-	"strconv"
 	"strings"
-	"time"
 
 	"github.com/arian-nj/chibazi/database"
-	"github.com/golang-jwt/jwt/v5"
 	"github.com/jackc/pgx/v5"
 )
 
@@ -94,57 +90,4 @@ func ContextGetAuthenticatedUser(queries *database.Queries, r *http.Request) (*d
 	}
 
 	return &user, nil
-}
-
-func (app *ApiApplication) ValidateToken(w http.ResponseWriter, r *http.Request, tokenString string) *http.Request {
-	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (any, error) {
-		return app.Config.Jwt.SecretKey, nil
-	}, jwt.WithValidMethods([]string{jwt.SigningMethodHS256.Alg()}))
-	if err != nil {
-		slog.Error("error parsing token", "err", err)
-		app.InvalidAuthenticationToken(w, r)
-		return nil
-	}
-
-	expireAt, err := token.Claims.GetExpirationTime()
-	if err != nil {
-		slog.Error("error getting expiration time", "err", err)
-		app.ServerError(w, r, err)
-		return nil
-	}
-	if expireAt.Time.Unix() < time.Now().Unix() {
-		slog.Error("token expired", "expireAt", expireAt)
-		app.InvalidAuthenticationToken(w, r)
-		return nil
-	}
-
-	notBefore, err := token.Claims.GetNotBefore()
-	if err != nil {
-		slog.Error("error getting not before", "err", err)
-		app.ServerError(w, r, err)
-		return nil
-	}
-
-	if notBefore.Time.Unix() > time.Now().Unix() {
-		slog.Error("token not before is in the future", "notBefore", notBefore)
-		app.InvalidAuthenticationToken(w, r)
-		return nil
-	}
-	sub, err := token.Claims.GetSubject()
-	if err != nil {
-		slog.Error("error getting subject", "err", err)
-		app.ServerError(w, r, err)
-		return nil
-	}
-
-	userID, err := strconv.Atoi(sub)
-	if err != nil {
-		slog.Error("error converting subject to int", "err", err)
-		app.invalidAuthenticationCreds(w, r)
-		return nil
-	}
-	// if user.ID == 0 {
-	// 	app.InvalidAuthenticationToken(w, r)
-	// }
-	return ContextSetAuthenticatedUser(r, &ReqContextUser{UserID: userID})
 }

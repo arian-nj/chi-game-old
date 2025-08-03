@@ -2,6 +2,7 @@ import { useQuery, type QueryFunctionContext } from '@tanstack/react-query'
 import { createFileRoute, useRouter, useSearch } from '@tanstack/react-router'
 import { useEffect, useState } from 'react'
 import { SetJwtToken } from '../lib/auth'
+import { GetBaseUrl } from '../lib/baseURL'
 
 export const Route = createFileRoute('/login')({
 	component: RouteComponent,
@@ -51,10 +52,9 @@ function RouteComponent() {
 
 
 type AuthResponse = { token: string };
-
 async function ValidateDummy({ queryKey }: QueryFunctionContext<[string, number]>): Promise<AuthResponse> {
 	const [, userId] = queryKey
-	const response = await fetch("http://localhost:8383/api/auth/validate-dummy/", {
+	const response = await fetch(GetBaseUrl() + "/api/auth/validate-dummy/", {
 		method: "POST",
 		headers: { "Content-Type": "application/json" },
 		body: JSON.stringify({ user_id: userId }),
@@ -63,5 +63,3 @@ async function ValidateDummy({ queryKey }: QueryFunctionContext<[string, number]
 
 	return response.json();
 }
-
-
