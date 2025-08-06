@@ -20,7 +20,7 @@ generate_sqlc() {
 build_frontend() {
 	echo "Building frontend"
 	cd ./frontend/
-	npm run devbu
+	npm run build
 	cd ..
 }
 

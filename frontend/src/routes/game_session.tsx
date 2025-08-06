@@ -1,10 +1,50 @@
 import { createFileRoute } from '@tanstack/react-router'
-import { useEffect, useRef, useState, type Dispatch, type SetStateAction } from 'react';
+import React, { useEffect, useRef, useState, type Dispatch, type SetStateAction } from 'react';
 import profilePic from '../assets/profile.jpg'
+import { useQuery } from '@tanstack/react-query';
+import { GetBaseUrl } from '../lib/baseURL';
+import { GetJwtToken } from '../lib/auth';
 
 export const Route = createFileRoute('/game_session')({
 	component: RouteComponent,
 })
+
+
+
+export class GameSessionSocket extends WebSocket {
+	constructor(url: string) {
+		super(url, [])
+		this.onopen = () => {
+			console.log("WebSocket connection established");
+		};
+
+		this.onmessage = async (event) => {
+			const text = await event.data.text();
+			console.log("Received message:", text);
+		};
+
+		this.onclose = (event) => {
+			console.warn("WebSocket closed:", {
+				code: event.code,
+				reason: event.reason,
+				wasClean: event.wasClean,
+			});
+		};
+
+		this.onerror = (event) => {
+			console.error("WebSocket error:", event);
+		};
+	}
+
+	SendChatMessage(messageData: string) {
+		const data = {
+			type: "chat",
+			data: messageData
+		}
+		const stringData = JSON.stringify(data)
+		this.send(stringData)
+	}
+}
 
 class Message {
 	text: string
@@ -14,32 +54,76 @@ class Message {
 }
 
 function RouteComponent() {
+	const sessionAPIUrl = GetBaseUrl() + "/api/game_session/" + "?auth_token=" + GetJwtToken()
+
+	const socketRef = useRef<GameSessionSocket | null>(null)
+
+	const { isPending, error, data } = useQuery({
+		queryKey: ['checkSession'],
+		queryFn: async () => {
+			const response = await fetch(sessionAPIUrl + "&noconn=true")
+			const status = response.status
+			if (status == 200) {
+				console.log("ok")
+			} else if (status == 404) {
+				throw new Error("session not found")
+			} else if (status == 500) {
+				throw new Error("server Error")
+			}
+			return await response.json()
+		}
+	})
+
+	useEffect(() => {
+		if (socketRef.current) { return }
+		const socket = new GameSessionSocket(sessionAPIUrl)
+		socketRef.current = socket
+		return () => {
+			socket.close()
+		}
+	}, [data])
+
+	if (isPending) {
+		return <h1 className="text-center py-2">Pending...</h1>
+	}
+	if (error) {
+		return <div className='text-center '>Error: {error.message}</div>
+	}
+
+	return (
+		<>
+			<h1 className="text-center py-2">Session</h1>
+			<Chat socketRef={socketRef} />
+		</>
+	);
+}
+
+type ChatProps = {
+	socketRef: React.RefObject<GameSessionSocket | null>
+	// 	showMessages: boolean;
+	// 	setShowMessages: Dispatch<SetStateAction<boolean>>;
+	// 	messages: Message[];
+	// 	setMessages: Dispatch<SetStateAction<Message[]>>;
+};
+
+function Chat({ socketRef }: ChatProps) {
 	const [showMessages, setShowMessages] = useState(false);
 	const [messages, setMessages] = useState<Message[]>([
 		new Message("Hello!"),
 		new Message("سلام!"),
 		new Message("This is a dummy chat message."),
 		new Message("این یک پیام آزمایشی است."),
+		new Message("Hello!"),
+		new Message("سلام!"),
+		new Message("This is a dummy chat message."),
+		new Message("این یک پیام آزمایشی است."),
+		new Message("Hello!"),
+		new Message("سلام!"),
+		new Message("This is a dummy chat message."),
+		new Message("این یک پیام آزمایشی است."),
 	]);
 
-	return (
-		<Chat
-			setShowMessages={setShowMessages}
-			showMessages={showMessages}
-			messages={messages}
-			setMessages={setMessages}
-		/>
-	);
-}
 
-type ChatProps = {
-	showMessages: boolean;
-	setShowMessages: Dispatch<SetStateAction<boolean>>;
-	messages: Message[];
-	setMessages: Dispatch<SetStateAction<Message[]>>;
-};
-
-function Chat({ showMessages, setShowMessages, messages, setMessages }: ChatProps) {
 	const chatRef = useRef<HTMLDivElement>(null);
 
 	useEffect(() => {
@@ -55,8 +139,7 @@ function Chat({ showMessages, setShowMessages, messages, setMessages }: ChatProp
 	}, []);
 
 	return (
-		<div className="flex flex-col w-screen h-screen font-[Rubik]">
-			<h1 className="text-center py-2">Game Session</h1>
+		<div className="flex flex-col w-screen h-screen font-[Rubik] overflow-hidden">
 
 			<div className="flex flex-col flex-grow overflow-hidden">
 
@@ -71,34 +154,37 @@ function Chat({ showMessages, setShowMessages, messages, setMessages }: ChatProp
 				</div>
 			</div>
 
-			<ChatInput setShowMessage={setShowMessages} setMessages={setMessages} />
+			<ChatInput setShowMessage={setShowMessages} socketRef={socketRef} setMessages={setMessages} />
 		</div>
 	);
 }
 
 type ChatInputProps = {
+	socketRef: React.RefObject<GameSessionSocket | null>
 	setShowMessage: Dispatch<SetStateAction<boolean>>;
+
 	setMessages: Dispatch<SetStateAction<Message[]>>;
 };
 
-function ChatInput({ setShowMessage, setMessages }: ChatInputProps) {
-	const [message, setMessage] = useState("");
+function ChatInput({ setShowMessage, socketRef, setMessages }: ChatInputProps) {
+	const [inputMessage, setInputText] = useState("");
 
 	const handleInput = (e: React.FormEvent<HTMLTextAreaElement>) => {
-		setMessage(e.currentTarget.value);
+		setInputText(e.currentTarget.value);
 	};
 
 	const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
 		e.preventDefault();
-		if (message.trim() === "") return;
-		setMessages(prev => [...prev, new Message(message)]);
-		setMessage("");
+		if (inputMessage.trim() === "") return;
+		setMessages(prev => [...prev, new Message(inputMessage)]);
+		setInputText("");
 	};
 	const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
 		if (e.key === "Enter" && !e.shiftKey) {
 			e.preventDefault(); // prevent newline
-			setMessages(prev => [...prev, new Message(message)]);
-			setMessage("");
+			setMessages(prev => [...prev, new Message(inputMessage)]);
+			socketRef.current?.SendChatMessage(inputMessage)
+			setInputText("");
 		}
 	}
 
@@ -109,10 +195,10 @@ function ChatInput({ setShowMessage, setMessages }: ChatInputProps) {
 				<div className="flex items-center px-3 py-2 rounded-t-lg">
 					<textarea
 						onKeyDown={handleKeyDown}
-						dir={detectDirection(message)}
+						dir={detectDirection(inputMessage)}
 						id="chat"
 						rows={1}
-						value={message}
+						value={inputMessage}
 						onInput={handleInput}
 						onFocus={() => setShowMessage(true)}
 						className="block mx-4 p-2.5 w-full text-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 bg-gray-800 text-xl"
@@ -147,7 +233,7 @@ function ChatBubble({ message, isMe }: ChatBubbleProps) {
 					${isMe ? "rounded-l-xl" : "rounded-r-xl"}
 					${isMe ? "bg-emerald-100" : "bg-gray-100"}
 					`}>
-					<p>{message}</p>
+					<p dir={detectDirection(message)}>{message}</p>
 				</div >
 			</div >
 		</>

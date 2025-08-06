@@ -80,7 +80,7 @@ function FinderRouteComponent() {
 		socketRef.current = newSocket
 
 		// return () => newSocket.close(1000, "Client finished work")
-	}, [])
+	}, [router])
 
 	function cancelClicked() {
 

@@ -3,6 +3,7 @@ package api
 import "github.com/arian-nj/chibazi/internals/socket"
 
 const FinderEventType socket.EventType = "finder"
+const ChatEventType socket.EventType = "chat"
 
 const (
 	FMAdded   socket.EventMessage = "added"
