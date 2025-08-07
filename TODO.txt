@@ -100,15 +100,13 @@
 [X] match making front
 [X] math making in web
 [X] ugly functional chat (beautiful unfunctional chat) 
-[ ] functional chat
-[ ] better chat implementation
-[ ] send web to bot and bot to web?
+[X] functional chat
 [ ] Log Chats
+[ ] send web to bot and bot to web?
 [ ] color pallete
 [ ] how to look? sending and joining + implementation transfer in via to web app
 [X] base xo ui
-[ ] store web loading time stats
-[ ] renew jwt token automaticly
+[ ] connect xo to backend
 
 ## WARNINGS
 [ ] Clean and Disconnect Session
@@ -124,6 +122,11 @@ maybe add scroing to make it harder to use other bots
 # 1.0.0
 [ ] log tickets in database for miss rate
 [ ] log who built game session (random from keyboard,random from web, via web ,via + creator)
+
+[ ] store web loading time stats
+[ ] renew jwt token automaticly
+
+
 
 
 [-] implementing

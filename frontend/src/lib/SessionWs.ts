@@ -1,21 +1,23 @@
+export type SessionEvent = {
+	type: string;
+	data: string
+}
+
 export class GameSessionSocket extends WebSocket {
-	HandleChatMessage: ((msg: any) => void) | null = null
+	HandleChatMessage: ((msg: SessionEvent) => void) | null = null
 
 	constructor(url: string) {
 		super(url, [])
-		this.onopen = () => {
-			console.log("WebSocket connection established");
-		};
-
 		this.onmessage = async (event) => {
 			const text = await event.data.text();
-			const json_data = await JSON.parse(text)
-			if (json_data?.type === "chat") {
+			const json_data: SessionEvent = await JSON.parse(text)
+
+			if (json_data.type === "chat") {
 				if (this.HandleChatMessage) {
 					this.HandleChatMessage(json_data);
 				}
 			} else {
-				throw new Error("invalid message type ", json_data.type)
+				throw new Error("invalid message type " + json_data.type)
 			}
 
 		};

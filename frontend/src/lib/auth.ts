@@ -21,12 +21,6 @@ export function SetJwtToken(token: string) {
 	sessionStorage.setItem("jwt_token", token);
 }
 
-class MeClass {
-	ID: number
-	constructor(id: number) {
-		this.ID = id
-	}
-}
 function fetchWithAuth(input: RequestInfo, init?: RequestInit) {
 	const token = GetJwtToken();
 
@@ -40,12 +34,17 @@ function fetchWithAuth(input: RequestInfo, init?: RequestInit) {
 		headers,
 	});
 }
-export async function GetMe(): Promise<MeClass> {
+
+interface MeResponse {
+	id: number;
+}
+
+export async function GetMe() {
 	const response = await fetchWithAuth(GetBaseUrl() + "/api/auth/me")
 	if (response.status != 200) {
 		throw new Error(response.statusText)
 	}
-	const json_data = await response.json()
+	const json_data: MeResponse = await response.json()
 	console.log("data ", json_data)
-	return new MeClass(json_data.id)
+	return json_data
 }
