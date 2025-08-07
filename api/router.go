@@ -10,7 +10,7 @@ import (
 	"github.com/go-chi/cors"
 )
 
-var COSS_PATTERNS = []string{"http://localhost:*", "https://localhost:*", "localhost:*"}
+var CORS_PATTERNS = []string{"http://localhost:5173", "https://localhost:5173", "localhost:5173"}
 
 func (app *ApiApplication) createRouter() *chi.Mux {
 	distFS := frontend.GetDistFS()
@@ -18,8 +18,11 @@ func (app *ApiApplication) createRouter() *chi.Mux {
 
 	if app.Config.ReleaseMode == config.Develop {
 		mux.Use(cors.Handler(cors.Options{
-			// AllowedOrigins: []string{"https://*", "http://*"},
-			AllowedOrigins: COSS_PATTERNS,
+			AllowedOrigins:   CORS_PATTERNS,
+			AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
+			AllowedHeaders:   []string{"Accept", "Authorization", "Content-Type", "X-CSRF-Token"},
+			ExposedHeaders:   []string{"Link"},
+			AllowCredentials: true,
 		}))
 	}
 
@@ -33,8 +36,11 @@ func (app *ApiApplication) createRouter() *chi.Mux {
 	mux.Handle("/web/*", http.StripPrefix("/web/", http.FileServerFS(distFS)))
 
 	mux.Group(func(authRouter chi.Router) {
+		authRouter.Use(app.Authenticate)
+		authRouter.Get("/api/auth/me", app.getMe)
+	})
+	mux.Group(func(authRouter chi.Router) {
 		authRouter.Use(app.AuthenticateQuery)
-		authRouter.Get("/api/auth/refresh", app.refreshToken)
 		authRouter.Get("/api/game_session/", app.gameSessionWS)
 		authRouter.Get("/api/match_making/ticket/", app.makeMatchMakingTicket)
 	})

@@ -173,7 +173,7 @@ func (gv *GlobalVars) createRandomGame(gameType gametype.GameType, tickets []*ma
 	_, err = gv.Queries.CreateGameSession(context.Background())
 
 	for _, ticket := range tickets {
-		ticket.MatchFound <- newSession
+		ticket.MatchFoundChan <- newSession
 	}
 
 	bot.SendFoundOpponentMessage(newSession.GameState.Players(), gv.Bot)

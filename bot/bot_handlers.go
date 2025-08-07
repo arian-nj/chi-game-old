@@ -220,7 +220,7 @@ func (app *BotApplication) PlayRandomGameHandler(c telebot.Context, gameType gam
 	app.MatchMaking.AddTicket(newTicket)
 
 	select {
-	case <-newTicket.MatchFound:
+	case <-newTicket.MatchFoundChan:
 		return c.Bot().Delete(msg)
 	case <-time.After(90 * time.Second):
 		_, err = c.Bot().Edit(msg, "حریف پیدا نکردم")

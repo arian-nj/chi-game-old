@@ -47,6 +47,8 @@ function FinderRouteComponent() {
 			return
 		}
 		const newSocket = new FinderSocket()
+		socketRef.current = newSocket
+
 		newSocket.onopen = () => {
 			console.log("WebSocket connection established");
 		};
@@ -77,7 +79,6 @@ function FinderRouteComponent() {
 			router.navigate({ to: "/" })
 		};
 
-		socketRef.current = newSocket
 
 		// return () => newSocket.close(1000, "Client finished work")
 	}, [router])

@@ -92,13 +92,13 @@ func (gs *GameSession) MonitorGame(allSession *AllSession) {
 	for {
 		select {
 		case newSEvent := <-gs.MsgChnl:
-
 			slog.Info("new msg")
 			switch newSEvent.Event.Type {
 			case ChatType:
 				slog.Info("new chat data")
 				gs.HandleWebChatMessage(newSEvent)
 			}
+
 		case <-gs.GameState.GetContext().Done():
 			gs.IsGameEnded = true
 			if gs.Chat.IsChatOn {

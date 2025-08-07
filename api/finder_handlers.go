@@ -13,7 +13,6 @@ import (
 )
 
 func (app *ApiApplication) makeMatchMakingTicket(w http.ResponseWriter, r *http.Request) {
-	slog.Info("hereee ")
 	tgUser, err := ContextGetAuthenticatedUser(app.Queries, r)
 	if err != nil {
 		app.ServerError(w, r, err)
@@ -22,7 +21,6 @@ func (app *ApiApplication) makeMatchMakingTicket(w http.ResponseWriter, r *http.
 	}
 
 	hasTicket := app.MatchMaking.HasTicket(tgUser.TgID)
-	slog.Info("has ticket", "d", hasTicket)
 	if hasTicket {
 		app.BadRequest(w, r, errors.New("user already have ticket can't make another one"))
 		slog.Error("user already have ticket can't make another one")
@@ -36,7 +34,7 @@ func (app *ApiApplication) makeMatchMakingTicket(w http.ResponseWriter, r *http.
 	}
 
 	conn, err := websocket.Accept(w, r, &websocket.AcceptOptions{
-		OriginPatterns: COSS_PATTERNS,
+		OriginPatterns: CORS_PATTERNS,
 	})
 	if err != nil {
 		slog.Error("error accepting new connection", "err", err)
@@ -57,7 +55,7 @@ func (app *ApiApplication) makeMatchMakingTicket(w http.ResponseWriter, r *http.
 
 	for {
 		select {
-		case <-NewTicket.MatchFound:
+		case <-NewTicket.MatchFoundChan:
 			socketClient.SendNewEvent(FinderEventType, FMFound)
 			return
 		case <-ticker.C:

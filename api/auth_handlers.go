@@ -91,6 +91,27 @@ func (app *ApiApplication) ValidateToken(w http.ResponseWriter, r *http.Request,
 	return ContextSetAuthenticatedUser(r, &ReqContextUser{UserID: userID})
 }
 
+type getMeOut struct {
+	ID int `json:"id"`
+}
+
+func (app *ApiApplication) getMe(w http.ResponseWriter, r *http.Request) {
+	tgUser, err := ContextGetAuthenticatedUser(app.Queries, r)
+	if err != nil {
+		app.ServerError(w, r, err)
+		return
+	}
+	out := &getMeOut{
+		ID: tgUser.ID,
+	}
+
+	err = response.JSON(w, http.StatusOK, out)
+	if err != nil {
+		app.ServerError(w, r, err)
+		return
+	}
+}
+
 func (app *ApiApplication) refreshToken(w http.ResponseWriter, r *http.Request) {
 	tgUser, err := ContextGetAuthenticatedUser(app.Queries, r)
 	if err != nil {

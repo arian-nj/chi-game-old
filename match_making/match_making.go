@@ -39,17 +39,17 @@ type Ticket struct {
 	Platform PlatformType
 	GameType gametype.GameType
 
-	MatchFound chan *gamesessions.GameSession
+	MatchFoundChan chan *gamesessions.GameSession
 
 	Timestamp time.Time
 }
 
 func NewTicket(name string, tgID int, gameType gametype.GameType) *Ticket {
 	return &Ticket{
-		TgID:       tgID,
-		Name:       name,
-		GameType:   gameType,
-		MatchFound: make(chan *gamesessions.GameSession, 1),
+		TgID:           tgID,
+		Name:           name,
+		GameType:       gameType,
+		MatchFoundChan: make(chan *gamesessions.GameSession, 1),
 	}
 }
 

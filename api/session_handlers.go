@@ -1,7 +1,6 @@
 package api
 
 import (
-	"fmt"
 	"log/slog"
 	"net/http"
 	"strconv"
@@ -33,7 +32,7 @@ func (app *ApiApplication) gameSessionWS(w http.ResponseWriter, r *http.Request)
 	}
 
 	conn, err := websocket.Accept(w, r, &websocket.AcceptOptions{
-		OriginPatterns: COSS_PATTERNS,
+		OriginPatterns: CORS_PATTERNS,
 	})
 	if err != nil {
 		slog.Error("error accepting new connection", "err", err)
@@ -46,9 +45,9 @@ func (app *ApiApplication) gameSessionWS(w http.ResponseWriter, r *http.Request)
 
 	var sessionPlayer *gamesessions.SessionPlayer
 
-	for _, player := range gameSession.Players {
-		if player.TgID == tgUser.TgID {
-			sessionPlayer = player
+	for _, SPlayer := range gameSession.Players {
+		if SPlayer.TgID == tgUser.TgID {
+			sessionPlayer = SPlayer
 			break
 		}
 	}
@@ -59,13 +58,9 @@ func (app *ApiApplication) gameSessionWS(w http.ResponseWriter, r *http.Request)
 		case <-socketClient.Ctx.Done():
 			slog.Info("socket context cancelled", "addr", r.RemoteAddr)
 			return
-		case <-sessionPlayer.Socket.EventChan:
-			if newEvent.Type == FinderEventType {
-				slog.Info("Cancelling")
-				return
-			}
+		case newEvent := <-sessionPlayer.Socket.EventChan:
+			gameSession.MsgChnl <- gamesessions.NewSessionEvent(sessionPlayer, newEvent)
 
 		}
 	}
-
 }

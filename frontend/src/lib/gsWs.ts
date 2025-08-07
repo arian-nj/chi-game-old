@@ -1,14 +1,23 @@
-
 export class GameSessionSocket extends WebSocket {
-	constructor(url: string, protocols?: string | string[]) {
-		super(url, protocols)
+	HandleChatMessage: ((msg: any) => void) | null = null
+
+	constructor(url: string) {
+		super(url, [])
 		this.onopen = () => {
 			console.log("WebSocket connection established");
 		};
 
 		this.onmessage = async (event) => {
 			const text = await event.data.text();
-			console.log("Received message:", text);
+			const json_data = await JSON.parse(text)
+			if (json_data?.type === "chat") {
+				if (this.HandleChatMessage) {
+					this.HandleChatMessage(json_data);
+				}
+			} else {
+				throw new Error("invalid message type ", json_data.type)
+			}
+
 		};
 
 		this.onclose = (event) => {
@@ -22,8 +31,6 @@ export class GameSessionSocket extends WebSocket {
 		this.onerror = (event) => {
 			console.error("WebSocket error:", event);
 		};
-
-
 	}
 
 	SendChatMessage(messageData: string) {
@@ -35,5 +42,4 @@ export class GameSessionSocket extends WebSocket {
 		this.send(stringData)
 	}
 }
-
 
