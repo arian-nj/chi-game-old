@@ -183,13 +183,13 @@ func (app *ApiApplication) validateInitdata(w http.ResponseWriter, r *http.Reque
 		return
 	}
 
-	botUserRow, err := app.Queries.GetTgUserBtTgID(r.Context(), int(user.ID))
+	botUserRow, err := app.Queries.GetTgUserByTgID(r.Context(), int(user.ID))
 	if err != nil {
 		app.ServerError(w, r, err)
 		return
 	}
 
-	var tgUserRow database.TelegramUser
+	var tgUserRow database.Person
 	if botUserRow.ID == 0 {
 		tgUserRow, err = app.CreateBrandNewPerson(int(user.ID))
 		if err != nil {
@@ -221,7 +221,7 @@ func (app *ApiApplication) validateInitdata(w http.ResponseWriter, r *http.Reque
 
 }
 
-func (app *ApiApplication) CreateBrandNewPerson(tgId int) (database.TelegramUser, error) {
+func (app *ApiApplication) CreateBrandNewPerson(tgId int) (database.Person, error) {
 
 	tgUserRow, err := app.Queries.CreateTgUser(context.Background(), tgId)
 

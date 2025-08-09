@@ -144,11 +144,16 @@ func (gv *GlobalVars) MakeMatches() {
 func (gv *GlobalVars) createRandomGame(gameType gametype.GameType, tickets []*matchmaking.Ticket) {
 	var newSession *gamesessions.GameSession
 
+	newSessionRow, err := gv.Queries.CreateSession(context.Background())
+	if err != nil {
+		slog.Error("can't create new random game", "error", err)
+	}
+
 	switch gameType {
 
 	case gametype.XOGameType3X3, gametype.XOGameType5X5:
 		newXOGame := xoconsole.NewXOGame(gametype.XOGameType3X3, gv.Queries)
-		newSession = gamesessions.NewGameSession(gv.AllSessions, gv.Bot, gameType, newXOGame)
+		newSession = gamesessions.NewGameSession(gv.AllSessions, gv.Bot, gameType, newXOGame, newSessionRow.ID)
 
 	default:
 		slog.Error("not possible random game")
@@ -165,12 +170,11 @@ func (gv *GlobalVars) createRandomGame(gameType gametype.GameType, tickets []*ma
 	gv.AllSessions.Add(strconv.Itoa(playerOne.TgID), newSession)
 	gv.AllSessions.Add(strconv.Itoa(playerTwo.TgID), newSession)
 
-	err := newSession.StartGame()
+	err = newSession.StartGame()
 	if err != nil {
 		slog.Error("error in starting random xo match", "error", err)
 		return
 	}
-	_, err = gv.Queries.CreateGameSession(context.Background())
 
 	for _, ticket := range tickets {
 		ticket.MatchFoundChan <- newSession

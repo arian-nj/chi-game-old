@@ -97,7 +97,7 @@ func (g *DotBoxGame) StartGame(c telebot.Context) error {
 	if err != nil {
 		return err
 	}
-	_, err = g.Queries.CreateGameSession(context.Background())
+	_, err = g.Queries.CreateSession(context.Background())
 	return err
 }
 

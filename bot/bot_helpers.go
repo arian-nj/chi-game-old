@@ -1,6 +1,7 @@
 package bot
 
 import (
+	"fmt"
 	"log/slog"
 
 	humanplayer "github.com/arian-nj/chibazi/internals/human_player"
@@ -21,4 +22,11 @@ func SendFoundOpponentMessage(players []*humanplayer.HumanPlayer, bot *telebot.B
 			}
 		}
 	}
+}
+
+func FoundOpponentText(oppName string) string {
+	text := ""
+	text += "🕹 بازی شروع شد☝️\n\n"
+	text += fmt.Sprintf("👀 به حریفت *%s* سلام کن 🤝", oppName)
+	return text
 }

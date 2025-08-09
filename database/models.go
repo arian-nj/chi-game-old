@@ -8,15 +8,38 @@ import (
 	"github.com/jackc/pgx/v5/pgtype"
 )
 
-type GameSession struct {
-	ID        int
-	CreatedAt pgtype.Timestamp
-}
-
-type TelegramUser struct {
+type Person struct {
 	ID        int
 	TgID      int
 	IsActive  pgtype.Bool
 	UpdatedAt pgtype.Timestamp
 	CreatedAt pgtype.Timestamp
+}
+
+type Session struct {
+	ID        int
+	CreatedAt pgtype.Timestamp
+}
+
+type SessionGame struct {
+	ID        int
+	SessionID int
+	GameType  string
+	StartedAt pgtype.Timestamp
+	EndedAt   pgtype.Timestamp
+	Status    pgtype.Text
+}
+
+type SessionMessage struct {
+	ID        int
+	SessionID int
+	PlayerID  int
+	Message   string
+	SentAt    pgtype.Timestamp
+}
+
+type SessionPlayer struct {
+	ID        int
+	SessionID int
+	PersonID  int
 }

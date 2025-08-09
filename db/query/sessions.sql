@@ -1,21 +1,21 @@
--- name: CreateGameSession :one
-INSERT INTO game_sessions DEFAULT VALUES RETURNING *;
+-- name: CreateSession :one
+INSERT INTO sessions DEFAULT VALUES RETURNING *;
 
--- name: CountGameSessions :one
-Select Count(*) from game_sessions;
+-- name: CountSessions :one
+Select Count(*) from sessions;
 
 -- name: CountLastHourHub :one
 SELECT COUNT(*) AS hubs_last_hour
-FROM game_sessions
+FROM sessions
 WHERE created_at >= NOW() - INTERVAL '1 hour';
 
--- name: CountLastDayHubs :one
+-- name: CountLastDaySessions :one
 SELECT COUNT(*) AS games_today
-FROM game_sessions
+FROM sessions
 WHERE created_at >= date_trunc('day', NOW());
 
 --
--- --name: CountLast7DaysHubs :many
+-- --name: CountLast7DaysSesion :many
 -- WITH days AS (
 --   SELECT generate_series(
 --     date_trunc('day', NOW()) - interval '6 days',

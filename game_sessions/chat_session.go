@@ -9,11 +9,11 @@ import (
 )
 
 type Chat struct {
-	IsChatOn bool
+	IsOn bool
 }
 
 func (gs *GameSession) HandleBotChatMessage(bot telebot.API, senderID int, text string) error {
-	if !gs.Chat.IsChatOn {
+	if !gs.Chat.IsOn {
 		return nil
 	}
 	var senderPlayer *SessionPlayer
@@ -43,7 +43,7 @@ func (gs *GameSession) HandleBotChatMessage(bot telebot.API, senderID int, text 
 }
 
 func (gs *GameSession) HandleWebChatMessage(newSessionEvent *SessionEvent) error {
-	if !gs.Chat.IsChatOn {
+	if !gs.Chat.IsOn {
 		return nil
 	}
 	senderID := newSessionEvent.Player.TgID

@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"runtime/debug"
+	"strconv"
 	"sync"
 	"time"
 
@@ -69,7 +70,7 @@ func (app *BotApplication) MakeBot() (*telebot.Bot, error) {
 	b.Handle(telebot.OnCallback, app.callbackRouter)
 
 	b.Handle("/start", app.welcomeHandler)
-	b.Handle("/stat", app.statHandler)
+	b.Handle("/panel", app.statHandler)
 
 	b.Handle(keybul.PlayWithFriendsButtonText, app.PlayWithFriendsHandler)
 	b.Handle(keybul.PlayWithRandomPlayerText, app.PlayWithRandomPlayerHandler)
@@ -119,4 +120,21 @@ func panicRecover(next telebot.HandlerFunc) telebot.HandlerFunc {
 
 		return next(c)
 	}
+}
+
+func (app *BotApplication) callbackRouter(c telebot.Context) error {
+	callback := c.Callback()
+	messageId := c.Callback().MessageID
+	if messageId == "" {
+		messageId = strconv.Itoa(int(callback.Sender.ID))
+	}
+
+	app.AllSessions.Mutex.Lock()
+	gameSession, has_game := app.AllSessions.Sessions[messageId]
+	app.AllSessions.Mutex.Unlock()
+
+	if has_game {
+		return gameSession.GameState.CallbackHandler(c)
+	}
+	return c.RespondText("هیچی")
 }

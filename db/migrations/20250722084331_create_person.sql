@@ -1,6 +1,6 @@
 -- +goose Up
 -- +goose StatementBegin
-CREATE TABLE telegram_users (
+CREATE TABLE persons(
   id   BIGSERIAL PRIMARY KEY,
   tg_id   bigint NOT NULL UNIQUE,
   is_active boolean DEFAULT TRUE,

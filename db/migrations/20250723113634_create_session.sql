@@ -1,7 +1,7 @@
 -- +goose Up
 -- +goose StatementBegin
 
-CREATE TABLE game_sessions (
+CREATE TABLE sessions (
   id BIGSERIAL PRIMARY KEY,
   created_at timestamp NOT NULL DEFAULT NOW()
   );

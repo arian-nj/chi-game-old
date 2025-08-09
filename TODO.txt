@@ -70,11 +70,7 @@
 
 [ ] start advertisement
 
-# 0.6.0 connect four
-
-# 0.7.0 user statistics
-
-
+# 0.6.0 Session Chat
 [X] make api base
 [X] make front base embed in go
 [X] dev reverse proxy
@@ -101,7 +97,14 @@
 [X] math making in web
 [X] ugly functional chat (beautiful unfunctional chat) 
 [X] functional chat
-[ ] Log Chats
+[ ] Log
+	[X] Session
+	[ ] Session Players
+	[ ] Session Game
+	[ ] Chats
+[ ] get old chats on rejoin
+[ ] Limit message len
+
 [ ] send web to bot and bot to web?
 [ ] color pallete
 [ ] how to look? sending and joining + implementation transfer in via to web app
@@ -112,12 +115,15 @@
 [ ] Clean and Disconnect Session
 [ ] set actual tg id in context middleware
 [ ] Remove Game.Players()?
-[ ] Limit Chat Message Length
 [ ] Limit Chat Message burst for telegram bot 1per 1s ?
-[ ] duplicate ticket sending
+[X] duplicate ticket sending
 maybe add scroing to make it harder to use other bots
 
-
+# 0.0.0
+[ ] better welcome message
+[ ] add /help
+[ ] add command list
+[ ] add webapp
 
 # 1.0.0
 [ ] log tickets in database for miss rate

@@ -93,7 +93,7 @@ func (g *XOGame) MonitorTimeout(bot telebot.API) {
 	}
 }
 
-func (g *XOGame) SendJoinPanel(c telebot.Context) error {
+func (g *XOGame) SendJoinPanelAddSender(c telebot.Context) error {
 	sender := c.Sender()
 	g.AddPlayer(humanplayer.NewHumanPlayer(sender.FirstName, int(sender.ID)))
 	inlineKeyboard := keybul.CreateInlineKeyboard(

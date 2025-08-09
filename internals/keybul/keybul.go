@@ -53,8 +53,8 @@ func CreateBotNameInlineButton() [][]telebot.InlineButton {
 	return [][]telebot.InlineButton{
 		{
 			{
-				Text: "بازی و چت | چی بازی",
-				URL:  "t.me/" + "ChiBaziBot" + "?start=new",
+				Text: "🎮 ادامه بازی در وب",
+				URL:  "t.me/" + "UltrunBot" + "/game",
 			},
 		},
 	}
@@ -95,3 +95,15 @@ func EndGameInlineKeyboard(isVia bool) [][]telebot.InlineButton {
 	}
 	return EndgameInlineKeyboard
 }
+
+var (
+	WelcomeReplyKeyboard = &telebot.ReplyMarkup{
+		ReplyKeyboard: [][]telebot.ReplyButton{
+			{
+				{Text: PlayWithFriendsButtonText},
+				{Text: PlayWithRandomPlayerText},
+			},
+		},
+		ResizeKeyboard: true,
+	}
+)

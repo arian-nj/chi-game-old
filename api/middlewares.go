@@ -68,14 +68,14 @@ func ContextSetAuthenticatedUser(r *http.Request, user *ReqContextUser) *http.Re
 	return r.WithContext(ctx)
 }
 
-func ContextGetAuthenticatedUser(queries *database.Queries, r *http.Request) (*database.TelegramUser, error) {
+func ContextGetAuthenticatedUser(queries *database.Queries, r *http.Request) (*database.Person, error) {
 	val := r.Context().Value(authenticatedUserContextKey)
 	reqConUser, ok := val.(*ReqContextUser)
 	if !ok || reqConUser == nil {
 		return nil, errors.New("authenticated user missing or invalid type in context")
 	}
 
-	var user database.TelegramUser
+	var user database.Person
 	var err error
 	user, err = queries.GetTgUserByID(r.Context(), reqConUser.UserID)
 

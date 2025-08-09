@@ -8,7 +8,6 @@ import (
 	"time"
 
 	"github.com/arian-nj/chibazi/database"
-	xoconsole "github.com/arian-nj/chibazi/games/xo_console"
 	gametype "github.com/arian-nj/chibazi/internals/game_type"
 	keybul "github.com/arian-nj/chibazi/internals/keybul"
 	matchmaking "github.com/arian-nj/chibazi/match_making"
@@ -16,71 +15,13 @@ import (
 	"gopkg.in/telebot.v4"
 )
 
-func (app *BotApplication) inlineQueryHandler(c telebot.Context) error {
-	results := telebot.Results{}
-	// XO result
-	xoResult3x3 := &telebot.ArticleResult{
-		Title:       "دوز بازی ۳ در ۳",
-		Description: "رو من کلیک کن",
-		Text:        xoconsole.XOStartText,
-	}
-	xoResult3x3.ParseMode = telebot.ModeMarkdownV2
-
-	xoResult3x3.ReplyMarkup = keybul.StartInlineKeyboard
-
-	xoResult3x3.SetResultID(string(gametype.XOGameType3X3))
-	results = append(results, xoResult3x3)
-
-	xoResult5x5 := &telebot.ArticleResult{
-		Title:       "دوز بازی  ۵ در ۵",
-		Description: "رو من کلیک کن",
-		Text:        xoconsole.XOStartText,
-	}
-	xoResult5x5.ParseMode = telebot.ModeMarkdownV2
-
-	xoResult5x5.ReplyMarkup = keybul.StartInlineKeyboard
-
-	xoResult5x5.SetResultID(string(gametype.XOGameType5X5))
-	results = append(results, xoResult5x5)
-
-	// // Dot Box result
-	// dotResult := &telebot.ArticleResult{
-	// 	Title:       "نقطه بازی",
-	// 	Description: "رو من کلیک کن",
-	// 	Text:        dotbox_console.DotBoxStartText,
-	// }
-	// dotResult.ParseMode = telebot.ModeMarkdownV2
-	//
-	// dotResult.ReplyMarkup = keybul.StartInlineKeyboard
-	//
-	// dotResult.SetResultID(string(gametype.DotBoxGameType))
-	// results = append(results, dotResult)
-	//
-	// // Web Dot Box result
-	// webDotResult := &telebot.ArticleResult{
-	// 	Title:       "نقطه بازی گرافیکی",
-	// 	Description: "رو من کلیک کن",
-	// 	Text:        consolegames.DotBoxStartText,
-	// }
-	// webDotResult.ParseMode = telebot.ModeMarkdownV2
-	//
-	// webDotResult.ReplyMarkup = keybul.StartInlineKeyboard
-	//
-	// webDotResult.SetResultID(string(gametype.WebDotBoxGameType))
-	// results = append(results, webDotResult)
-	//
-	return c.Answer(&telebot.QueryResponse{
-		Results:   results,
-		CacheTime: 0,
-	})
-}
-
 func (app *BotApplication) statHandler(c telebot.Context) error {
+
 	if c.Sender().ID != 1909090204 {
 		return app.textHandler(c)
 	}
 
-	allGamesCount, err := app.Queries.CountGameSessions(context.Background())
+	allGamesCount, err := app.Queries.CountSessions(context.Background())
 	if err != nil {
 		return err
 	}
@@ -90,7 +31,7 @@ func (app *BotApplication) statHandler(c telebot.Context) error {
 		return err
 	}
 
-	lastDayCount, err := app.Queries.CountLastDayHubs(context.Background())
+	lastDayCount, err := app.Queries.CountLastDaySessions(context.Background())
 	if err != nil {
 		return err
 	}
@@ -126,7 +67,7 @@ func (app *BotApplication) statHandler(c telebot.Context) error {
 
 func (app *BotApplication) welcomeHandler(c telebot.Context) error {
 	return c.Send(
-		`خوش اومدید 👋`, welcomeReplyKeyboard)
+		`خوش اومدید 👋`, keybul.WelcomeReplyKeyboard)
 }
 func (app *BotApplication) textHandler(c telebot.Context) error {
 	if !c.Message().Private() {
@@ -143,20 +84,8 @@ func (app *BotApplication) textHandler(c telebot.Context) error {
 	}
 
 	return c.Send(
-		`خوش اومدید 👋`, welcomeReplyKeyboard)
+		`خوش اومدید 👋`, keybul.WelcomeReplyKeyboard)
 }
-
-var (
-	welcomeReplyKeyboard = &telebot.ReplyMarkup{
-		ReplyKeyboard: [][]telebot.ReplyButton{
-			{
-				{Text: keybul.PlayWithFriendsButtonText},
-				{Text: keybul.PlayWithRandomPlayerText},
-			},
-		},
-		ResizeKeyboard: true,
-	}
-)
 
 func (app *BotApplication) PlayWithFriendsHandler(c telebot.Context) error {
 	return c.Send(
@@ -271,9 +200,9 @@ func (app *BotApplication) StopChatHandler(c telebot.Context) error {
 		return nil
 	}
 
-	gameSession.Chat.IsChatOn = false
+	gameSession.Chat.IsOn = false
 	for _, player := range gameSession.GameState.Players() {
-		_, err := c.Bot().Send(&telebot.User{ID: int64(player.TgID)}, "⛔️چت قطع شد بازی ادامه داره", welcomeReplyKeyboard)
+		_, err := c.Bot().Send(&telebot.User{ID: int64(player.TgID)}, "⛔️چت قطع شد بازی ادامه داره", keybul.WelcomeReplyKeyboard)
 		if err != nil {
 			slog.Error("can't send close chat message ", "error", err)
 		}
