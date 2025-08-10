@@ -57,9 +57,15 @@ func (gs *GameSession) HandleBotChatMessage(bot telebot.API, senderID int, messa
 	return nil
 }
 
-func (gs *GameSession) HandleWebChatMessage(newSessionEvent *SessionEvent) error {
+func (gs *GameSession) HandleWebChatMessage(newSessionEvent *SessionEvent) {
 	if !gs.Chat.IsOn {
-		return nil
+		return
+	}
+
+	messageText := newSessionEvent.Event.Data
+	if len(messageText) > 256 {
+		slog.Error("message is to long")
+		return
 	}
 	senderID := newSessionEvent.Player.TgID
 
@@ -74,7 +80,6 @@ func (gs *GameSession) HandleWebChatMessage(newSessionEvent *SessionEvent) error
 		}
 	}
 
-	messageText := newSessionEvent.Event.Data
 	if recieverPlayer.Socket != nil {
 		err := recieverPlayer.Socket.SendEvent(socket.NewEvent(ChatType, messageText))
 		if err != nil {
@@ -102,8 +107,6 @@ func (gs *GameSession) HandleWebChatMessage(newSessionEvent *SessionEvent) error
 			slog.Error("error creating new message in db")
 		}
 	})
-
-	return nil
 }
 
 func SendChatMessageInBot(bot telebot.API, toId int, text string, senderName string) error {

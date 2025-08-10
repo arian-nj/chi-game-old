@@ -123,10 +123,8 @@ func (gs *GameSession) MonitorGameSession(allSession *AllSession) {
 	for {
 		select {
 		case newSEvent := <-gs.MsgChnl:
-			slog.Info("new msg")
 			switch newSEvent.Event.Type {
 			case ChatType:
-				slog.Info("new chat data")
 				gs.HandleWebChatMessage(newSEvent)
 			}
 

@@ -37,6 +37,7 @@ export function ChatInput({ setShowMessage, sendMessage }: ChatInputProps) {
 				<label htmlFor="chat" className="sr-only">Your message</label>
 				<div className="flex items-center px-3 py-2 rounded-t-lg">
 					<textarea
+						maxLength={256}
 						onKeyDown={handleKeyDown}
 						dir={detectDirection(inputMessage)}
 						id="chat"

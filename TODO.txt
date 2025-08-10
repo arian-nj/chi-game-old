@@ -105,7 +105,7 @@
 	[X] Chats
 
 [X] get old chats on rejoin
-[ ] Limit message len
+[X] ignore on to long message len
 
 [X] send web to bot and bot to web?
 
@@ -127,6 +127,8 @@
 [ ] Limit Chat Message burst for telegram bot 1per 1s ?
 [X] duplicate ticket sending
 maybe add scroing to make it harder to use other bots
+
+[ ] visual notify on new message
 
 # 1.0.0
 [ ] log tickets in database for miss rate
