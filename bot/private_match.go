@@ -2,7 +2,10 @@ package bot
 
 import (
 	"context"
+	"fmt"
+	"log/slog"
 
+	"github.com/arian-nj/chibazi/database"
 	gamesessions "github.com/arian-nj/chibazi/game_sessions"
 	xoconsole "github.com/arian-nj/chibazi/games/xo_console"
 	gametype "github.com/arian-nj/chibazi/internals/game_type"
@@ -14,33 +17,50 @@ func (app *BotApplication) inlineResultFeedbackHandler(c telebot.Context) error 
 	resultId := c.InlineResult().ResultID
 	messageID := c.InlineResult().MessageID
 
-	newSession, err := app.Queries.CreateSession(context.Background())
+	newSession, err := app.Queries.CreateSession(context.Background(), string(gamesessions.RandomSession))
 	if err != nil {
 		return err
 	}
-
-	switch gametype.GameType(resultId) {
+	var newGame gamesessions.Game
+	gameType := gametype.GameType(resultId)
+	switch gameType {
 	case gametype.XOGameType3X3:
 		newXOGame := xoconsole.NewXOGame(gametype.XOGameType3X3, app.Queries)
 		newXOGame.ViaMessageId = messageID
-
-		newGameSession := gamesessions.NewGameSession(app.AllSessions, app.Bot, gametype.XOGameType3X3, newXOGame, newSession.ID)
-
-		app.AllSessions.Add(messageID, newGameSession)
-
-		return newXOGame.SendJoinPanelAddSender(c)
-
+		newGame = newXOGame
 	case gametype.XOGameType5X5:
 		newXOGame := xoconsole.NewXOGame(gametype.XOGameType5X5, app.Queries)
 		newXOGame.ViaMessageId = messageID
-
-		newGameSession := gamesessions.NewGameSession(app.AllSessions, app.Bot, gametype.XOGameType3X3, newXOGame, newSession.ID)
-
-		app.AllSessions.Add(messageID, newGameSession)
-
-		return newXOGame.SendJoinPanelAddSender(c)
+		newGame = newXOGame
+	default:
+		return c.RespondAlert("این بازیرو ندارم!")
 	}
-	return c.RespondAlert("این بازیرو ندارم!")
+
+	newGameSession := gamesessions.NewGameSession(app.AllSessions, app.Bot, app.Queries, gametype.XOGameType3X3, newGame, newSession.ID)
+
+	app.AllSessions.Add(messageID, newGameSession)
+
+	if newGame == nil {
+		err := fmt.Errorf("new game is nil")
+		slog.Error("inline feedback handler", "error", err)
+		return err
+	}
+
+	err = newGame.SendJoinPanelAddSender(c)
+	if err != nil {
+		slog.Error("can't send join panel", "error", err)
+		return err
+	}
+	_, err = app.Queries.CreateSessionGame(context.Background(), database.CreateSessionGameParams{
+		SessionID: newSession.ID,
+		GameType:  string(gameType),
+	})
+
+	if err != nil {
+		slog.Error("error creating session game in when creating private match", "error", err)
+		return err
+	}
+	return nil
 }
 
 func (app *BotApplication) inlineQueryHandler(c telebot.Context) error {

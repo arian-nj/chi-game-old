@@ -9,20 +9,20 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as SessionRouteImport } from './routes/session'
 import { Route as LoginRouteImport } from './routes/login'
-import { Route as Game_sessionRouteImport } from './routes/game_session'
 import { Route as FinderRouteImport } from './routes/finder'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
 
+const SessionRoute = SessionRouteImport.update({
+  id: '/session',
+  path: '/session',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
   path: '/login',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const Game_sessionRoute = Game_sessionRouteImport.update({
-  id: '/game_session',
-  path: '/game_session',
   getParentRoute: () => rootRouteImport,
 } as any)
 const FinderRoute = FinderRouteImport.update({
@@ -45,54 +45,54 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/finder': typeof FinderRoute
-  '/game_session': typeof Game_sessionRoute
   '/login': typeof LoginRoute
+  '/session': typeof SessionRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/finder': typeof FinderRoute
-  '/game_session': typeof Game_sessionRoute
   '/login': typeof LoginRoute
+  '/session': typeof SessionRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/finder': typeof FinderRoute
-  '/game_session': typeof Game_sessionRoute
   '/login': typeof LoginRoute
+  '/session': typeof SessionRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/about' | '/finder' | '/game_session' | '/login'
+  fullPaths: '/' | '/about' | '/finder' | '/login' | '/session'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/about' | '/finder' | '/game_session' | '/login'
-  id: '__root__' | '/' | '/about' | '/finder' | '/game_session' | '/login'
+  to: '/' | '/about' | '/finder' | '/login' | '/session'
+  id: '__root__' | '/' | '/about' | '/finder' | '/login' | '/session'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AboutRoute: typeof AboutRoute
   FinderRoute: typeof FinderRoute
-  Game_sessionRoute: typeof Game_sessionRoute
   LoginRoute: typeof LoginRoute
+  SessionRoute: typeof SessionRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/session': {
+      id: '/session'
+      path: '/session'
+      fullPath: '/session'
+      preLoaderRoute: typeof SessionRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/login': {
       id: '/login'
       path: '/login'
       fullPath: '/login'
       preLoaderRoute: typeof LoginRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/game_session': {
-      id: '/game_session'
-      path: '/game_session'
-      fullPath: '/game_session'
-      preLoaderRoute: typeof Game_sessionRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/finder': {
@@ -123,8 +123,8 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
   FinderRoute: FinderRoute,
-  Game_sessionRoute: Game_sessionRoute,
   LoginRoute: LoginRoute,
+  SessionRoute: SessionRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

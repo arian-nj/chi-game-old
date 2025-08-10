@@ -62,8 +62,8 @@ func (app *BotApplication) MakeBot() (*telebot.Bot, error) {
 
 	app.Bot = b
 
-	b.Use(app.addUserMiddleware)
 	b.Use(panicRecover)
+	b.Use(app.addUserMiddleware)
 
 	b.Handle(telebot.OnQuery, app.inlineQueryHandler)
 	b.Handle(telebot.OnInlineResult, app.inlineResultFeedbackHandler)

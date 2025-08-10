@@ -54,7 +54,7 @@ func CreateBotNameInlineButton() [][]telebot.InlineButton {
 		{
 			{
 				Text: "🎮 ادامه بازی در وب",
-				URL:  "t.me/" + "UltrunBot" + "/game",
+				URL:  "t.me/" + "ChiBaziBot" + "/game",
 			},
 		},
 	}

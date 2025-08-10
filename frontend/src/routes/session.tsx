@@ -6,12 +6,12 @@ import { GetJwtToken } from '../lib/auth';
 import { Chat } from '../components/Chat/Chat';
 import { GameSessionSocket } from '../lib/SessionWs';
 
-export const Route = createFileRoute('/game_session')({
+export const Route = createFileRoute('/session')({
 	component: RouteComponent,
 })
 
 function RouteComponent() {
-	const sessionAPIUrl = GetBaseUrl() + "/api/game_session/" + "?auth_token=" + GetJwtToken()
+	const sessionAPIUrl = GetBaseUrl() + "/api/session/" + "?auth_token=" + GetJwtToken()
 
 	const socketRef = useRef<GameSessionSocket | null>(null)
 	const [isSocketReady, setSocketReady] = useState(false)
@@ -38,7 +38,7 @@ function RouteComponent() {
 		socket.onopen = () => {
 			console.log("WebSocket connection established");
 			setSocketReady(true)
-		};
+		}
 		socketRef.current = socket
 	}, [isSuccess])
 
@@ -63,6 +63,6 @@ function RouteComponent() {
 				<Chat socketRef={socketRef as RefObject<GameSessionSocket>} />
 			</div>
 		</div>
-	);
+	)
 }
 

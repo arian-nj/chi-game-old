@@ -8,6 +8,7 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/arian-nj/chibazi/database"
 	gametype "github.com/arian-nj/chibazi/internals/game_type"
 	humanplayer "github.com/arian-nj/chibazi/internals/human_player"
 	"github.com/arian-nj/chibazi/internals/keybul"
@@ -22,16 +23,26 @@ type Game interface {
 	CallbackHandler(c telebot.Context) error
 	GetContext() context.Context
 	StartGame(bot telebot.API) error
+	SendJoinPanelAddSender(telebot.Context) error
 }
 
+type SessionType string
+
+const (
+	PrivateSession SessionType = "private"
+	RandomSession  SessionType = "random"
+)
+
 type SessionPlayer struct {
+	ID     int
 	TgID   int
 	Name   string
 	Socket *socket.Socket
 }
 
-func NewSessionPlayer(tgID int, name string) *SessionPlayer {
+func NewSessionPlayer(ID int, tgID int, name string) *SessionPlayer {
 	return &SessionPlayer{
+		ID:   ID,
 		TgID: tgID,
 		Name: name,
 	}
@@ -51,9 +62,14 @@ type GameSession struct {
 	ExpireDuaration time.Duration
 
 	MsgChnl chan *SessionEvent
+
+	Queries *database.Queries
 }
 
-func NewGameSession(allSession *AllSession, bot *telebot.Bot, gameType gametype.GameType, gameState Game, sessionId int) *GameSession {
+func NewGameSession(allSession *AllSession, bot *telebot.Bot, Queries *database.Queries,
+	gameType gametype.GameType, gameState Game,
+	sessionId int) *GameSession {
+
 	gs := &GameSession{
 		ID:        sessionId,
 		Bot:       bot,
@@ -66,6 +82,8 @@ func NewGameSession(allSession *AllSession, bot *telebot.Bot, gameType gametype.
 		Players:         []*SessionPlayer{},
 		ExpireDuaration: 2*time.Minute*2 + 30,
 		MsgChnl:         make(chan *SessionEvent, 10),
+
+		Queries: Queries,
 	}
 
 	utils.RunBackgroundTask(func() {
@@ -90,6 +108,15 @@ func (gs *GameSession) StartGame() error {
 
 func (gs *GameSession) AddPlayer(player *SessionPlayer) {
 	gs.Players = append(gs.Players, player)
+	utils.RunBackgroundTask(func() {
+		_, err := gs.Queries.CreateSessionPlayer(context.Background(), database.CreateSessionPlayerParams{
+			SessionID: gs.ID,
+			PersonID:  player.ID,
+		})
+		if err != nil {
+			slog.Error("can't add session player", "error", err)
+		}
+	})
 }
 
 func (gs *GameSession) MonitorGameSession(allSession *AllSession) {

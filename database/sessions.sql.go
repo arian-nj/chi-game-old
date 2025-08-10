@@ -47,12 +47,12 @@ func (q *Queries) CountSessions(ctx context.Context) (int64, error) {
 }
 
 const createSession = `-- name: CreateSession :one
-INSERT INTO sessions DEFAULT VALUES RETURNING id, created_at
+INSERT INTO sessions (createdMode) VALUES ($1) RETURNING id, createdmode, created_at
 `
 
-func (q *Queries) CreateSession(ctx context.Context) (Session, error) {
-	row := q.db.QueryRow(ctx, createSession)
+func (q *Queries) CreateSession(ctx context.Context, createdmode string) (Session, error) {
+	row := q.db.QueryRow(ctx, createSession, createdmode)
 	var i Session
-	err := row.Scan(&i.ID, &i.CreatedAt)
+	err := row.Scan(&i.ID, &i.Createdmode, &i.CreatedAt)
 	return i, err
 }

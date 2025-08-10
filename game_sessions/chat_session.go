@@ -1,10 +1,13 @@
 package gamesessions
 
 import (
+	"context"
 	"fmt"
 	"log/slog"
 
+	"github.com/arian-nj/chibazi/database"
 	"github.com/arian-nj/chibazi/internals/socket"
+	"github.com/arian-nj/chibazi/internals/utils"
 	"gopkg.in/telebot.v4"
 )
 
@@ -12,7 +15,7 @@ type Chat struct {
 	IsOn bool
 }
 
-func (gs *GameSession) HandleBotChatMessage(bot telebot.API, senderID int, text string) error {
+func (gs *GameSession) HandleBotChatMessage(bot telebot.API, senderID int, messageText string) error {
 	if !gs.Chat.IsOn {
 		return nil
 	}
@@ -27,17 +30,29 @@ func (gs *GameSession) HandleBotChatMessage(bot telebot.API, senderID int, text 
 		}
 	}
 
-	err := SendChatMessageInBot(bot, recieverPlayer.TgID, text, senderPlayer.Name)
+	err := SendChatMessageInBot(bot, recieverPlayer.TgID, messageText, senderPlayer.Name)
 	if err != nil {
 		slog.Error("can't send chat message from bot", "error", err)
 	}
+
 	if recieverPlayer.Socket != nil {
-		em := socket.EventMessage(text)
+		em := socket.EventMessage(messageText)
 		err := recieverPlayer.Socket.SendEvent(socket.NewEvent(ChatType, em))
 		if err != nil {
-			slog.Error("can't send chat message to socker", "error", err)
+			slog.Error("can't send chat message to socket", "error", err, "message", messageText)
 		}
 	}
+
+	utils.RunBackgroundTask(func() {
+		_, err := gs.Queries.CreateSessionMessage(context.Background(), database.CreateSessionMessageParams{
+			SessionID: gs.ID,
+			PlayerID:  senderPlayer.ID,
+			Message:   messageText,
+		})
+		if err != nil {
+			slog.Error("error creating new message in db")
+		}
+	})
 
 	return nil
 }
@@ -59,20 +74,35 @@ func (gs *GameSession) HandleWebChatMessage(newSessionEvent *SessionEvent) error
 		}
 	}
 
-	chatMessage := newSessionEvent.Event.Data
+	messageText := newSessionEvent.Event.Data
 	if recieverPlayer.Socket != nil {
-		return recieverPlayer.Socket.SendEvent(socket.NewEvent(ChatType, chatMessage))
+		err := recieverPlayer.Socket.SendEvent(socket.NewEvent(ChatType, messageText))
+		if err != nil {
+			slog.Error("error seding message to socket", "error", err)
+		}
 	}
 
-	err := SendChatMessageInBot(gs.Bot, recieverPlayer.TgID, string(chatMessage), senderPlayer.Name)
+	err := SendChatMessageInBot(gs.Bot, recieverPlayer.TgID, string(messageText), senderPlayer.Name)
 	if err != nil {
 		slog.Error("can't send bot message from got from socket to reciever ", "error", err)
 	}
 
-	err = SendChatMessageInBot(gs.Bot, senderPlayer.TgID, string(chatMessage), senderPlayer.Name)
+	err = SendChatMessageInBot(gs.Bot, senderPlayer.TgID, string(messageText), senderPlayer.Name)
 	if err != nil {
 		slog.Error("can't send bot message from got from socket to sender", "error", err)
 	}
+
+	utils.RunBackgroundTask(func() {
+		_, err := gs.Queries.CreateSessionMessage(context.Background(), database.CreateSessionMessageParams{
+			SessionID: gs.ID,
+			PlayerID:  senderPlayer.ID,
+			Message:   string(messageText),
+		})
+		if err != nil {
+			slog.Error("error creating new message in db")
+		}
+	})
+
 	return nil
 }
 

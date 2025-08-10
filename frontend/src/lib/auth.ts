@@ -21,7 +21,7 @@ export function SetJwtToken(token: string) {
 	sessionStorage.setItem("jwt_token", token);
 }
 
-function fetchWithAuth(input: RequestInfo, init?: RequestInit) {
+export function fetchWithAuth(input: RequestInfo, init?: RequestInit) {
 	const token = GetJwtToken();
 
 	const headers = new Headers(init?.headers);

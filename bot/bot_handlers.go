@@ -131,6 +131,11 @@ func (app *BotApplication) PlayRandomXO5X5Handler(c telebot.Context) error {
 func (app *BotApplication) PlayRandomGameHandler(c telebot.Context, gameType gametype.GameType) error {
 	text := ""
 	sender := c.Sender()
+	personRow, err := app.Queries.GetTgUserByTgID(context.Background(), int(sender.ID))
+	if err != nil {
+		slog.Error("can't find user in random game", "error", err)
+		return c.Send("پیدات نمیکنم")
+	}
 
 	if app.AllSessions.IsSessionEmpty(int(sender.ID)) == false {
 		return c.Send("بازی قبلیت باید تموم بشه")
@@ -145,7 +150,8 @@ func (app *BotApplication) PlayRandomGameHandler(c telebot.Context, gameType gam
 	if err != nil {
 		return err
 	}
-	newTicket := matchmaking.NewTicket(sender.FirstName, int(sender.ID), gameType)
+
+	newTicket := matchmaking.NewTicket(sender.FirstName, personRow.ID, int(sender.ID), gameType)
 	app.MatchMaking.AddTicket(newTicket)
 
 	select {

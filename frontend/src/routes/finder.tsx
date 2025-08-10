@@ -60,7 +60,7 @@ function FinderRouteComponent() {
 				console.log("here")
 				const data = json_data.data
 				if (data == FinderMessages.Found) {
-					router.navigate({ to: "/game_session" });
+					router.navigate({ to: "/session" });
 				} else if (data == FinderMessages.Timeout) {
 					router.navigate({ to: "/" })
 				}

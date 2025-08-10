@@ -45,7 +45,7 @@ func (app *ApiApplication) makeMatchMakingTicket(w http.ResponseWriter, r *http.
 	socketClient := socket.NewSocketClient(conn)
 	socketClient.Listen(r)
 
-	NewTicket := matchmaking.NewTicket("Player Name", tgUser.TgID, gametype.XOGameType3X3)
+	NewTicket := matchmaking.NewTicket("Player Name", tgUser.ID, tgUser.TgID, gametype.XOGameType3X3)
 	app.MatchMaking.AddTicket(NewTicket)
 	defer app.MatchMaking.RemovePlayerFromMatchMaking(tgUser.TgID)
 

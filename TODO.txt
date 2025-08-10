@@ -97,39 +97,42 @@
 [X] math making in web
 [X] ugly functional chat (beautiful unfunctional chat) 
 [X] functional chat
-[ ] Log
+[X] Store in DB
 	[X] Session
-	[ ] Session Players
-	[ ] Session Game
-	[ ] Chats
-[ ] get old chats on rejoin
+	[X] Session Players
+	[X] Session Game
+	[X] log is session random or private
+	[X] Chats
+
+[X] get old chats on rejoin
 [ ] Limit message len
 
-[ ] send web to bot and bot to web?
+[X] send web to bot and bot to web?
+
 [ ] color pallete
-[ ] how to look? sending and joining + implementation transfer in via to web app
+[X] how to look? sending and joining + implementation transfer from telgram to web app
 [X] base xo ui
 [ ] connect xo to backend
 
+# bot look
+[ ] better welcome message
+[ ] add /help
+[ ] add command list
+
+
 ## WARNINGS
-[ ] Clean and Disconnect Session
+[X] Clean and Disconnect Session
 [ ] set actual tg id in context middleware
 [ ] Remove Game.Players()?
 [ ] Limit Chat Message burst for telegram bot 1per 1s ?
 [X] duplicate ticket sending
 maybe add scroing to make it harder to use other bots
 
-# 0.0.0
-[ ] better welcome message
-[ ] add /help
-[ ] add command list
-[ ] add webapp
-
 # 1.0.0
 [ ] log tickets in database for miss rate
 [ ] log who built game session (random from keyboard,random from web, via web ,via + creator)
 
-[ ] store web loading time stats
+[ ] log web loading time stats
 [ ] renew jwt token automaticly
 
 

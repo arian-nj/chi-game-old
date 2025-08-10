@@ -20,7 +20,7 @@ func (app *ApiApplication) createRouter() *chi.Mux {
 		mux.Use(cors.Handler(cors.Options{
 			AllowedOrigins:   CORS_PATTERNS,
 			AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
-			AllowedHeaders:   []string{"Accept", "Authorization", "Content-Type", "X-CSRF-Token"},
+			AllowedHeaders:   []string{"Accept", "Authorization", "Content-Type"},
 			ExposedHeaders:   []string{"Link"},
 			AllowCredentials: true,
 		}))
@@ -35,14 +35,18 @@ func (app *ApiApplication) createRouter() *chi.Mux {
 
 	mux.Handle("/web/*", http.StripPrefix("/web/", http.FileServerFS(distFS)))
 
-	mux.Group(func(authRouter chi.Router) {
-		authRouter.Use(app.Authenticate)
-		authRouter.Get("/api/auth/me", app.getMe)
+	mux.Group(func(authHRouter chi.Router) {
+		authHRouter.Use(app.Authenticate)
+
+		authHRouter.Get("/api/auth/me", app.getMe)
+		authHRouter.Get("/api/session/chat/history", app.getChatHistoryHandler)
 	})
-	mux.Group(func(authRouter chi.Router) {
-		authRouter.Use(app.AuthenticateQuery)
-		authRouter.Get("/api/game_session/", app.gameSessionWS)
-		authRouter.Get("/api/match_making/ticket/", app.makeMatchMakingTicket)
+	mux.Group(func(authQRouter chi.Router) {
+		authQRouter.Use(app.AuthenticateQuery)
+
+		authQRouter.Get("/api/session/", app.gameSessionWS)
+		authQRouter.Get("/api/match_making/ticket/", app.makeMatchMakingTicket)
+
 	})
 	return mux
 }

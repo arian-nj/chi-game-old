@@ -1,5 +1,5 @@
 -- name: CreateSession :one
-INSERT INTO sessions DEFAULT VALUES RETURNING *;
+INSERT INTO sessions (createdMode) VALUES ($1) RETURNING *;
 
 -- name: CountSessions :one
 Select Count(*) from sessions;

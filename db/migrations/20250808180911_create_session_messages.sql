@@ -7,6 +7,7 @@ CREATE TABLE session_messages (
     message TEXT NOT NULL,
     sent_at TIMESTAMP NOT NULL DEFAULT NOW()
 );
+
 -- +goose StatementEnd
 
 -- +goose Down

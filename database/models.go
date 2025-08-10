@@ -17,8 +17,9 @@ type Person struct {
 }
 
 type Session struct {
-	ID        int
-	CreatedAt pgtype.Timestamp
+	ID          int
+	Createdmode string
+	CreatedAt   pgtype.Timestamp
 }
 
 type SessionGame struct {
