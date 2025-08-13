@@ -17,15 +17,6 @@ import (
 	"gopkg.in/telebot.v4"
 )
 
-type Game interface {
-	Players() []*humanplayer.HumanPlayer
-	AddPlayer(player *humanplayer.HumanPlayer)
-	CallbackHandler(c telebot.Context) error
-	GetContext() context.Context
-	StartGame(bot telebot.API) error
-	SendJoinPanelAddSender(telebot.Context) error
-}
-
 type SessionType string
 
 const (
@@ -46,6 +37,15 @@ func NewSessionPlayer(ID int, tgID int, name string) *SessionPlayer {
 		TgID: tgID,
 		Name: name,
 	}
+}
+
+type Game interface {
+	Players() []*humanplayer.HumanPlayer
+	AddPlayer(player *humanplayer.HumanPlayer)
+	CallbackHandler(c telebot.Context) error
+	GetContext() context.Context
+	StartGame(bot telebot.API) error
+	SendJoinPanelAddSender(telebot.Context) error
 }
 
 type GameSession struct {

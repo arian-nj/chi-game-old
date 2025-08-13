@@ -2,9 +2,12 @@ package xoconsole
 
 import (
 	"fmt"
+	"log/slog"
 	"strconv"
+	"time"
 
 	humanplayer "github.com/arian-nj/chibazi/internals/human_player"
+	"github.com/arian-nj/chibazi/internals/keybul"
 	"github.com/arian-nj/chibazi/internals/xo_core"
 	"gopkg.in/telebot.v4"
 )
@@ -38,7 +41,7 @@ func (g *XOGame) CreateBoardAsEmoji() string {
 	return text
 }
 
-func CreateTicBoardInlineButton(board *xo_core.TicBoard) [][]telebot.InlineButton {
+func CreateTicBoardInlineButton(board *xo_core.XoBoard) [][]telebot.InlineButton {
 	buttons := make([][]telebot.InlineButton, board.MaxCellSize)
 	for r := range board.MaxCellSize {
 		buttons[r] = make([]telebot.InlineButton, board.MaxCellSize)
@@ -104,4 +107,31 @@ func (g *XOGame) RulesText() string {
 	text += fmt.Sprintf("❕اندازه *%dX%d*\n", g.XOBoard.MaxCellSize, g.XOBoard.MaxCellSize)
 	text += fmt.Sprintf("⚠️با یه خط *%d تایی* برنده ای", g.XOBoard.WinSize)
 	return text
+}
+
+func (g *XOGame) Edit(bot telebot.API, msg telebot.Editable, text string, keyboard *telebot.ReplyMarkup) error {
+	g.LastEdit = time.Now()
+	if g.ViaMessageId != "" {
+		err := keybul.EditGameMessage(bot, g, text, keyboard)
+		if err != nil {
+			return fmt.Errorf("can't edit via message %w", err)
+		}
+		return nil
+	} else {
+		for _, p := range g.Players() {
+			if p.MessageID == 0 {
+				msg, err := bot.Send(p, "game")
+				if err != nil {
+					slog.Error("can't send player message ", "error", err)
+				}
+				p.SetMessageSig(msg.ID)
+			}
+			err := keybul.EditGameMessage(bot, p, text, keyboard)
+			if err != nil {
+				slog.Error("can't edit player message ", "error", err)
+			}
+		}
+
+	}
+	return nil
 }

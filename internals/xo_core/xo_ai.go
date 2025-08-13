@@ -10,7 +10,7 @@ const (
 	RandomChance = .25
 )
 
-func FindBestMove(board *TicBoard, player Cell) (int, int) {
+func FindBestMove(board *XoBoard, player Cell) (int, int) {
 	// startTime := time.Now()
 	if rand.Float64() < RandomChance {
 		return RandomMove(*board)
@@ -24,7 +24,7 @@ func FindBestMove(board *TicBoard, player Cell) (int, int) {
 	// return RandomMove(*board, player)
 }
 
-func BestMove(board *TicBoard, playerMove Cell) (int, int) {
+func BestMove(board *XoBoard, playerMove Cell) (int, int) {
 	bestIndex := -1
 	bestScore := math.MinInt
 
@@ -46,7 +46,7 @@ func BestMove(board *TicBoard, playerMove Cell) (int, int) {
 
 var howMany = 0
 
-func MinMax(index int, Move Cell, board *TicBoard, alpha, beta int, depth int, isMaximizing bool) int {
+func MinMax(index int, Move Cell, board *XoBoard, alpha, beta int, depth int, isMaximizing bool) int {
 	if depth == 0 {
 		return 0
 	}
@@ -102,7 +102,7 @@ func MinMax(index int, Move Cell, board *TicBoard, alpha, beta int, depth int, i
 
 }
 
-func RandomMove(board TicBoard) (int, int) {
+func RandomMove(board XoBoard) (int, int) {
 	var emptyCells [][2]int
 	for r := 0; r < board.MaxCellSize; r++ {
 		for c := 0; c < board.MaxCellSize; c++ {

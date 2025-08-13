@@ -21,30 +21,30 @@ func (c *Cell) Flip() Cell {
 
 }
 
-type TicBoard struct {
+type XoBoard struct {
 	Board       []Cell
 	MaxCellSize int
 	WinSize     int
 }
 
-func (t *TicBoard) CellIndex(r, c int) int {
+func (t *XoBoard) CellIndex(r, c int) int {
 	return r*t.MaxCellSize + c
 }
 
-func (t *TicBoard) SetCell(r, c int, cell Cell) {
+func (t *XoBoard) SetCell(r, c int, cell Cell) {
 	t.Board[t.CellIndex(r, c)] = cell
 }
 
-func (t *TicBoard) GetCell(r, c int) Cell {
+func (t *XoBoard) GetCell(r, c int) Cell {
 	return t.Board[t.CellIndex(r, c)]
 }
 
-func NewTicBoard(maxBoardSize int, winSize int) *TicBoard {
+func NewTicBoard(maxBoardSize int, winSize int) *XoBoard {
 	if winSize > int(maxBoardSize) {
 		panic("wtf win size is bigger than max board size")
 	}
 
-	ticBoard := &TicBoard{
+	ticBoard := &XoBoard{
 		MaxCellSize: maxBoardSize,
 		WinSize:     winSize,
 
@@ -53,17 +53,17 @@ func NewTicBoard(maxBoardSize int, winSize int) *TicBoard {
 
 	return ticBoard
 }
-func (board *TicBoard) DeepCopy() *TicBoard {
+func (board *XoBoard) DeepCopy() *XoBoard {
 	newBoard := make([]Cell, len(board.Board))
 	copy(newBoard, board.Board)
-	return &TicBoard{
+	return &XoBoard{
 		Board:       newBoard,
 		MaxCellSize: board.MaxCellSize,
 		WinSize:     board.WinSize,
 	}
 }
 
-func (board *TicBoard) PlayMove(r, c int, moveType Cell) (bool, string) {
+func (board *XoBoard) PlayMove(r, c int, moveType Cell) (bool, string) {
 	if (r < 0 || c < 0) && (r >= board.MaxCellSize || c >= board.MaxCellSize) {
 		return false, "خارج از محدوده چیکار داری میکنی؟"
 	}
@@ -76,7 +76,7 @@ func (board *TicBoard) PlayMove(r, c int, moveType Cell) (bool, string) {
 }
 
 // HasWon checks if the last move at (r, c) resulted in a win.
-func (board *TicBoard) HasWon(index int) bool {
+func (board *XoBoard) HasWon(index int) bool {
 	moveType := board.Board[index]
 	r := index / board.MaxCellSize
 	c := index % board.MaxCellSize
@@ -122,7 +122,7 @@ func (board *TicBoard) HasWon(index int) bool {
 	// No winning line was found
 	return false
 }
-func (board *TicBoard) IsAnyCellEmpty() bool {
+func (board *XoBoard) IsAnyCellEmpty() bool {
 	return slices.Contains(board.Board, Empty)
 }
 
