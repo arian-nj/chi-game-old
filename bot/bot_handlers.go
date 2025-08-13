@@ -207,7 +207,7 @@ func (app *BotApplication) StopChatHandler(c telebot.Context) error {
 	}
 
 	gameSession.Chat.IsOn = false
-	for _, player := range gameSession.GameState.Players() {
+	for _, player := range gameSession.Players {
 		_, err := c.Bot().Send(&telebot.User{ID: int64(player.TgID)}, "⛔️چت قطع شد بازی ادامه داره", keybul.WelcomeReplyKeyboard)
 		if err != nil {
 			slog.Error("can't send close chat message ", "error", err)

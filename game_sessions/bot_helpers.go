@@ -1,4 +1,4 @@
-package humanplayer
+package gamesessions
 
 import (
 	"fmt"
@@ -8,10 +8,8 @@ import (
 	"gopkg.in/telebot.v4"
 )
 
-// FIX: WHY TF THIS FUNCTION IS HERE FUCK YOU
-
 // SendFoundOpponentMessage sends a message to all players that they have found an opponent
-func SendFoundOpponentMessage(players []*HumanPlayer, bot *telebot.Bot) {
+func SendFoundOpponentMessage(players []*SessionPlayer, bot *telebot.Bot) {
 	for _, player := range players {
 		for _, oppPlayer := range players {
 			if player.TgID == oppPlayer.TgID {

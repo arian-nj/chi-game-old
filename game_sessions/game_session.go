@@ -40,8 +40,7 @@ func NewSessionPlayer(ID int, tgID int, name string) *SessionPlayer {
 }
 
 type Game interface {
-	Players() []*humanplayer.HumanPlayer
-	AddPlayer(player *humanplayer.HumanPlayer)
+	AddPlayer(name string, tgId int)
 	CallbackHandler(c telebot.Context) error
 	GetContext() context.Context
 	StartGame(bot telebot.API) error
@@ -134,8 +133,8 @@ func (gs *GameSession) MonitorGameSession(allSession *AllSession) {
 				expDur := 30 * time.Second
 
 				text := fmt.Sprintf("چت تا %d ثانیه دیگه بسته میشه", int(expDur.Seconds()))
-				for _, player := range gs.GameState.Players() {
-					_, err := gs.Bot.Send(player, text)
+				for _, player := range gs.Players {
+					_, err := gs.Bot.Send(&telebot.User{ID: int64(player.TgID)}, text)
 					if err != nil {
 						slog.Error("can't send end game chat message", "err", err)
 					}
@@ -151,8 +150,8 @@ func (gs *GameSession) MonitorGameSession(allSession *AllSession) {
 func (gs *GameSession) CleanAndDisconnect(allSession *AllSession) {
 	if gs.Chat.IsOn {
 		text := "چت قطع شد"
-		for _, player := range gs.GameState.Players() {
-			_, err := gs.Bot.Send(player, text, keybul.WelcomeReplyKeyboard)
+		for _, player := range gs.Players {
+			_, err := gs.Bot.Send(&telebot.User{ID: int64(player.TgID)}, text, keybul.WelcomeReplyKeyboard)
 			if err != nil {
 				slog.Error("can't send chat ended message", "err", err)
 			}
@@ -162,7 +161,7 @@ func (gs *GameSession) CleanAndDisconnect(allSession *AllSession) {
 	allSession.Mutex.Lock()
 	defer allSession.Mutex.Unlock()
 
-	for _, player := range gs.GameState.Players() {
+	for _, player := range gs.Players {
 		delete(allSession.Sessions, strconv.Itoa(player.TgID))
 	}
 }

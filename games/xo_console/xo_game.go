@@ -15,24 +15,12 @@ import (
 	"gopkg.in/telebot.v4"
 )
 
-const (
-	EmptyEmoji = "◽️"
-	XEmoji     = "❌"  // player one
-	OEmoji     = "⭕️" // player two
-)
-
-const (
-	XOStartText  = `❌ *دوز بازی* ⭕️`
-	ticRulesText = `
-	قوانین 🎮
-	یک سطر یا ستون یا قطر رو با علامتت پر کن`
-)
 const MaxPlayerTime = time.Minute * 2
 
 type XOGame struct { // of GameInterface type
 	GameType gametype.GameType
 
-	XOBoard *xo_core.XoBoard
+	Board *xo_core.XoBoard
 
 	ViaMessageId string // Via Bots
 	LastEdit     time.Time
@@ -65,7 +53,7 @@ func NewXOGame(gameType gametype.GameType, queries *database.Queries) *XOGame {
 		Ctx:                ctx,
 
 		GameType: gameType,
-		XOBoard:  xo_core.NewTicBoard(maxBoardSize, winSize),
+		Board:    xo_core.NewTicBoard(maxBoardSize, winSize),
 		Queries:  queries,
 	}
 }
@@ -76,7 +64,8 @@ func (cg *XOGame) MessageSig() (string, int64) {
 func (cg *XOGame) Players() []*humanplayer.HumanPlayer {
 	return cg.players
 }
-func (g *XOGame) AddPlayer(player *humanplayer.HumanPlayer) {
+func (g *XOGame) AddPlayer(name string, tgId int) {
+	player := humanplayer.NewHumanPlayer(name, tgId)
 	g.players = append(g.players, player)
 }
 
@@ -147,7 +136,7 @@ func (g *XOGame) StartGame(bot telebot.API) error {
 	err := g.Edit(bot, g, XOStartText+"\n\n"+g.RulesText(),
 		keybul.CreateInlineKeyboard(
 			keybul.CreateBotNameInlineButton(),
-			CreateTicBoardInlineButton(g.XOBoard),
+			CreateTicBoardInlineButton(g.Board),
 			g.CreatePlayersInlineButton(g.Players(), g.CurrentPlayerIndex),
 		),
 	)
@@ -181,7 +170,7 @@ func (g *XOGame) XOJoinGameHandler(c telebot.Context) error {
 		text := "خودت بازیو ساختی تو بازی هستی"
 		return c.RespondText(text)
 	}
-	g.AddPlayer(humanplayer.NewHumanPlayer(sender.FirstName, int(sender.ID)))
+	g.AddPlayer(sender.FirstName, int(sender.ID))
 	text := "اضافه شدی بازی شروع شد"
 	err := c.RespondText(text)
 	if err != nil {

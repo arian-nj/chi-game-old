@@ -12,6 +12,18 @@ import (
 	"gopkg.in/telebot.v4"
 )
 
+const (
+	XOStartText  = `❌ *دوز بازی* ⭕️`
+	ticRulesText = `
+	قوانین 🎮
+	یک سطر یا ستون یا قطر رو با علامتت پر کن`
+)
+const (
+	EmptyEmoji = "◽️"
+	XEmoji     = "❌"  // player one
+	OEmoji     = "⭕️" // player two
+)
+
 func (g *XOGame) WinGameText() string {
 	return "\n🏆برنده بازی:*" + g.GetCurrentPlayer().Name + "*"
 

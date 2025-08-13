@@ -181,5 +181,5 @@ func (gv *GlobalVars) createRandomGame(gameType gametype.GameType, ticketOne *ma
 		ticket.MatchFoundChan <- newSession
 	}
 
-	humanplayer.SendFoundOpponentMessage(newSession.GameState.Players(), gv.Bot)
+	gamesessions.SendFoundOpponentMessage(newSession.Players, gv.Bot)
 }
