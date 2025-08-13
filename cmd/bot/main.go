@@ -18,7 +18,6 @@ import (
 	xoconsole "github.com/arian-nj/chibazi/games/xo_console"
 	"github.com/arian-nj/chibazi/internals/config"
 	gametype "github.com/arian-nj/chibazi/internals/game_type"
-	humanplayer "github.com/arian-nj/chibazi/internals/human_player"
 	matchmaking "github.com/arian-nj/chibazi/match_making"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"gopkg.in/telebot.v4"
@@ -143,43 +142,42 @@ func (gv *GlobalVars) MakeMatches() {
 }
 
 func (gv *GlobalVars) createRandomGame(gameType gametype.GameType, ticketOne *matchmaking.Ticket, ticketTwo *matchmaking.Ticket) {
-	var newSession *gamesessions.GameSession
 
 	newSessionRow, err := gv.Queries.CreateSession(context.Background(), string(gamesessions.RandomSession))
 	if err != nil {
 		slog.Error("can't create new random game", "error", err)
 	}
+	newGameSession := gamesessions.NewGameSession(gv.Bot, gv.Queries, newSessionRow.ID)
+	var newGame gamesessions.Game
 
 	switch gameType {
-
 	case gametype.XOGameType3X3, gametype.XOGameType5X5:
-		newXOGame := xoconsole.NewXOGame(gametype.XOGameType3X3, gv.Queries)
-		newSession = gamesessions.NewGameSession(gv.AllSessions, gv.Bot, gv.Queries, gameType, newXOGame, newSessionRow.ID)
-
+		newGame = xoconsole.NewXOGame(newGameSession.SessionCtx, gametype.XOGameType3X3, gv.Queries)
 	default:
 		slog.Error("not possible random game")
 		return
-
 	}
+	newGameSession.GameState = newGame
+	newGameSession.RunBgTask(gv.AllSessions)
 
 	playerOne := gamesessions.NewSessionPlayer(ticketOne.UserID, ticketOne.TgID, ticketOne.Name)
 	playerTwo := gamesessions.NewSessionPlayer(ticketTwo.UserID, ticketTwo.TgID, ticketTwo.Name)
 
-	newSession.AddPlayer(playerOne)
-	newSession.AddPlayer(playerTwo)
+	newGameSession.AddPlayer(playerOne)
+	newGameSession.AddPlayer(playerTwo)
 
-	gv.AllSessions.Add(strconv.Itoa(playerOne.TgID), newSession)
-	gv.AllSessions.Add(strconv.Itoa(playerTwo.TgID), newSession)
+	gv.AllSessions.Add(strconv.Itoa(playerOne.TgID), newGameSession)
+	gv.AllSessions.Add(strconv.Itoa(playerTwo.TgID), newGameSession)
 
-	err = newSession.StartGame()
+	err = newGameSession.StartGame()
 	if err != nil {
 		slog.Error("error in starting random xo match", "error", err)
 		return
 	}
 
 	for _, ticket := range []*matchmaking.Ticket{ticketOne, ticketTwo} {
-		ticket.MatchFoundChan <- newSession
+		ticket.MatchFoundChan <- newGameSession
 	}
 
-	gamesessions.SendFoundOpponentMessage(newSession.Players, gv.Bot)
+	gamesessions.SendFoundOpponentMessage(newGameSession.Players, gv.Bot)
 }

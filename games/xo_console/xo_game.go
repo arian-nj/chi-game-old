@@ -3,12 +3,10 @@ package xoconsole
 import (
 	"context"
 	"fmt"
-	"strings"
 	"time"
 
 	"github.com/arian-nj/chibazi/database"
 	gametype "github.com/arian-nj/chibazi/internals/game_type"
-	humanplayer "github.com/arian-nj/chibazi/internals/human_player"
 	keybul "github.com/arian-nj/chibazi/internals/keybul"
 	"github.com/arian-nj/chibazi/internals/random"
 	"github.com/arian-nj/chibazi/internals/xo_core"
@@ -22,20 +20,19 @@ type XOGame struct { // of GameInterface type
 
 	Board *xo_core.XoBoard
 
+	players            []*XoPlayer
+	CurrentPlayerIndex int
+
 	ViaMessageId string // Via Bots
 	LastEdit     time.Time
 
 	Queries *database.Queries
 
-	players []*humanplayer.HumanPlayer
-
 	CancelGame context.CancelFunc
 	Ctx        context.Context
-
-	CurrentPlayerIndex int
 }
 
-func NewXOGame(gameType gametype.GameType, queries *database.Queries) *XOGame {
+func NewXOGame(sessionCtx context.Context, gameType gametype.GameType, queries *database.Queries) *XOGame {
 	maxBoardSize := 3
 	winSize := 3
 	if gameType == gametype.XOGameType5X5 {
@@ -44,11 +41,11 @@ func NewXOGame(gameType gametype.GameType, queries *database.Queries) *XOGame {
 	}
 	randIndex := random.GenerateRandomNumber(2)
 
-	ctx, cancel := context.WithCancel(context.Background())
+	ctx, cancel := context.WithCancel(sessionCtx)
 	return &XOGame{
 
 		CurrentPlayerIndex: randIndex,
-		players:            []*humanplayer.HumanPlayer{},
+		players:            []*XoPlayer{},
 		CancelGame:         cancel,
 		Ctx:                ctx,
 
@@ -61,15 +58,15 @@ func NewXOGame(gameType gametype.GameType, queries *database.Queries) *XOGame {
 func (cg *XOGame) MessageSig() (string, int64) {
 	return cg.ViaMessageId, 0
 }
-func (cg *XOGame) Players() []*humanplayer.HumanPlayer {
+func (cg *XOGame) Players() []*XoPlayer {
 	return cg.players
 }
 func (g *XOGame) AddPlayer(name string, tgId int) {
-	player := humanplayer.NewHumanPlayer(name, tgId)
+	player := NewXoPlayer(name, tgId)
 	g.players = append(g.players, player)
 }
 
-func (cg *XOGame) GetCurrentPlayer() *humanplayer.HumanPlayer {
+func (cg *XOGame) GetCurrentPlayer() *XoPlayer {
 	return cg.players[cg.CurrentPlayerIndex]
 }
 
@@ -124,7 +121,7 @@ func (cg *XOGame) GetContext() context.Context {
 
 func (g *XOGame) SendJoinPanelAddSender(c telebot.Context) error {
 	sender := c.Sender()
-	g.AddPlayer(humanplayer.NewHumanPlayer(sender.FirstName, int(sender.ID)))
+	g.AddPlayer(sender.FirstName, int(sender.ID))
 	inlineKeyboard := keybul.CreateInlineKeyboard(
 		keybul.JoinGameInlineButtons,
 	)
@@ -158,9 +155,10 @@ func (g *XOGame) CallbackHandler(c telebot.Context) error {
 	if callbackData == "join" {
 		return g.XOJoinGameHandler(c)
 
-	} else if after, hasPrefix := strings.CutPrefix(callbackData, "play_"); hasPrefix {
-		// return g.XOPlayHandler(c, after)
 	}
+	// else if after, hasPrefix := strings.CutPrefix(callbackData, "play_"); hasPrefix {
+	// return g.XOPlayHandler(c, after)
+	// }
 	return c.RespondAlert("no a valid callback")
 }
 

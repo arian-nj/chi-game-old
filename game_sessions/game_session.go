@@ -9,11 +9,10 @@ import (
 	"time"
 
 	"github.com/arian-nj/chibazi/database"
-	gametype "github.com/arian-nj/chibazi/internals/game_type"
-	humanplayer "github.com/arian-nj/chibazi/internals/human_player"
 	"github.com/arian-nj/chibazi/internals/keybul"
 	"github.com/arian-nj/chibazi/internals/socket"
 	"github.com/arian-nj/chibazi/internals/utils"
+	"golang.org/x/text/cases"
 	"gopkg.in/telebot.v4"
 )
 
@@ -48,32 +47,32 @@ type Game interface {
 }
 
 type GameSession struct {
-	ID          int
-	Bot         *telebot.Bot
+	ID int
+
+	Bot     *telebot.Bot
+	Queries *database.Queries
+
 	IsGameEnded bool
 	Chat        *Chat
-	Gametype    gametype.GameType
 	GameState   Game
-
-	Players []*SessionPlayer
-
-	CreatedAt       time.Time
-	ExpireDuaration time.Duration
 
 	MsgChnl chan *SessionEvent
 
-	Queries *database.Queries
+	Players []*SessionPlayer
+
+	CancelSession context.CancelFunc
+	SessionCtx    context.Context
+
+	CreatedAt       time.Time
+	ExpireDuaration time.Duration
 }
 
-func NewGameSession(allSession *AllSession, bot *telebot.Bot, Queries *database.Queries,
-	gameType gametype.GameType, gameState Game,
-	sessionId int) *GameSession {
+func NewGameSession(bot *telebot.Bot, Queries *database.Queries, sessionId int) *GameSession {
 
+	ctx, cancel := context.WithCancel(context.Background())
 	gs := &GameSession{
 		ID:        sessionId,
 		Bot:       bot,
-		Gametype:  gameType,
-		GameState: gameState,
 		CreatedAt: time.Now(),
 		Chat: &Chat{
 			IsOn: true,
@@ -83,13 +82,17 @@ func NewGameSession(allSession *AllSession, bot *telebot.Bot, Queries *database.
 		MsgChnl:         make(chan *SessionEvent, 10),
 
 		Queries: Queries,
-	}
 
+		CancelSession: cancel,
+		SessionCtx:    ctx,
+	}
+	return gs
+}
+
+func (gs *GameSession) RunBgTask(allSession *AllSession) {
 	utils.RunBackgroundTask(func() {
 		gs.MonitorGameSession(allSession)
 	})
-
-	return gs
 }
 
 func (gs *GameSession) StartGame() error {
@@ -98,8 +101,7 @@ func (gs *GameSession) StartGame() error {
 	}
 
 	for _, player := range gs.Players {
-		newPlayer := humanplayer.NewHumanPlayer(player.Name, player.TgID)
-		gs.GameState.AddPlayer(newPlayer)
+		gs.GameState.AddPlayer(player.Name, player.TgID)
 	}
 
 	return gs.GameState.StartGame(gs.Bot)

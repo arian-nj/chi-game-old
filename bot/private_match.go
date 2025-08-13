@@ -17,28 +17,27 @@ func (app *BotApplication) inlineResultFeedbackHandler(c telebot.Context) error 
 	resultId := c.InlineResult().ResultID
 	messageID := c.InlineResult().MessageID
 
-	newSession, err := app.Queries.CreateSession(context.Background(), string(gamesessions.RandomSession))
+	newSessionRow, err := app.Queries.CreateSession(context.Background(), string(gamesessions.RandomSession))
 	if err != nil {
 		return err
 	}
+
+	newGameSession := gamesessions.NewGameSession(app.Bot, app.Queries, newSessionRow.ID)
+
 	var newGame gamesessions.Game
 	gameType := gametype.GameType(resultId)
 	switch gameType {
 	case gametype.XOGameType3X3:
-		newXOGame := xoconsole.NewXOGame(gametype.XOGameType3X3, app.Queries)
+		newXOGame := xoconsole.NewXOGame(newGameSession.SessionCtx, gametype.XOGameType3X3, app.Queries)
 		newXOGame.ViaMessageId = messageID
 		newGame = newXOGame
 	case gametype.XOGameType5X5:
-		newXOGame := xoconsole.NewXOGame(gametype.XOGameType5X5, app.Queries)
+		newXOGame := xoconsole.NewXOGame(newGameSession.SessionCtx, gametype.XOGameType5X5, app.Queries)
 		newXOGame.ViaMessageId = messageID
 		newGame = newXOGame
 	default:
 		return c.RespondAlert("این بازیرو ندارم!")
 	}
-
-	newGameSession := gamesessions.NewGameSession(app.AllSessions, app.Bot, app.Queries, gametype.XOGameType3X3, newGame, newSession.ID)
-
-	app.AllSessions.Add(messageID, newGameSession)
 
 	if newGame == nil {
 		err := fmt.Errorf("new game is nil")
@@ -46,13 +45,18 @@ func (app *BotApplication) inlineResultFeedbackHandler(c telebot.Context) error 
 		return err
 	}
 
+	newGameSession.GameState = newGame
+	newGameSession.RunBgTask(app.AllSessions)
+
+	app.AllSessions.Add(messageID, newGameSession)
+
 	err = newGame.SendJoinPanelAddSender(c)
 	if err != nil {
 		slog.Error("can't send join panel", "error", err)
 		return err
 	}
 	_, err = app.Queries.CreateSessionGame(context.Background(), database.CreateSessionGameParams{
-		SessionID: newSession.ID,
+		SessionID: newSessionRow.ID,
 		GameType:  string(gameType),
 	})
 

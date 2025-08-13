@@ -1,4 +1,4 @@
-package humanplayer
+package xoconsole
 
 import (
 	"strconv"
@@ -7,7 +7,7 @@ import (
 	"github.com/arian-nj/chibazi/internals/keybul"
 )
 
-type HumanPlayer struct {
+type XoPlayer struct {
 	TgID int
 	Name string
 
@@ -17,25 +17,25 @@ type HumanPlayer struct {
 	TurnStartedAt time.Time
 }
 
-func NewHumanPlayer(name string, tgID int) *HumanPlayer {
+func NewXoPlayer(name string, tgID int) *XoPlayer {
 	if len(name) > 20 {
 		name = name[:20]
 		name += "..."
 	}
-	return &HumanPlayer{
+	return &XoPlayer{
 		Name: keybul.EscapeReserved(name),
 		TgID: tgID,
 	}
 }
 
-func (p *HumanPlayer) SetMessageSig(messageID int) *HumanPlayer {
+func (p *XoPlayer) SetMessageSig(messageID int) *XoPlayer {
 	p.MessageID = messageID
 	return p
 }
-func (p *HumanPlayer) MessageSig() (string, int64) {
+func (p *XoPlayer) MessageSig() (string, int64) {
 	return strconv.Itoa(p.MessageID), int64(p.TgID)
 }
 
-func (p *HumanPlayer) Recipient() string {
+func (p *XoPlayer) Recipient() string {
 	return strconv.FormatInt(int64(p.TgID), 10)
 }

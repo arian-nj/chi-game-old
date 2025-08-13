@@ -6,7 +6,6 @@ import (
 	"strconv"
 	"time"
 
-	humanplayer "github.com/arian-nj/chibazi/internals/human_player"
 	"github.com/arian-nj/chibazi/internals/keybul"
 	"github.com/arian-nj/chibazi/internals/xo_core"
 	"gopkg.in/telebot.v4"
@@ -35,7 +34,7 @@ func (g *XOGame) EndGameText() string {
 
 func (g *XOGame) CreateBoardAsEmoji() string {
 	text := ""
-	for cellIndex, cell := range g.XOBoard.Board {
+	for cellIndex, cell := range g.Board.Board {
 		if cellIndex%3 == 0 {
 			text += "\n"
 		}
@@ -77,7 +76,7 @@ func CreateTicBoardInlineButton(board *xo_core.XoBoard) [][]telebot.InlineButton
 	return buttons
 }
 
-func (g *XOGame) CreatePlayersInlineButton(humanPlayers []*humanplayer.HumanPlayer, CurrentPlayerTurn int) [][]telebot.InlineButton {
+func (g *XOGame) CreatePlayersInlineButton(humanPlayers []*XoPlayer, CurrentPlayerTurn int) [][]telebot.InlineButton {
 	buttons := make([][]telebot.InlineButton, 0)
 	for index, hplayer := range humanPlayers {
 
@@ -116,8 +115,8 @@ func (g *XOGame) CreatePlayersInlineButton(humanPlayers []*humanplayer.HumanPlay
 func (g *XOGame) RulesText() string {
 	text := ""
 	// text += "قوانین:\د"
-	text += fmt.Sprintf("❕اندازه *%dX%d*\n", g.XOBoard.MaxCellSize, g.XOBoard.MaxCellSize)
-	text += fmt.Sprintf("⚠️با یه خط *%d تایی* برنده ای", g.XOBoard.WinSize)
+	text += fmt.Sprintf("❕اندازه *%dX%d*\n", g.Board.MaxCellSize, g.Board.MaxCellSize)
+	text += fmt.Sprintf("⚠️با یه خط *%d تایی* برنده ای", g.Board.WinSize)
 	return text
 }
 
