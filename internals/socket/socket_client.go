@@ -19,7 +19,7 @@ type Socket struct {
 
 	Ctx       context.Context
 	Cancel    context.CancelFunc
-	EventChan chan *Event
+	EventChan chan *SocketEvent
 }
 
 func NewSocketClient(conn *websocket.Conn) *Socket {
@@ -29,23 +29,7 @@ func NewSocketClient(conn *websocket.Conn) *Socket {
 		limiter:   rate.NewLimiter(rate.Every(time.Millisecond*100), 10),
 		Ctx:       ctx,
 		Cancel:    cancel,
-		EventChan: make(chan *Event, 16),
-	}
-}
-
-type EventMessage string
-
-type EventType string
-
-type Event struct {
-	Type EventType    `json:"type"`
-	Data EventMessage `json:"data"`
-}
-
-func NewEvent(Etype EventType, data EventMessage) *Event {
-	return &Event{
-		Type: Etype,
-		Data: data,
+		EventChan: make(chan *SocketEvent, 16),
 	}
 }
 
@@ -75,7 +59,7 @@ func (sc *Socket) listen(r *http.Request) {
 			}
 			return
 		}
-		newEvent := &Event{}
+		newEvent := &SocketEvent{}
 		err = json.Unmarshal(messageByte, newEvent)
 		if err != nil {
 			slog.Error("can't marshal websocket event", "error", err)
@@ -85,10 +69,11 @@ func (sc *Socket) listen(r *http.Request) {
 	}
 }
 
-func (sc *Socket) SendNewEvent(Etype EventType, data EventMessage) error {
-	return sc.SendEvent(NewEvent(Etype, data))
+func (sc *Socket) Write(text string) error {
+	return sc.Conn.Write(sc.Ctx, websocket.MessageText, []byte(text))
 }
-func (sc *Socket) SendEvent(newEvent *Event) error {
+
+func (sc *Socket) sendEvent(newEvent *SocketEvent) error {
 	data_btye, err := json.Marshal(newEvent)
 	if err != nil {
 		slog.Error("can't marshal event %w", "error", err)
@@ -103,6 +88,15 @@ func (sc *Socket) SendEvent(newEvent *Event) error {
 	return nil
 }
 
-func (sc *Socket) Write(text string) error {
-	return sc.Conn.Write(sc.Ctx, websocket.MessageText, []byte(text))
+func (sc *Socket) SendNewEvent(Etype SocketEventType, data any) error {
+	raw, err := json.Marshal(data)
+	if err != nil {
+		return err
+	}
+	return sc.sendEvent(NewSocketEvent(Etype, raw))
+}
+
+func (s *Socket) SendNewAction(AType ActionType, data any) error {
+	newAction := NewGameAction(AType, data)
+	return s.SendNewEvent(GameEventType, newAction)
 }

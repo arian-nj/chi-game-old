@@ -23,7 +23,6 @@ func (app *ApiApplication) gameSessionWS(w http.ResponseWriter, r *http.Request)
 	gameSession, found := app.AllSessions.Get(strconv.Itoa(tgUser.TgID))
 	if found == false {
 		app.NotFound(w, r)
-		slog.Info("not found")
 		return
 	}
 
@@ -54,6 +53,9 @@ func (app *ApiApplication) gameSessionWS(w http.ResponseWriter, r *http.Request)
 		}
 	}
 	sessionPlayer.Socket = socketClient
+	if gameSession.GameState != nil {
+		gameSession.GameState.SetPlayerSocket(tgUser.TgID, socketClient)
+	}
 
 	for {
 		select {
@@ -86,6 +88,7 @@ func (app *ApiApplication) getChatHistoryHandler(w http.ResponseWriter, r *http.
 	gameSession, ok := app.AllSessions.Get(strconv.Itoa(tgUser.TgID))
 	if !ok {
 		app.NotFound(w, r)
+		return
 	}
 	// NOTE: in case of dynamic Limit and offset cap limit by 50
 	allMessages, err := app.Queries.GetSessionMessages(context.Background(), database.GetSessionMessagesParams{

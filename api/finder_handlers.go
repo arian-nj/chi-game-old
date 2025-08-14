@@ -49,19 +49,19 @@ func (app *ApiApplication) makeMatchMakingTicket(w http.ResponseWriter, r *http.
 	app.MatchMaking.AddTicket(NewTicket)
 	defer app.MatchMaking.RemovePlayerFromMatchMaking(tgUser.TgID)
 
-	socketClient.SendNewEvent(FinderEventType, FMAdded)
+	socketClient.SendNewEvent(socket.FinderEventType, socket.FMAdded)
 
 	ticker := time.NewTicker(time.Second * 30)
 
 	for {
 		select {
 		case <-NewTicket.MatchFoundChan:
-			socketClient.SendNewEvent(FinderEventType, FMFound)
+			socketClient.SendNewEvent(socket.FinderEventType, socket.FMFound)
 			return
 		case <-ticker.C:
-			socketClient.SendNewEvent(FinderEventType, FMTimeout)
+			socketClient.SendNewEvent(socket.FinderEventType, socket.FMTimeout)
 		case newEvent := <-socketClient.EventChan:
-			if newEvent.Type == FinderEventType && newEvent.Data == FMCancel {
+			if newEvent.Type == socket.FinderEventType && string(newEvent.Data) == socket.FMCancel {
 				slog.Info("Cancelling")
 				return
 			}

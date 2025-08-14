@@ -12,7 +12,6 @@ import (
 	"github.com/arian-nj/chibazi/internals/keybul"
 	"github.com/arian-nj/chibazi/internals/socket"
 	"github.com/arian-nj/chibazi/internals/utils"
-	"golang.org/x/text/cases"
 	"gopkg.in/telebot.v4"
 )
 
@@ -36,14 +35,6 @@ func NewSessionPlayer(ID int, tgID int, name string) *SessionPlayer {
 		TgID: tgID,
 		Name: name,
 	}
-}
-
-type Game interface {
-	AddPlayer(name string, tgId int)
-	CallbackHandler(c telebot.Context) error
-	GetContext() context.Context
-	StartGame(bot telebot.API) error
-	SendJoinPanelAddSender(telebot.Context) error
 }
 
 type GameSession struct {
@@ -101,10 +92,10 @@ func (gs *GameSession) StartGame() error {
 	}
 
 	for _, player := range gs.Players {
-		gs.GameState.AddPlayer(player.Name, player.TgID)
+		gs.GameState.AddPlayer(player.Name, player.TgID, player.Socket)
 	}
 
-	return gs.GameState.StartGame(gs.Bot)
+	return gs.GameState.StartGame()
 }
 
 func (gs *GameSession) AddPlayer(player *SessionPlayer) {
@@ -125,7 +116,7 @@ func (gs *GameSession) MonitorGameSession(allSession *AllSession) {
 		select {
 		case newSEvent := <-gs.MsgChnl:
 			switch newSEvent.Event.Type {
-			case ChatType:
+			case socket.ChatEventType:
 				gs.HandleWebChatMessage(newSEvent)
 			}
 

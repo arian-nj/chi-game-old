@@ -63,7 +63,7 @@ func (board *XoBoard) DeepCopy() *XoBoard {
 	}
 }
 
-func (board *XoBoard) PlayMove(r, c int, moveType Cell) (bool, string) {
+func (board *XoBoard) ApplyMove(r, c int, moveType Cell) (bool, string) {
 	if (r < 0 || c < 0) && (r >= board.MaxCellSize || c >= board.MaxCellSize) {
 		return false, "خارج از محدوده چیکار داری میکنی؟"
 	}

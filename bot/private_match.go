@@ -28,11 +28,11 @@ func (app *BotApplication) inlineResultFeedbackHandler(c telebot.Context) error 
 	gameType := gametype.GameType(resultId)
 	switch gameType {
 	case gametype.XOGameType3X3:
-		newXOGame := xoconsole.NewXOGame(newGameSession.SessionCtx, gametype.XOGameType3X3, app.Queries)
+		newXOGame := xoconsole.NewXOGame(newGameSession.SessionCtx, gametype.XOGameType3X3, app.Bot, app.Queries)
 		newXOGame.ViaMessageId = messageID
 		newGame = newXOGame
 	case gametype.XOGameType5X5:
-		newXOGame := xoconsole.NewXOGame(newGameSession.SessionCtx, gametype.XOGameType5X5, app.Queries)
+		newXOGame := xoconsole.NewXOGame(newGameSession.SessionCtx, gametype.XOGameType5X5, app.Bot, app.Queries)
 		newXOGame.ViaMessageId = messageID
 		newGame = newXOGame
 	default:

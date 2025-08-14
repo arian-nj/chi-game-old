@@ -57,7 +57,6 @@ function FinderRouteComponent() {
 			const json_data = await JSON.parse(text)
 			console.log(json_data)
 			if (json_data?.type == "finder" && json_data?.data) {
-				console.log("here")
 				const data = json_data.data
 				if (data == FinderMessages.Found) {
 					router.navigate({ to: "/session" });

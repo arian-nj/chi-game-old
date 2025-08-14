@@ -45,6 +45,5 @@ export async function GetMe() {
 		throw new Error(response.statusText)
 	}
 	const json_data: MeResponse = await response.json()
-	console.log("data ", json_data)
 	return json_data
 }

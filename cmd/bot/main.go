@@ -18,6 +18,7 @@ import (
 	xoconsole "github.com/arian-nj/chibazi/games/xo_console"
 	"github.com/arian-nj/chibazi/internals/config"
 	gametype "github.com/arian-nj/chibazi/internals/game_type"
+	"github.com/arian-nj/chibazi/internals/utils"
 	matchmaking "github.com/arian-nj/chibazi/match_making"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"gopkg.in/telebot.v4"
@@ -152,7 +153,7 @@ func (gv *GlobalVars) createRandomGame(gameType gametype.GameType, ticketOne *ma
 
 	switch gameType {
 	case gametype.XOGameType3X3, gametype.XOGameType5X5:
-		newGame = xoconsole.NewXOGame(newGameSession.SessionCtx, gametype.XOGameType3X3, gv.Queries)
+		newGame = xoconsole.NewXOGame(newGameSession.SessionCtx, gametype.XOGameType3X3, gv.Bot, gv.Queries)
 	default:
 		slog.Error("not possible random game")
 		return
@@ -169,15 +170,16 @@ func (gv *GlobalVars) createRandomGame(gameType gametype.GameType, ticketOne *ma
 	gv.AllSessions.Add(strconv.Itoa(playerOne.TgID), newGameSession)
 	gv.AllSessions.Add(strconv.Itoa(playerTwo.TgID), newGameSession)
 
-	err = newGameSession.StartGame()
-	if err != nil {
-		slog.Error("error in starting random xo match", "error", err)
-		return
-	}
-
 	for _, ticket := range []*matchmaking.Ticket{ticketOne, ticketTwo} {
 		ticket.MatchFoundChan <- newGameSession
 	}
+	utils.RunBackgroundTask(func() {
+		err = newGameSession.StartGame()
+		if err != nil {
+			slog.Error("error in starting random xo match", "error", err)
+			return
+		}
+		gamesessions.SendFoundOpponentMessage(newGameSession.Players, gv.Bot)
 
-	gamesessions.SendFoundOpponentMessage(newGameSession.Players, gv.Bot)
+	})
 }

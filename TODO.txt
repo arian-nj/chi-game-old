@@ -109,10 +109,14 @@
 
 [X] send web to bot and bot to web?
 
-[ ] color pallete
 [X] how to look? sending and joining + implementation transfer from telgram to web app
 [X] base xo ui
-[ ] connect xo to backend
+[X] see game web
+[ ] play game web
+[ ] rejoin game web
+[ ] timer 
+
+[ ] color pallete
 
 # bot look
 [ ] better welcome message

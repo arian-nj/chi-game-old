@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { GameSessionSocket, type SessionEvent } from "../../lib/SessionWs";
+import { GameSessionSocket, type SessionSocketEvent } from "../../lib/SessionWs";
 import { Message } from "../../models/Message";
 import { fetchWithAuth, GetMe } from "../../lib/auth";
 import { useQuery } from "@tanstack/react-query";
@@ -55,7 +55,7 @@ export function Chat({ socketRef }: ChatProps) {
 	if (error) return <h1>error Me {String(error)}</h1>;
 
 	// Receive new message from socket
-	const receiveMessage = (se: SessionEvent) => {
+	const receiveMessage = (se: SessionSocketEvent) => {
 		setMessages(prev => [...prev, new Message(se.data, 0)]);
 	};
 	socketRef.current.HandleChatMessage = receiveMessage;
@@ -67,20 +67,24 @@ export function Chat({ socketRef }: ChatProps) {
 	};
 
 	return (
-		<div className="flex flex-col w-full h-full justify-end font-[Rubik]">
-			<div className="flex flex-col w-full h-full overflow-hidden">
-				<div
-					className={`flex flex-col gap-3 px-4 py-2 overflow-y-auto flex-grow transition-all duration-1000
+		<div className="absolute bottom-0" >
+			{showMessages &&
+				< div className="flex flex-col w-full h-full justify-end font-[Rubik]">
+					<div className="flex flex-col w-full h-full overflow-hidden">
+						<div
+							className={`flex flex-col gap-3 px-4 py-2 overflow-y-auto flex-grow transition-all duration-1000
 						${showMessages ? "opacity-100 bg-gray-800/50" : "opacity-0 "}`}
-					ref={chatRef}
-				>
-					{messages.map((msg, index) => (
-						<ChatBubble key={index} message={msg.text} isMe={msg.userID === me.id} />
-					))}
+							ref={chatRef}
+						>
+							{messages.map((msg, index) => (
+								<ChatBubble key={index} message={msg.text} isMe={msg.userID === me.id} />
+							))}
+						</div>
+					</div>
 				</div>
-			</div>
+			}
 			<ChatInput setShowMessage={setShowMessages} sendMessage={sendMessage} />
-		</div>
+		</div >
 	);
 }
 
@@ -100,6 +104,5 @@ export async function GetChatHistory() {
 		throw new Error(response.statusText);
 	}
 	const json_data: ChatHistoryResponse = await response.json();
-	console.log(json_data)
 	return json_data;
 }

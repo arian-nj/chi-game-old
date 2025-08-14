@@ -2,12 +2,14 @@ import { createFileRoute } from '@tanstack/react-router'
 import { useEffect, useRef, useState, type RefObject, } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { GetBaseUrl } from '../lib/baseURL';
-import { GetJwtToken } from '../lib/auth';
+import { authBeforeLoad, GetJwtToken } from '../lib/auth';
 import { Chat } from '../components/Chat/Chat';
 import { GameSessionSocket } from '../lib/SessionWs';
+import XoGame from '../components/XoGame/XOGame';
 
 export const Route = createFileRoute('/session')({
 	component: RouteComponent,
+	beforeLoad: authBeforeLoad,
 })
 
 function RouteComponent() {
@@ -21,9 +23,7 @@ function RouteComponent() {
 		queryFn: async () => {
 			const response = await fetch(sessionAPIUrl + "&noconn=true")
 			const status = response.status
-			if (status == 200) {
-				console.log("ok")
-			} else if (status == 404) {
+			if (status == 404) {
 				throw new Error("session not found")
 			} else if (status == 500) {
 				throw new Error("server Error")
@@ -55,13 +55,11 @@ function RouteComponent() {
 		)
 	}
 	return (
-		<div className="w-screen h-screen overflow-hidden relative bg-green-200">
-			<div >
-				<h1 className="text-center py-2">Session</h1>
+		<div className="w-screen h-screen overflow-hidden relative bg-green-200 flex items-center justify-center">
+			<div className='items-center'>
+				<XoGame socketRef={socketRef as RefObject<GameSessionSocket>} />
 			</div>
-			<div className="absolute inset-0 z-10">
-				<Chat socketRef={socketRef as RefObject<GameSessionSocket>} />
-			</div>
+			<Chat socketRef={socketRef as RefObject<GameSessionSocket>} />
 		</div>
 	)
 }

@@ -5,6 +5,8 @@ import (
 	"time"
 
 	"github.com/arian-nj/chibazi/internals/keybul"
+	"github.com/arian-nj/chibazi/internals/socket"
+	"github.com/arian-nj/chibazi/internals/xo_core"
 )
 
 type XoPlayer struct {
@@ -13,11 +15,15 @@ type XoPlayer struct {
 
 	MessageID int
 
+	Socket *socket.Socket
+
 	SpentTime     time.Duration
 	TurnStartedAt time.Time
+
+	Move xo_core.Cell
 }
 
-func NewXoPlayer(name string, tgID int) *XoPlayer {
+func NewXoPlayer(name string, tgID int, socket *socket.Socket) *XoPlayer {
 	if len(name) > 20 {
 		name = name[:20]
 		name += "..."

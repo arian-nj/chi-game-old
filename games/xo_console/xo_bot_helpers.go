@@ -11,6 +11,20 @@ import (
 	"gopkg.in/telebot.v4"
 )
 
+func (cg *XOGame) MessageSig() (string, int64) {
+	return cg.ViaMessageId, 0
+}
+
+func (g *XOGame) SendJoinPanelAddSender(c telebot.Context) error {
+	sender := c.Sender()
+	g.AddPlayer(sender.FirstName, int(sender.ID), nil)
+	inlineKeyboard := keybul.CreateInlineKeyboard(
+		keybul.JoinGameInlineButtons,
+	)
+	text := XOStartText + "\n\n" + g.RulesText() + "\n\n🕹 بازیکن " + fmt.Sprintf("%s", sender.FirstName) + " منتظر حریفه"
+	return g.Edit(c.Bot(), g, text, inlineKeyboard)
+}
+
 const (
 	XOStartText  = `❌ *دوز بازی* ⭕️`
 	ticRulesText = `
@@ -28,7 +42,7 @@ func (g *XOGame) WinGameText() string {
 
 }
 func (g *XOGame) EndGameText() string {
-	players := g.Players()
+	players := g.Players
 	return XOStartText + "\nبازیکن ها:\n" + players[0].Name + " " + XEmoji + "\n" + players[1].Name + " " + OEmoji + "\n\n" + g.CreateBoardAsEmoji()
 }
 
@@ -129,7 +143,7 @@ func (g *XOGame) Edit(bot telebot.API, msg telebot.Editable, text string, keyboa
 		}
 		return nil
 	} else {
-		for _, p := range g.Players() {
+		for _, p := range g.Players {
 			if p.MessageID == 0 {
 				msg, err := bot.Send(p, "game")
 				if err != nil {
