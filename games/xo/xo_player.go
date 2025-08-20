@@ -1,12 +1,11 @@
-package xoconsole
+package xo
 
 import (
+	"fmt"
 	"strconv"
 	"time"
 
-	"github.com/arian-nj/chibazi/internals/keybul"
 	"github.com/arian-nj/chibazi/internals/socket"
-	"github.com/arian-nj/chibazi/internals/xo_core"
 )
 
 type XoPlayer struct {
@@ -20,7 +19,7 @@ type XoPlayer struct {
 	SpentTime     time.Duration
 	TurnStartedAt time.Time
 
-	Move xo_core.Cell
+	Move Cell
 }
 
 func NewXoPlayer(name string, tgID int, socket *socket.Socket) *XoPlayer {
@@ -29,15 +28,12 @@ func NewXoPlayer(name string, tgID int, socket *socket.Socket) *XoPlayer {
 		name += "..."
 	}
 	return &XoPlayer{
-		Name: keybul.EscapeReserved(name),
+		// Name: keybul.EscapeReserved(name),
+		Name: fmt.Sprintf("`%s`", name),
 		TgID: tgID,
 	}
 }
 
-func (p *XoPlayer) SetMessageSig(messageID int) *XoPlayer {
-	p.MessageID = messageID
-	return p
-}
 func (p *XoPlayer) MessageSig() (string, int64) {
 	return strconv.Itoa(p.MessageID), int64(p.TgID)
 }

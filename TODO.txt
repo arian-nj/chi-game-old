@@ -112,9 +112,13 @@
 [X] how to look? sending and joining + implementation transfer from telgram to web app
 [X] base xo ui
 [X] see game web
+[X] make all xo board index not x y
+[X] Command - observer telegram working
 [ ] play game web
 [ ] rejoin game web
 [ ] timer 
+
+[ ] Send Join Panel
 
 [ ] color pallete
 

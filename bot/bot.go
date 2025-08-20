@@ -136,6 +136,7 @@ func (app *BotApplication) handleCallback(c telebot.Context) error {
 	if has_game {
 		err := gameSession.GameState.CallBackRouter(c)
 		if err != nil {
+			slog.Error("error in call back router", "error", err)
 			return c.RespondText("خطا")
 		}
 		return nil

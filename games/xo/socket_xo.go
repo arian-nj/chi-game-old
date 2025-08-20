@@ -1,14 +1,23 @@
-package xoconsole
+package xo
 
 import (
 	"encoding/json"
 	"log/slog"
 
 	"github.com/arian-nj/chibazi/internals/socket"
-	"github.com/arian-nj/chibazi/internals/xo_core"
 )
 
-func SocketRouter() {
+type SocketListener struct{}
+
+func (tg *SocketListener) Update(game *XOGame, action Action) {
+	switch a := action.(type) {
+	case *PlayAction:
+	case *StartAction:
+	case *EndGameAction:
+		if a.Winner == nil {
+		} else {
+		}
+	}
 }
 
 const (
@@ -39,7 +48,7 @@ type MoveAction struct {
 	CellType  int `json:"value"`
 }
 
-func (g *XOGame) SocketBrodcastNewMove(moveIndex int, cellType xo_core.Cell) {
+func (g *XOGame) SocketBrodcastNewMove(moveIndex int, cellType Cell) {
 	for _, player := range g.Players {
 		if player.Socket == nil {
 			continue

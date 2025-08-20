@@ -17,7 +17,8 @@ func SendFoundOpponentMessage(players []*SessionPlayer, bot *telebot.Bot) {
 			}
 			_, err := bot.Send(&telebot.User{ID: int64(player.TgID)}, FoundOpponentText(oppPlayer.Name), telebot.ModeMarkdownV2, keybul.StopChatReplyKeyboard)
 			if err != nil {
-				slog.Error("can't send found opponent message ", "error", err)
+				slog.Error("can't send found opponent message ", "error", err, "text", FoundOpponentText(oppPlayer.Name))
+
 			}
 		}
 	}

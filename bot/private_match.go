@@ -4,10 +4,11 @@ import (
 	"context"
 	"fmt"
 	"log/slog"
+	"time"
 
 	"github.com/arian-nj/chibazi/database"
 	gamesessions "github.com/arian-nj/chibazi/game_sessions"
-	xoconsole "github.com/arian-nj/chibazi/games/xo_console"
+	"github.com/arian-nj/chibazi/games/xo"
 	gametype "github.com/arian-nj/chibazi/internals/game_type"
 	"github.com/arian-nj/chibazi/internals/keybul"
 	"gopkg.in/telebot.v4"
@@ -26,14 +27,19 @@ func (app *BotApplication) inlineResultFeedbackHandler(c telebot.Context) error 
 
 	var newGame gamesessions.Game
 	gameType := gametype.GameType(resultId)
+	tgListen := xo.TelegramListener{
+		Bot:          app.Bot,
+		LastEdit:     time.Now(),
+		ViaMessageId: messageID,
+	}
 	switch gameType {
 	case gametype.XOGameType3X3:
-		newXOGame := xoconsole.NewXOGame(newGameSession.SessionCtx, gametype.XOGameType3X3, app.Bot, app.Queries)
-		newXOGame.ViaMessageId = messageID
+		newXOGame := xo.NewXOGame(newGameSession.SessionCtx, gametype.XOGameType3X3, app.Bot, app.Queries)
+		newXOGame.Register(&tgListen)
 		newGame = newXOGame
 	case gametype.XOGameType5X5:
-		newXOGame := xoconsole.NewXOGame(newGameSession.SessionCtx, gametype.XOGameType5X5, app.Bot, app.Queries)
-		newXOGame.ViaMessageId = messageID
+		newXOGame := xo.NewXOGame(newGameSession.SessionCtx, gametype.XOGameType5X5, app.Bot, app.Queries)
+		newXOGame.Register(&tgListen)
 		newGame = newXOGame
 	default:
 		return c.RespondAlert("این بازیرو ندارم!")
@@ -73,7 +79,7 @@ func (app *BotApplication) inlineQueryHandler(c telebot.Context) error {
 	xoResult3x3 := &telebot.ArticleResult{
 		Title:       "دوز بازی ۳ در ۳",
 		Description: "رو من کلیک کن",
-		Text:        xoconsole.XOStartText,
+		Text:        xo.XOStartText,
 	}
 	xoResult3x3.ParseMode = telebot.ModeMarkdownV2
 
@@ -85,7 +91,7 @@ func (app *BotApplication) inlineQueryHandler(c telebot.Context) error {
 	xoResult5x5 := &telebot.ArticleResult{
 		Title:       "دوز بازی  ۵ در ۵",
 		Description: "رو من کلیک کن",
-		Text:        xoconsole.XOStartText,
+		Text:        xo.XOStartText,
 	}
 	xoResult5x5.ParseMode = telebot.ModeMarkdownV2
 

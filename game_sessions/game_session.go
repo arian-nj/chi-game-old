@@ -33,7 +33,7 @@ func NewSessionPlayer(ID int, tgID int, name string) *SessionPlayer {
 	return &SessionPlayer{
 		ID:   ID,
 		TgID: tgID,
-		Name: name,
+		Name: keybul.EscapeReserved(name),
 	}
 }
 

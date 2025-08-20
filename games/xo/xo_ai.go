@@ -1,4 +1,4 @@
-package xo_core
+package xo
 
 import (
 	"math"
@@ -28,7 +28,7 @@ func BestMove(board *XoBoard, playerMove Cell) (int, int) {
 	bestIndex := -1
 	bestScore := math.MinInt
 
-	for i := 0; i < board.MaxCellSize*board.MaxCellSize; i++ {
+	for i := range board.MaxCellSize * board.MaxCellSize {
 		if board.Board[i] != Empty {
 			continue
 		}
@@ -65,7 +65,7 @@ func MinMax(index int, Move Cell, board *XoBoard, alpha, beta int, depth int, is
 
 	if isMaximizing {
 		bestScore := math.MinInt
-		for i := 0; i < board.MaxCellSize*board.MaxCellSize; i++ {
+		for i := range board.MaxCellSize * board.MaxCellSize {
 			if board.Board[i] != Empty {
 				continue
 			}
@@ -84,7 +84,7 @@ func MinMax(index int, Move Cell, board *XoBoard, alpha, beta int, depth int, is
 	}
 
 	worstScore := math.MaxInt
-	for i := 0; i < board.MaxCellSize*board.MaxCellSize; i++ {
+	for i := range board.MaxCellSize * board.MaxCellSize {
 		if board.Board[i] != Empty {
 			continue
 		}
@@ -104,9 +104,9 @@ func MinMax(index int, Move Cell, board *XoBoard, alpha, beta int, depth int, is
 
 func RandomMove(board XoBoard) (int, int) {
 	var emptyCells [][2]int
-	for r := 0; r < board.MaxCellSize; r++ {
-		for c := 0; c < board.MaxCellSize; c++ {
-			if board.GetCell(r, c) == Empty {
+	for r := range board.MaxCellSize {
+		for c := range board.MaxCellSize {
+			if board.GetCell(board.toCellIndex(r, c)) == Empty {
 				emptyCells = append(emptyCells, [2]int{r, c})
 			}
 		}

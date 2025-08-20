@@ -15,7 +15,8 @@ import (
 	"github.com/arian-nj/chibazi/database"
 	"github.com/arian-nj/chibazi/db"
 	gamesessions "github.com/arian-nj/chibazi/game_sessions"
-	xoconsole "github.com/arian-nj/chibazi/games/xo_console"
+	"github.com/arian-nj/chibazi/games/xo"
+	xoconsole "github.com/arian-nj/chibazi/games/xo"
 	"github.com/arian-nj/chibazi/internals/config"
 	gametype "github.com/arian-nj/chibazi/internals/game_type"
 	"github.com/arian-nj/chibazi/internals/utils"
@@ -153,7 +154,14 @@ func (gv *GlobalVars) createRandomGame(gameType gametype.GameType, ticketOne *ma
 
 	switch gameType {
 	case gametype.XOGameType3X3, gametype.XOGameType5X5:
-		newGame = xoconsole.NewXOGame(newGameSession.SessionCtx, gametype.XOGameType3X3, gv.Bot, gv.Queries)
+		tgListen := xo.TelegramListener{
+			Bot:      gv.Bot,
+			LastEdit: time.Now(),
+		}
+		newXoGame := xoconsole.NewXOGame(newGameSession.SessionCtx, gametype.XOGameType3X3, gv.Bot, gv.Queries)
+		newXoGame.Register(&tgListen)
+		newGame = newXoGame
+
 	default:
 		slog.Error("not possible random game")
 		return
