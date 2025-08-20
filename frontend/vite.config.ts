@@ -18,7 +18,7 @@ export default defineConfig({
 		react(),
 		tailwindcss()],
 
-	assetsInclude: ['**/*.lottie'], // 👈 This line tells Vite not to parse .lottie files
+	assetsInclude: ['**/*.lottie'],
 	// base: "/web/",
 
 })

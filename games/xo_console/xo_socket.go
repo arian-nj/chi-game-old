@@ -8,6 +8,9 @@ import (
 	"github.com/arian-nj/chibazi/internals/xo_core"
 )
 
+func SocketRouter() {
+}
+
 const (
 	StartActionType socket.ActionType = "start"
 	MoveActionType  socket.ActionType = "move"
@@ -36,7 +39,7 @@ type MoveAction struct {
 	CellType  int `json:"value"`
 }
 
-func (g *XOGame) BrodcastNewMove(moveIndex int, cellType xo_core.Cell) {
+func (g *XOGame) SocketBrodcastNewMove(moveIndex int, cellType xo_core.Cell) {
 	for _, player := range g.Players {
 		if player.Socket == nil {
 			continue

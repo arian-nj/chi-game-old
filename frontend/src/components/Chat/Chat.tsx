@@ -1,11 +1,11 @@
 import { useEffect, useRef, useState } from "react";
 import { GameSessionSocket, type SessionSocketEvent } from "../../lib/SessionWs";
-import { Message } from "../../models/Message";
 import { fetchWithAuth, GetMe } from "../../lib/auth";
 import { useQuery } from "@tanstack/react-query";
 import { ChatBubble } from "./ChatBubble";
 import { ChatInput } from "./ChatInput";
 import { GetBaseUrl } from "../../lib/baseURL";
+import { Message } from "../../types/Message";
 
 type ChatProps = {
 	socketRef: React.RefObject<GameSessionSocket>

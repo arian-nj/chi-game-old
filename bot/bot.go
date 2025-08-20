@@ -67,7 +67,7 @@ func (app *BotApplication) MakeBot() (*telebot.Bot, error) {
 
 	b.Handle(telebot.OnQuery, app.inlineQueryHandler)
 	b.Handle(telebot.OnInlineResult, app.inlineResultFeedbackHandler)
-	b.Handle(telebot.OnCallback, app.callbackRouter)
+	b.Handle(telebot.OnCallback, app.handleCallback)
 
 	b.Handle("/start", app.welcomeHandler)
 	b.Handle("/panel", app.statHandler)
@@ -122,7 +122,7 @@ func panicRecover(next telebot.HandlerFunc) telebot.HandlerFunc {
 	}
 }
 
-func (app *BotApplication) callbackRouter(c telebot.Context) error {
+func (app *BotApplication) handleCallback(c telebot.Context) error {
 	callback := c.Callback()
 	messageId := c.Callback().MessageID
 	if messageId == "" {
@@ -134,7 +134,11 @@ func (app *BotApplication) callbackRouter(c telebot.Context) error {
 	app.AllSessions.Mutex.Unlock()
 
 	if has_game {
-		return gameSession.GameState.CallbackHandler(c)
+		err := gameSession.GameState.CallBackRouter(c)
+		if err != nil {
+			return c.RespondText("خطا")
+		}
+		return nil
 	}
 	return c.RespondText("هیچی")
 }

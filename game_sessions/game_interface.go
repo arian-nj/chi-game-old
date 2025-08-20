@@ -9,7 +9,7 @@ import (
 
 type Game interface {
 	AddPlayer(name string, tgId int, socket *socket.Socket)
-	CallbackHandler(c telebot.Context) error
+	CallBackRouter(c telebot.Context) error
 	GetContext() context.Context
 	StartGame() error
 	SendJoinPanelAddSender(telebot.Context) error
