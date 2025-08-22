@@ -28,7 +28,7 @@ type XOGame struct { // of GameInterface type
 	CancelGame context.CancelFunc
 	Ctx        context.Context
 
-	Actions     []Action
+	Commands    []Command
 	Subscribers []XoSubscriber
 
 	mu sync.Mutex
@@ -60,29 +60,36 @@ func NewXOGame(
 
 		Queries: queries,
 
-		Actions:     []Action{},
+		Commands:    []Command{},
 		Subscribers: []XoSubscriber{},
 	}
 }
-
+func (game *XOGame) Find(telegramID int) *XoPlayer {
+	for _, p := range game.Players {
+		if telegramID == p.TelegramID {
+			return p
+		}
+	}
+	return nil
+}
 func (game *XOGame) Register(subscriber XoSubscriber) {
 	game.Subscribers = append(game.Subscribers, subscriber)
 }
 
-func (game *XOGame) PushAction(newAction Action) {
-	game.Actions = append(game.Actions, newAction)
+func (game *XOGame) PushCommand(newAction Command) {
+	game.Commands = append(game.Commands, newAction)
 }
 
-func (game *XOGame) InjectAction(newAction Action) {
-	game.Actions = append([]Action{newAction}, game.Actions...)
+func (game *XOGame) InjectCommand(newAction Command) {
+	game.Commands = append([]Command{newAction}, game.Commands...)
 }
-func (game *XOGame) PopAction() Action {
-	firstAction := game.Actions[0]
-	game.Actions = game.Actions[1:]
+func (game *XOGame) PopCommand() Command {
+	firstAction := game.Commands[0]
+	game.Commands = game.Commands[1:]
 	return firstAction
 }
 
-func (gs *XOGame) Apply(action Action) {
+func (gs *XOGame) Apply(action Command) {
 	gs.mu.Lock()
 	defer gs.mu.Unlock()
 
@@ -90,14 +97,14 @@ func (gs *XOGame) Apply(action Action) {
 	gs.Notify(action)
 }
 
-func (gs *XOGame) Notify(action Action) {
+func (gs *XOGame) Notify(command Command) {
 	for _, sub := range gs.Subscribers {
-		sub.Update(gs, action) // pass both state + action
+		sub.Update(gs, command) // pass both state + action
 	}
 }
 
-func (g *XOGame) AddPlayer(name string, tgId int, socket *socket.Socket) {
-	player := NewXoPlayer(name, tgId, socket)
+func (g *XOGame) AddPlayer(id int, name string, tgId int, socket *socket.Socket) {
+	player := NewXoPlayer(id, name, tgId, socket)
 	g.Players = append(g.Players, player)
 }
 
@@ -106,7 +113,7 @@ func (cg *XOGame) GetCurrentPlayer() *XoPlayer {
 }
 
 func (cg *XOGame) IsPlayersTurn(senderId int) bool {
-	return cg.GetCurrentPlayer().TgID == senderId
+	return cg.GetCurrentPlayer().TelegramID == senderId
 }
 
 func (cg *XOGame) GetOpponentPlayer() *XoPlayer {
@@ -132,7 +139,7 @@ func (cg *XOGame) GetContext() context.Context {
 
 func (g *XOGame) SetPlayerSocket(tgId int, socket *socket.Socket) {
 	for _, player := range g.Players {
-		if player.TgID == tgId {
+		if player.TelegramID == tgId {
 			player.Socket = socket
 			return
 		}
@@ -150,8 +157,8 @@ func (game *XOGame) StartGame() error {
 	game.Players[0].Move = X
 	game.Players[1].Move = O
 
-	startAction := NewStartAction()
-	game.PushAction(startAction)
+	startAction := NewStartCommand()
+	game.PushCommand(startAction)
 	// err = g.StartSocket()
 	// if err != nil {
 	// 	slog.Error("error starting game in web ", "error", err)
@@ -189,8 +196,8 @@ func (game *XOGame) MonitorTimeout() {
 		case <-game.Ctx.Done():
 			return
 		default:
-			if len(game.Actions) > 0 {
-				action := game.PopAction()
+			if len(game.Commands) > 0 {
+				action := game.PopCommand()
 				game.Apply(action)
 			}
 		}

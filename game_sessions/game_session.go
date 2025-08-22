@@ -92,7 +92,7 @@ func (gs *GameSession) StartGame() error {
 	}
 
 	for _, player := range gs.Players {
-		gs.GameState.AddPlayer(player.Name, player.TgID, player.Socket)
+		gs.GameState.AddPlayer(player.ID, player.Name, player.TgID, player.Socket)
 	}
 
 	return gs.GameState.StartGame()
@@ -114,11 +114,12 @@ func (gs *GameSession) AddPlayer(player *SessionPlayer) {
 func (gs *GameSession) MonitorGameSession(allSession *AllSession) {
 	for {
 		select {
-		case newSEvent := <-gs.MsgChnl:
-			switch newSEvent.Event.Type {
+		case newSessionEvent := <-gs.MsgChnl:
+			switch newSessionEvent.Event.Type {
 			case socket.ChatEventType:
-				gs.HandleWebChatMessage(newSEvent)
+				gs.HandleWebChatMessage(newSessionEvent)
 			case socket.GameEventType:
+				gs.GameState.SocketRouter(newSessionEvent.Event.Data, newSessionEvent.Player.ID)
 				// gs.SocketRouter()
 			}
 

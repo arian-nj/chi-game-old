@@ -1,16 +1,16 @@
 export type SessionSocketEvent = {
 	type: string;
-	data: any
+	data: GameAction | string
 }
 export type GameAction = {
 	action: string
 	adata: any
 }
 
-const ChatEventType = "chat"
-const GameEventType = "game"
+const ChatEventType = "chat" as const;
+const GameActionType = "game" as const;
 
-export class GameSessionSocket extends WebSocket {
+export class SessionSocket extends WebSocket {
 	HandleChatMessage: ((msg: SessionSocketEvent) => void) | null = null
 
 	HandleGameAction: ((msg: GameAction) => void) | null = null
@@ -27,7 +27,7 @@ export class GameSessionSocket extends WebSocket {
 				} else {
 					throw new Error("no chat handler is set")
 				}
-			} else if (json_data.type == GameEventType) {
+			} else if (json_data.type == GameActionType) {
 				if (this.HandleGameAction != null) {
 					this.HandleGameAction(json_data.data)
 				}
@@ -50,10 +50,18 @@ export class GameSessionSocket extends WebSocket {
 		};
 	}
 
-	SendChatMessage(messageData: string) {
-		const data = {
-			type: "chat",
-			data: messageData
+	SendChatMessage(text: string) {
+		const data: SessionSocketEvent = {
+			type: ChatEventType,
+			data: text,
+		}
+		const stringData = JSON.stringify(data)
+		this.send(stringData)
+	}
+	SendGameAction(gameAction: GameAction) {
+		const data: SessionSocketEvent = {
+			type: GameActionType,
+			data: gameAction,
 		}
 		const stringData = JSON.stringify(data)
 		this.send(stringData)

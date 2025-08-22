@@ -160,6 +160,7 @@ func (gv *GlobalVars) createRandomGame(gameType gametype.GameType, ticketOne *ma
 		}
 		newXoGame := xoconsole.NewXOGame(newGameSession.SessionCtx, gametype.XOGameType3X3, gv.Bot, gv.Queries)
 		newXoGame.Register(&tgListen)
+		newXoGame.Register(&xo.SocketListener{})
 		newGame = newXoGame
 
 	default:

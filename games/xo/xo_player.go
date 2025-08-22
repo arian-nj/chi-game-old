@@ -9,8 +9,9 @@ import (
 )
 
 type XoPlayer struct {
-	TgID int
-	Name string
+	ID         int
+	TelegramID int
+	Name       string
 
 	MessageID int
 
@@ -22,22 +23,23 @@ type XoPlayer struct {
 	Move Cell
 }
 
-func NewXoPlayer(name string, tgID int, socket *socket.Socket) *XoPlayer {
+func NewXoPlayer(id int, name string, tgID int, socket *socket.Socket) *XoPlayer {
 	if len(name) > 20 {
 		name = name[:20]
 		name += "..."
 	}
 	return &XoPlayer{
 		// Name: keybul.EscapeReserved(name),
-		Name: fmt.Sprintf("`%s`", name),
-		TgID: tgID,
+		ID:         id,
+		Name:       fmt.Sprintf("`%s`", name),
+		TelegramID: tgID,
 	}
 }
 
 func (p *XoPlayer) MessageSig() (string, int64) {
-	return strconv.Itoa(p.MessageID), int64(p.TgID)
+	return strconv.Itoa(p.MessageID), int64(p.TelegramID)
 }
 
 func (p *XoPlayer) Recipient() string {
-	return strconv.FormatInt(int64(p.TgID), 10)
+	return strconv.FormatInt(int64(p.TelegramID), 10)
 }

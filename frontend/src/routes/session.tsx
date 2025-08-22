@@ -4,7 +4,7 @@ import { useQuery } from '@tanstack/react-query';
 import { GetBaseUrl } from '../lib/baseURL';
 import { authBeforeLoad, GetJwtToken } from '../lib/auth';
 import { Chat } from '../components/Chat/Chat';
-import { GameSessionSocket } from '../lib/SessionWs';
+import { SessionSocket } from '../lib/SessionWs';
 import XoGame from '../components/XoGame/XOGame';
 
 export const Route = createFileRoute('/session')({
@@ -15,7 +15,7 @@ export const Route = createFileRoute('/session')({
 function RouteComponent() {
 	const sessionAPIUrl = GetBaseUrl() + "/api/session/" + "?auth_token=" + GetJwtToken()
 
-	const socketRef = useRef<GameSessionSocket | null>(null)
+	const socketRef = useRef<SessionSocket | null>(null)
 	const [isSocketReady, setSocketReady] = useState(false)
 
 	const { isPending, error, isSuccess } = useQuery({
@@ -34,7 +34,7 @@ function RouteComponent() {
 
 	useEffect(() => {
 		if (socketRef.current != null) { return }
-		const socket = new GameSessionSocket(sessionAPIUrl)
+		const socket = new SessionSocket(sessionAPIUrl)
 		socket.onopen = () => {
 			console.log("WebSocket connection established");
 			setSocketReady(true)
@@ -57,9 +57,9 @@ function RouteComponent() {
 	return (
 		<div className="w-screen h-screen overflow-hidden relative bg-green-200 flex items-center justify-center">
 			<div className='items-center'>
-				<XoGame socketRef={socketRef as RefObject<GameSessionSocket>} />
+				<XoGame socketRef={socketRef as RefObject<SessionSocket>} />
 			</div>
-			<Chat socketRef={socketRef as RefObject<GameSessionSocket>} />
+			<Chat socketRef={socketRef as RefObject<SessionSocket>} />
 		</div>
 	)
 }

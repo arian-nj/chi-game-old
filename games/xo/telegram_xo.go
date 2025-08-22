@@ -18,20 +18,20 @@ type TelegramListener struct {
 	ViaMessageId string // Via Bots
 }
 
-func (tg *TelegramListener) Update(game *XOGame, action Action) {
-	switch a := action.(type) {
-	case *PlayAction:
+func (tg *TelegramListener) Update(game *XOGame, command Command) {
+	switch c := command.(type) {
+	case *PlayCommand:
 		tg.EditDuringGameBoard(game)
-	case *StartAction:
+	case *StartCommand:
 		tg.EditDuringGameBoard(game)
-	case *EndGameAction:
-		if a.Winner == nil {
+	case *EndGameCommand:
+		if c.Winner == nil {
 			err := tg.TieGame(game)
 			if err != nil {
 				slog.Error("tie failed", "error", err)
 			}
 		} else {
-			err := tg.TheEnd(game, a.Winner, a.Text)
+			err := tg.TheEnd(game, c.Winner, c.Text)
 			if err != nil {
 				slog.Error("the end failed", "error", err)
 			}
@@ -121,8 +121,12 @@ func (game *XOGame) XOPlayHandler(c telebot.Context, callbackData string) error 
 		return c.RespondText(errMsg)
 	}
 
-	playAction := NewPlayAction(cellIndex, moveType)
-	game.PushAction(playAction)
+	player := game.Find(int(sender.ID))
+	if player == nil {
+		return c.RespondText("can't find player")
+	}
+	playCommand := NewPlayCommand(cellIndex, moveType, player.ID)
+	game.PushCommand(playCommand)
 	return nil
 }
 
