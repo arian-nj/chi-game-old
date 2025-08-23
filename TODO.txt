@@ -116,6 +116,7 @@
 [X] Command - observer telegram working
 [X] init protobuff
 [ ] finder socket us buff
+[ ] chat protobuff
 [ ] websocket use protobuff
 [ ] play game web
 [ ] rejoin game web

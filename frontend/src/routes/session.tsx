@@ -5,7 +5,7 @@ import { GetBaseUrl } from '../lib/baseURL';
 import { authBeforeLoad, GetJwtToken } from '../lib/auth';
 import { Chat } from '../components/Chat/Chat';
 import { SessionSocket } from '../lib/SessionWs';
-import XoGame from '../components/XoGame/XOGame';
+import XoGame from '../games/XO/XoGame';
 
 export const Route = createFileRoute('/session')({
 	component: RouteComponent,

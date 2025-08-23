@@ -69,14 +69,14 @@ func (mm *MatchMaking) HasTicket(tgUserID int) bool {
 
 }
 
-func (mm *MatchMaking) AddTicket(newTicket *Ticket) {
+func (mm *MatchMaking) PushTicket(newTicket *Ticket) {
 	mm.Mutex.Lock()
 	defer mm.Mutex.Unlock()
 
 	queue := mm.WaitingPlayers[newTicket.GameType]
 	mm.WaitingPlayers[newTicket.GameType] = append(queue, newTicket)
 }
-func (mm *MatchMaking) RemovePlayerFromMatchMaking(tgUserID int) bool {
+func (mm *MatchMaking) RemovePlayerTicket(tgUserID int) bool {
 	mm.Mutex.Lock()
 	defer mm.Mutex.Unlock()
 

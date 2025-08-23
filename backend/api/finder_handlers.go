@@ -6,10 +6,12 @@ import (
 	"net/http"
 	"time"
 
+	finderv1 "github.com/arian-nj/chibazi/gen/finder/v1"
 	gametype "github.com/arian-nj/chibazi/internals/game_type"
 	"github.com/arian-nj/chibazi/internals/socket"
 	matchmaking "github.com/arian-nj/chibazi/match_making"
 	"github.com/coder/websocket"
+	"google.golang.org/protobuf/proto"
 )
 
 func (app *ApiApplication) makeMatchMakingTicket(w http.ResponseWriter, r *http.Request) {
@@ -46,22 +48,41 @@ func (app *ApiApplication) makeMatchMakingTicket(w http.ResponseWriter, r *http.
 	socketClient.Listen(r)
 
 	NewTicket := matchmaking.NewTicket("Player Name", tgUser.ID, tgUser.TgID, gametype.XOGameType3X3)
-	app.MatchMaking.AddTicket(NewTicket)
-	defer app.MatchMaking.RemovePlayerFromMatchMaking(tgUser.TgID)
+	app.MatchMaking.PushTicket(NewTicket)
+	defer app.MatchMaking.RemovePlayerTicket(tgUser.TgID) // remove in case of error or canceling
 
-	socketClient.SendNewEvent(socket.FinderEventType, socket.FMAdded)
+	addEvent := finderv1.FinderEvent{
+		Type: finderv1.FinderType_FINDER_TYPE_ADDED,
+	}
+	err = socketClient.SendMessage(&addEvent)
+	if err != nil {
+		slog.Error("", "error", err)
+	}
 
 	ticker := time.NewTicker(time.Second * 30)
 
 	for {
 		select {
 		case <-NewTicket.MatchFoundChan:
-			socketClient.SendNewEvent(socket.FinderEventType, socket.FMFound)
+			foundEvent := finderv1.FinderEvent{
+				Type: finderv1.FinderType_FINDER_TYPE_FOUND,
+			}
+			socketClient.SendMessage(&foundEvent)
 			return
 		case <-ticker.C:
-			socketClient.SendNewEvent(socket.FinderEventType, socket.FMTimeout)
-		case newEvent := <-socketClient.EventChan:
-			if newEvent.Type == socket.FinderEventType && string(newEvent.Data) == socket.FMCancel {
+			timeoutEvent := finderv1.FinderEvent{
+				Type: finderv1.FinderType_FINDER_TYPE_TIMEOUT,
+			}
+			socketClient.SendMessage(&timeoutEvent)
+			return // removed by defer
+		case newEventByte := <-socketClient.EventChan:
+			newEvent := &finderv1.FinderEvent{}
+			err := proto.Unmarshal(newEventByte, newEvent)
+			if err != nil {
+				slog.Error("can't unmarshal finder incoming event")
+				continue
+			}
+			if newEvent.Type == finderv1.FinderType_FINDER_TYPE_CANCEL {
 				slog.Info("Cancelling")
 				return
 			}

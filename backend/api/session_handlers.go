@@ -62,8 +62,9 @@ func (app *ApiApplication) gameSessionWS(w http.ResponseWriter, r *http.Request)
 		case <-socketClient.Ctx.Done():
 			slog.Info("socket context cancelled", "addr", r.RemoteAddr)
 			return
-		case newEvent := <-sessionPlayer.Socket.EventChan:
-			gameSession.MsgChnl <- gamesessions.NewSessionEvent(sessionPlayer, newEvent)
+		case <-sessionPlayer.Socket.EventChan:
+			slog.Error("session_handler event is no handled it's btyes")
+			// gameSession.MsgChnl <- gamesessions.NewSessionEvent(sessionPlayer, newEvent)
 
 		}
 	}

@@ -3,6 +3,7 @@ package socket
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"log/slog"
 	"net/http"
 	"time"
@@ -10,6 +11,7 @@ import (
 	"github.com/arian-nj/chibazi/internals/utils"
 	"github.com/coder/websocket"
 	"golang.org/x/time/rate"
+	"google.golang.org/protobuf/proto"
 )
 
 type Socket struct {
@@ -19,7 +21,7 @@ type Socket struct {
 
 	Ctx       context.Context
 	Cancel    context.CancelFunc
-	EventChan chan *SocketEvent
+	EventChan chan []byte
 }
 
 func NewSocketClient(conn *websocket.Conn) *Socket {
@@ -29,7 +31,7 @@ func NewSocketClient(conn *websocket.Conn) *Socket {
 		limiter:   rate.NewLimiter(rate.Every(time.Millisecond*100), 10),
 		Ctx:       ctx,
 		Cancel:    cancel,
-		EventChan: make(chan *SocketEvent, 16),
+		EventChan: make(chan []byte, 16),
 	}
 }
 
@@ -59,17 +61,20 @@ func (sc *Socket) listen(r *http.Request) {
 			}
 			return
 		}
-		newEvent := &SocketEvent{}
-		err = json.Unmarshal(messageByte, newEvent)
-		if err != nil {
-			slog.Error("can't marshal websocket event", "error", err)
-		} else {
-			sc.EventChan <- newEvent
-		}
+		sc.EventChan <- messageByte
 	}
 }
 
-func (sc *Socket) Write(text string) error {
+func (sc *Socket) SendMessage(message proto.Message) error {
+	out, err := proto.Marshal(message)
+	if err != nil {
+		return fmt.Errorf("can't marshal proto message %w", err)
+	}
+	return sc.Conn.Write(sc.Ctx, websocket.MessageBinary, out)
+
+}
+
+func (sc *Socket) WriteText(text string) error {
 	return sc.Conn.Write(sc.Ctx, websocket.MessageText, []byte(text))
 }
 

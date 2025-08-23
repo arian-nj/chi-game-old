@@ -1,0 +1,15 @@
+syntax = "proto3";
+
+package finder.v1;
+
+enum FinderType {
+  FINDER_TYPE_UNSPECIFIED = 0;
+  FINDER_TYPE_ADDED = 1;
+  FINDER_TYPE_FOUND = 2;
+  FINDER_TYPE_TIMEOUT = 3;
+  FINDER_TYPE_CANCEL = 4;
+}
+
+message FinderEvent {
+  FinderType type = 1;
+}

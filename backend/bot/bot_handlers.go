@@ -141,7 +141,7 @@ func (app *BotApplication) PlayRandomGameHandler(c telebot.Context, gameType gam
 		return c.Send("بازی قبلیت باید تموم بشه")
 	}
 
-	if app.MatchMaking.RemovePlayerFromMatchMaking(int(sender.ID)) {
+	if app.MatchMaking.RemovePlayerTicket(int(sender.ID)) {
 		text += "قبلیو لغو کردم\n"
 	}
 
@@ -152,7 +152,7 @@ func (app *BotApplication) PlayRandomGameHandler(c telebot.Context, gameType gam
 	}
 
 	newTicket := matchmaking.NewTicket(sender.FirstName, personRow.ID, int(sender.ID), gameType)
-	app.MatchMaking.AddTicket(newTicket)
+	app.MatchMaking.PushTicket(newTicket)
 
 	select {
 	case <-newTicket.MatchFoundChan:
@@ -186,7 +186,7 @@ func (app *BotApplication) CancelSearchingForGame(c telebot.Context) error {
 	app.MatchMaking.Mutex.Lock()
 	defer app.MatchMaking.Mutex.Unlock()
 
-	app.MatchMaking.RemovePlayerFromMatchMaking(int(c.Sender().ID))
+	app.MatchMaking.RemovePlayerTicket(int(c.Sender().ID))
 	return c.Send("لغوش کردم 😔", WhatRandomGameReplyKeyboard)
 }
 

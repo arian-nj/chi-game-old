@@ -4,6 +4,8 @@ import EyesAnimation from '../assets/lottie/Eyes.lottie';
 import { useEffect, useRef } from 'react';
 import { authBeforeLoad, GetJwtToken } from '../lib/auth';
 import { GetBaseUrl } from '../lib/baseURL';
+import { create, fromBinary, toBinary } from '@bufbuild/protobuf';
+import { FinderEventSchema, FinderType } from '../gen/finder/v1/finder_pb';
 
 export const Route = createFileRoute('/finder')({
 	component: FinderRouteComponent,
@@ -14,29 +16,12 @@ class FinderSocket extends WebSocket {
 	constructor() {
 		const url = GetBaseUrl() + "/api/match_making/ticket/?auth_token=" + GetJwtToken()
 		super(url, [])
+		this.binaryType = 'arraybuffer'
 	}
-
-	SendMessage(message: FinderMessageValue) {
-		const msg_obj = {
-			type: "finder",
-			data: message
-		}
-		const msg = JSON.stringify(msg_obj)
-		console.log("sending " + msg)
-		this.send(msg)
+	SendMessage() {
 	}
 }
 
-const FinderMessages = {
-	Added: "added",
-	Found: "found",
-	Timeout: "timeout",
-	Cancel: "cancel"
-}
-
-export type FinderMessage = keyof typeof FinderMessages;
-
-export type FinderMessageValue = (typeof FinderMessages)[keyof typeof FinderMessages];
 
 function FinderRouteComponent() {
 	const socketRef = useRef<FinderSocket | null>(null)
@@ -52,17 +37,14 @@ function FinderRouteComponent() {
 		newSocket.onopen = () => {
 			console.log("WebSocket connection established");
 		};
-		newSocket.onmessage = async (event: MessageEvent) => {
-			const text = await event.data.text()
-			const json_data = await JSON.parse(text)
-			console.log(json_data)
-			if (json_data?.type == "finder" && json_data?.data) {
-				const data = json_data.data
-				if (data == FinderMessages.Found) {
-					router.navigate({ to: "/session" });
-				} else if (data == FinderMessages.Timeout) {
-					router.navigate({ to: "/" })
-				}
+		newSocket.onmessage = async (msg) => {
+			const data = new Uint8Array(msg.data)
+			const newFinderEvent = fromBinary(FinderEventSchema, data)
+			console.log(newFinderEvent)
+			if (newFinderEvent.type == FinderType.FOUND) {
+				router.navigate({ to: "/session" });
+			} else if (newFinderEvent.type == FinderType.TIMEOUT) {
+				router.navigate({ to: "/" })
 			}
 		}
 		newSocket.onclose = (event) => {
@@ -79,14 +61,16 @@ function FinderRouteComponent() {
 		};
 
 
-		// return () => newSocket.close(1000, "Client finished work")
 	}, [router])
 
 	function cancelClicked() {
 
 
 		if (socketRef.current) {
-			socketRef.current.SendMessage(FinderMessages.Cancel)
+			// socketRef.current.SendMessage(FinderMessages.Cancel)
+			const finderEvent = create(FinderEventSchema, { type: FinderType.CANCEL })
+			const byte = toBinary(FinderEventSchema, finderEvent)
+			socketRef.current.send(byte)
 			socketRef.current.close()
 		}
 		router.navigate({ to: "/" })
@@ -104,20 +88,9 @@ function FinderRouteComponent() {
 				...دنبال حریفم
 			</h1>
 
-			{/* <div className="flex-grow"></div> */}
 			<button
 				onClick={cancelClicked}
 				className='w-24 text-3xl font-bold text-gray-500' >لغو</button>
 		</div>
 	)
 }
-// function FinderRouteComponent() {
-// 	return <div className='flex justify-center items-center h-screen'>
-// 		<DotLottieReact src={EyesAnimation} loop autoplay
-// 			className='w-40'
-// 		/>
-// 		<h1
-// 			className='text-2xl font-bold'
-// 		>Hello "/finder"!</h1>
-// 	</div>
-// }
