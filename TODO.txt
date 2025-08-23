@@ -114,6 +114,9 @@
 [X] see game web
 [X] make all xo board index not x y
 [X] Command - observer telegram working
+[X] init protobuff
+[ ] finder socket us buff
+[ ] websocket use protobuff
 [ ] play game web
 [ ] rejoin game web
 [ ] timer 

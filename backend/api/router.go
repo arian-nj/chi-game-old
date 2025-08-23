@@ -4,7 +4,6 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/arian-nj/chibazi/frontend"
 	"github.com/arian-nj/chibazi/internals/config"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/cors"
@@ -13,7 +12,6 @@ import (
 var CORS_PATTERNS = []string{"http://localhost:5173", "https://localhost:5173", "localhost:5173"}
 
 func (app *ApiApplication) createRouter() *chi.Mux {
-	distFS := frontend.GetDistFS()
 	mux := chi.NewMux()
 
 	if app.Config.ReleaseMode == config.Develop {
@@ -32,8 +30,6 @@ func (app *ApiApplication) createRouter() *chi.Mux {
 		mux.Post("/api/auth/validate-dummy/", app.dummyValidate)
 	}
 	// mux.Get("/api/auth/me/", app.getMe)
-
-	mux.Handle("/web/*", http.StripPrefix("/web/", http.FileServerFS(distFS)))
 
 	mux.Group(func(authHRouter chi.Router) {
 		authHRouter.Use(app.Authenticate)

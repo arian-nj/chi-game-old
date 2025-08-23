@@ -13,7 +13,9 @@ BASE_LOCATION=$(pwd)
 
 generate_sqlc() {
 	echo "Generating..."
+	cd ./backend/
 	sqlc generate
+	cd ..
 	echo "OK"	
 }
 
@@ -37,8 +39,9 @@ case $COMMAND in
 	run)
 		generate_sqlc
 		echo "Starting Core API"
+		cd ./backend/
 		go run ./cmd/bot/.
-
+		cd ..
 		echo "The End"
 		;;
 
