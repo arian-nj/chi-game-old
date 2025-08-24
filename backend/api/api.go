@@ -7,10 +7,10 @@ import (
 	"sync"
 	"time"
 
-	"github.com/arian-nj/chibazi/database"
-	gamesessions "github.com/arian-nj/chibazi/game_sessions"
-	"github.com/arian-nj/chibazi/internals/config"
-	matchmaking "github.com/arian-nj/chibazi/match_making"
+	"github.com/arian-nj/chibazi/backend/database"
+	gamesessions "github.com/arian-nj/chibazi/backend/game_sessions"
+	"github.com/arian-nj/chibazi/backend/internals/config"
+	matchmaking "github.com/arian-nj/chibazi/backend/match_making"
 )
 
 type ApiApplication struct {

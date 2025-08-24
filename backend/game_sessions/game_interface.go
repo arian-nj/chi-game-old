@@ -4,7 +4,7 @@ import (
 	"context"
 	"encoding/json"
 
-	"github.com/arian-nj/chibazi/internals/socket"
+	"github.com/arian-nj/chibazi/backend/internals/socket"
 	"gopkg.in/telebot.v4"
 )
 

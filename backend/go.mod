@@ -1,4 +1,4 @@
-module github.com/arian-nj/chibazi
+module github.com/arian-nj/chibazi/backend
 
 go 1.24.3
 

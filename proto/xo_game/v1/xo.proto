@@ -2,6 +2,8 @@ syntax = "proto3";
 
 package xo_game.v1;
 
+option go_package = "backend/gen/xo_game/v1;xogamev1";
+
 message Move {
   int32 player_id = 1;
   int32 cell_index = 2;

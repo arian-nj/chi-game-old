@@ -14,9 +14,9 @@ import (
 	"strings"
 	"time"
 
-	"github.com/arian-nj/chibazi/database"
-	"github.com/arian-nj/chibazi/pkg/request"
-	"github.com/arian-nj/chibazi/pkg/response"
+	"github.com/arian-nj/chibazi/backend/database"
+	"github.com/arian-nj/chibazi/backend/pkg/request"
+	"github.com/arian-nj/chibazi/backend/pkg/response"
 	"github.com/golang-jwt/jwt/v5"
 )
 

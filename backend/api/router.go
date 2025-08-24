@@ -4,7 +4,7 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/arian-nj/chibazi/internals/config"
+	"github.com/arian-nj/chibazi/backend/internals/config"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/cors"
 )

@@ -4,9 +4,9 @@ import (
 	"sync"
 	"time"
 
-	"github.com/arian-nj/chibazi/database"
-	gamesessions "github.com/arian-nj/chibazi/game_sessions"
-	gametype "github.com/arian-nj/chibazi/internals/game_type"
+	"github.com/arian-nj/chibazi/backend/database"
+	gamesessions "github.com/arian-nj/chibazi/backend/game_sessions"
+	gametype "github.com/arian-nj/chibazi/backend/internals/game_type"
 )
 
 type MatchMaking struct {

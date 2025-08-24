@@ -12,6 +12,22 @@ import type { XoGameMessage } from "../../xo_game/v1/xo_pb";
 export declare const file_session_v1_session: GenFile;
 
 /**
+ * @generated from message session.v1.ChatMessageRequest
+ */
+export declare type ChatMessageRequest = Message<"session.v1.ChatMessageRequest"> & {
+  /**
+   * @generated from field: string text = 1;
+   */
+  text: string;
+};
+
+/**
+ * Describes the message session.v1.ChatMessageRequest.
+ * Use `create(ChatMessageRequestSchema)` to create a new message.
+ */
+export declare const ChatMessageRequestSchema: GenMessage<ChatMessageRequest>;
+
+/**
  * @generated from message session.v1.ChatMessage
  */
 export declare type ChatMessage = Message<"session.v1.ChatMessage"> & {
@@ -69,7 +85,13 @@ export declare type SessionMessage = Message<"session.v1.SessionMessage"> & {
     case: "chat";
   } | {
     /**
-     * @generated from field: session.v1.GameMessage game = 2;
+     * @generated from field: session.v1.ChatMessageRequest chat_req = 2;
+     */
+    value: ChatMessageRequest;
+    case: "chatReq";
+  } | {
+    /**
+     * @generated from field: session.v1.GameMessage game = 3;
      */
     value: GameMessage;
     case: "game";

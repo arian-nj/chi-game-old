@@ -7,11 +7,11 @@ import (
 	"strings"
 	"time"
 
-	"github.com/arian-nj/chibazi/database"
-	dotbox "github.com/arian-nj/chibazi/internals/dot_box"
-	gametype "github.com/arian-nj/chibazi/internals/game_type"
-	keybul "github.com/arian-nj/chibazi/internals/keybul"
-	"github.com/arian-nj/chibazi/internals/random"
+	"github.com/arian-nj/chibazi/backend/database"
+	dotbox "github.com/arian-nj/chibazi/backend/internals/dot_box"
+	gametype "github.com/arian-nj/chibazi/backend/internals/game_type"
+	keybul "github.com/arian-nj/chibazi/backend/internals/keybul"
+	"github.com/arian-nj/chibazi/backend/internals/random"
 	"gopkg.in/telebot.v4"
 )
 

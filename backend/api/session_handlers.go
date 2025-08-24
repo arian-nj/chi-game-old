@@ -6,11 +6,13 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/arian-nj/chibazi/database"
-	gamesessions "github.com/arian-nj/chibazi/game_sessions"
-	"github.com/arian-nj/chibazi/internals/socket"
-	"github.com/arian-nj/chibazi/pkg/response"
+	"github.com/arian-nj/chibazi/backend/database"
+	gamesessions "github.com/arian-nj/chibazi/backend/game_sessions"
+	sessionv1 "github.com/arian-nj/chibazi/backend/gen/session/v1"
+	"github.com/arian-nj/chibazi/backend/internals/socket"
+	"github.com/arian-nj/chibazi/backend/pkg/response"
 	"github.com/coder/websocket"
+	"google.golang.org/protobuf/proto"
 )
 
 func (app *ApiApplication) gameSessionWS(w http.ResponseWriter, r *http.Request) {
@@ -62,9 +64,14 @@ func (app *ApiApplication) gameSessionWS(w http.ResponseWriter, r *http.Request)
 		case <-socketClient.Ctx.Done():
 			slog.Info("socket context cancelled", "addr", r.RemoteAddr)
 			return
-		case <-sessionPlayer.Socket.EventChan:
-			// gameSession.MsgChnl <- gamesessions.NewSessionEvent(sessionPlayer, newEvent)
-
+		case newMsgBytes := <-sessionPlayer.Socket.EventChan:
+			newSessionMsg := &sessionv1.SessionMessage{}
+			err := proto.Unmarshal(newMsgBytes, newSessionMsg)
+			if err != nil {
+				slog.Error("can't unmarshal session msg", "error", err)
+				continue
+			}
+			gameSession.MsgChnl <- gamesessions.NewSessionEvent(sessionPlayer, newSessionMsg)
 		}
 	}
 }

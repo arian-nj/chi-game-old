@@ -5,9 +5,10 @@ import (
 	"fmt"
 	"log/slog"
 
-	"github.com/arian-nj/chibazi/database"
-	"github.com/arian-nj/chibazi/internals/socket"
-	"github.com/arian-nj/chibazi/internals/utils"
+	"github.com/arian-nj/chibazi/backend/database"
+	sessionv1 "github.com/arian-nj/chibazi/backend/gen/session/v1"
+	"github.com/arian-nj/chibazi/backend/internals/socket"
+	"github.com/arian-nj/chibazi/backend/internals/utils"
 	"gopkg.in/telebot.v4"
 )
 
@@ -56,17 +57,17 @@ func (gs *GameSession) HandleBotChatMessage(bot telebot.API, senderID int, messa
 	return nil
 }
 
-func (gs *GameSession) HandleWebChatMessage(newSessionEvent *SessionEvent) {
+func (gs *GameSession) HandleWebChatMessage(sessionPlayer *SessionPlayer, chatMsgReq *sessionv1.ChatMessageRequest) {
 	if !gs.Chat.IsOn {
 		return
 	}
 
-	messageText := newSessionEvent.Event.Data
+	messageText := chatMsgReq.Text
 	if len(messageText) > 256 {
 		slog.Error("message is to long")
 		return
 	}
-	senderID := newSessionEvent.Player.TgID
+	senderID := sessionPlayer.TgID
 
 	var senderPlayer *SessionPlayer
 	var recieverPlayer *SessionPlayer
@@ -80,7 +81,15 @@ func (gs *GameSession) HandleWebChatMessage(newSessionEvent *SessionEvent) {
 	}
 
 	if recieverPlayer.Socket != nil {
-		err := recieverPlayer.Socket.SendNewEvent(socket.ChatEventType, messageText)
+		newChatMsg := &sessionv1.SessionMessage{
+			Content: &sessionv1.SessionMessage_Chat{
+				Chat: &sessionv1.ChatMessage{
+					PlayerId: int32(senderPlayer.ID),
+					Text:     messageText,
+				},
+			},
+		}
+		err := recieverPlayer.Socket.SendMessage(newChatMsg)
 		if err != nil {
 			slog.Error("error seding message to socket", "error", err)
 		}

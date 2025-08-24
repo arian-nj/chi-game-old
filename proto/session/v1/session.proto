@@ -4,6 +4,10 @@ package session.v1;
 
 import "xo_game/v1/xo.proto";
 
+message ChatMessageRequest {
+  string text = 1;
+}
+
 message ChatMessage {
   int32 player_id = 1;
   string text = 2;
@@ -18,6 +22,7 @@ message GameMessage {
 message SessionMessage {
   oneof content {
     ChatMessage chat = 1;
-    GameMessage game = 2;
+    ChatMessageRequest chat_req = 2;
+    GameMessage game = 3;
   }
 }

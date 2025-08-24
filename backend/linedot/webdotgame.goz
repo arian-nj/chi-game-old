@@ -4,8 +4,8 @@ import (
 	"errors"
 	"fmt"
 
-	gametype "github.com/arian-nj/chibazi/internals/game_type"
-	keybul "github.com/arian-nj/chibazi/internals/keybul"
+	gametype "github.com/arian-nj/chibazi/backend/internals/game_type"
+	keybul "github.com/arian-nj/chibazi/backend/internals/keybul"
 	"gopkg.in/telebot.v4"
 )
 

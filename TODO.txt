@@ -115,9 +115,9 @@
 [X] make all xo board index not x y
 [X] Command - observer telegram working
 [X] init protobuff
-[ ] finder socket us buff
-[ ] chat protobuff
-[ ] websocket use protobuff
+[X] finder socket us buff
+[X] chat protobuff
+[ ] xo websocket use protobuff
 [ ] play game web
 [ ] rejoin game web
 [ ] timer 

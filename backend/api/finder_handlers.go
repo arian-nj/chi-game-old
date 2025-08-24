@@ -6,10 +6,10 @@ import (
 	"net/http"
 	"time"
 
-	finderv1 "github.com/arian-nj/chibazi/gen/finder/v1"
-	gametype "github.com/arian-nj/chibazi/internals/game_type"
-	"github.com/arian-nj/chibazi/internals/socket"
-	matchmaking "github.com/arian-nj/chibazi/match_making"
+	finderv1 "github.com/arian-nj/chibazi/backend/gen/finder/v1"
+	gametype "github.com/arian-nj/chibazi/backend/internals/game_type"
+	"github.com/arian-nj/chibazi/backend/internals/socket"
+	matchmaking "github.com/arian-nj/chibazi/backend/match_making"
 	"github.com/coder/websocket"
 	"google.golang.org/protobuf/proto"
 )

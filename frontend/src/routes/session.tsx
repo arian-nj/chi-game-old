@@ -40,7 +40,7 @@ function RouteComponent() {
 			setSocketReady(true)
 		}
 		socketRef.current = socket
-	}, [isSuccess])
+	}, [isSuccess, sessionAPIUrl])
 
 	if (isPending) {
 		return <h1 className="text-center py-2">Pending...</h1>

@@ -1,13 +1,15 @@
 package gamesessions
 
-import "github.com/arian-nj/chibazi/internals/socket"
+import (
+	sessionv1 "github.com/arian-nj/chibazi/backend/gen/session/v1"
+)
 
 type SessionEvent struct {
 	Player *SessionPlayer
-	Event  *socket.SocketEvent
+	Event  *sessionv1.SessionMessage
 }
 
-func NewSessionEvent(player *SessionPlayer, event *socket.SocketEvent) *SessionEvent {
+func NewSessionEvent(player *SessionPlayer, event *sessionv1.SessionMessage) *SessionEvent {
 	return &SessionEvent{
 		Player: player,
 		Event:  event,

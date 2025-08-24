@@ -8,10 +8,11 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/arian-nj/chibazi/database"
-	"github.com/arian-nj/chibazi/internals/keybul"
-	"github.com/arian-nj/chibazi/internals/socket"
-	"github.com/arian-nj/chibazi/internals/utils"
+	"github.com/arian-nj/chibazi/backend/database"
+	sessionv1 "github.com/arian-nj/chibazi/backend/gen/session/v1"
+	"github.com/arian-nj/chibazi/backend/internals/keybul"
+	"github.com/arian-nj/chibazi/backend/internals/socket"
+	"github.com/arian-nj/chibazi/backend/internals/utils"
 	"gopkg.in/telebot.v4"
 )
 
@@ -115,11 +116,11 @@ func (gs *GameSession) MonitorGameSession(allSession *AllSession) {
 	for {
 		select {
 		case newSessionEvent := <-gs.MsgChnl:
-			switch newSessionEvent.Event.Type {
-			case socket.ChatEventType:
-				gs.HandleWebChatMessage(newSessionEvent)
-			case socket.GameEventType:
-				gs.GameState.SocketRouter(newSessionEvent.Event.Data, newSessionEvent.Player.ID)
+			switch newSessionEvent.Event.Content.(type) {
+			case *sessionv1.SessionMessage_ChatReq:
+				gs.HandleWebChatMessage(newSessionEvent.Player, newSessionEvent.Event.GetChatReq())
+				// case socket.GameEventType:
+				// gs.GameState.SocketRouter(newSessionEvent.Event.Data, newSessionEvent.Player.ID)
 				// gs.SocketRouter()
 			}
 

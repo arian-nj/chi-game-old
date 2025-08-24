@@ -6,11 +6,11 @@ import (
 	"log/slog"
 	"time"
 
-	"github.com/arian-nj/chibazi/database"
-	gamesessions "github.com/arian-nj/chibazi/game_sessions"
-	"github.com/arian-nj/chibazi/games/xo"
-	gametype "github.com/arian-nj/chibazi/internals/game_type"
-	"github.com/arian-nj/chibazi/internals/keybul"
+	"github.com/arian-nj/chibazi/backend/database"
+	gamesessions "github.com/arian-nj/chibazi/backend/game_sessions"
+	"github.com/arian-nj/chibazi/backend/games/xo"
+	gametype "github.com/arian-nj/chibazi/backend/internals/game_type"
+	"github.com/arian-nj/chibazi/backend/internals/keybul"
 	"gopkg.in/telebot.v4"
 )
 

@@ -7,7 +7,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/arian-nj/chibazi/internals/keybul"
+	"github.com/arian-nj/chibazi/backend/internals/keybul"
 	"gopkg.in/telebot.v4"
 )
 

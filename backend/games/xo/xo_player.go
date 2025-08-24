@@ -5,7 +5,7 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/arian-nj/chibazi/internals/socket"
+	"github.com/arian-nj/chibazi/backend/internals/socket"
 )
 
 type XoPlayer struct {

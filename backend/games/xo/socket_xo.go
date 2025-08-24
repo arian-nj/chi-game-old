@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"log/slog"
 
-	"github.com/arian-nj/chibazi/internals/socket"
+	"github.com/arian-nj/chibazi/backend/internals/socket"
 )
 
 // FIXME: make it map handler with auto Converting inputs

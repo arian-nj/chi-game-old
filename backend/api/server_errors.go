@@ -8,8 +8,8 @@ import (
 	"runtime/debug"
 	"strings"
 
-	"github.com/arian-nj/chibazi/pkg/response"
-	"github.com/arian-nj/chibazi/pkg/validator"
+	"github.com/arian-nj/chibazi/backend/pkg/response"
+	"github.com/arian-nj/chibazi/backend/pkg/validator"
 )
 
 func (app *ApiApplication) ReportServerError(r *http.Request, err error) {

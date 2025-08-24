@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { SessionSocket, type SessionSocketEvent } from "../../lib/SessionWs";
+import { SessionSocket } from "../../lib/SessionWs";
 import { fetchWithAuth, GetMe } from "../../lib/auth";
 import { useQuery } from "@tanstack/react-query";
 import { ChatBubble } from "./ChatBubble";
@@ -55,10 +55,10 @@ export function Chat({ socketRef }: ChatProps) {
 	if (error) return <h1>error Me {String(error)}</h1>;
 
 	// Receive new message from socket
-	const receiveMessage = (se: SessionSocketEvent) => {
-		setMessages(prev => [...prev, new Message(se.data, 0)]);
+	socketRef.current.HandleChatMessage = (chatMessage) => {
+		setMessages(prev => [...prev, new Message(chatMessage.text, chatMessage.playerId)]);
 	};
-	socketRef.current.HandleChatMessage = receiveMessage;
+
 
 	// Send message
 	const sendMessage = (message: string) => {

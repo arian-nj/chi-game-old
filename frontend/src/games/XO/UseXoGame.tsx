@@ -13,7 +13,7 @@ export function useXoGame(
 	const [lastPlayed, setLastPlayed] = useState<number | null>(null);
 
 	useEffect(() => {
-		socketRef.current.HandleGameAction = (gameAction) => {
+		socketRef.current.HandleGameMessage = (gameAction) => {
 			console.log(gameAction)
 			switch (gameAction.action) {
 				case MoveActionType:

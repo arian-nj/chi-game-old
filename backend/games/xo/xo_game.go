@@ -5,11 +5,11 @@ import (
 	"sync"
 	"time"
 
-	"github.com/arian-nj/chibazi/database"
-	gametype "github.com/arian-nj/chibazi/internals/game_type"
-	"github.com/arian-nj/chibazi/internals/random"
-	"github.com/arian-nj/chibazi/internals/socket"
-	"github.com/arian-nj/chibazi/internals/utils"
+	"github.com/arian-nj/chibazi/backend/database"
+	gametype "github.com/arian-nj/chibazi/backend/internals/game_type"
+	"github.com/arian-nj/chibazi/backend/internals/random"
+	"github.com/arian-nj/chibazi/backend/internals/socket"
+	"github.com/arian-nj/chibazi/backend/internals/utils"
 	"gopkg.in/telebot.v4"
 )
 

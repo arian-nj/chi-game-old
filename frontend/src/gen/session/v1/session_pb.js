@@ -9,26 +9,33 @@ import { file_xo_game_v1_xo } from "../../xo_game/v1/xo_pb";
  * Describes the file session/v1/session.proto.
  */
 export const file_session_v1_session = /*@__PURE__*/
-  fileDesc("ChhzZXNzaW9uL3YxL3Nlc3Npb24ucHJvdG8SCnNlc3Npb24udjEiLgoLQ2hhdE1lc3NhZ2USEQoJcGxheWVyX2lkGAEgASgFEgwKBHRleHQYAiABKAkiQwoLR2FtZU1lc3NhZ2USJwoCeG8YASABKAsyGS54b19nYW1lLnYxLlhvR2FtZU1lc3NhZ2VIAEILCglnYW1lX3R5cGUibQoOU2Vzc2lvbk1lc3NhZ2USJwoEY2hhdBgBIAEoCzIXLnNlc3Npb24udjEuQ2hhdE1lc3NhZ2VIABInCgRnYW1lGAIgASgLMhcuc2Vzc2lvbi52MS5HYW1lTWVzc2FnZUgAQgkKB2NvbnRlbnRCogEKDmNvbS5zZXNzaW9uLnYxQgxTZXNzaW9uUHJvdG9QAVo5Z2l0aHViLmNvbS9idWZidWlsZC9idWYtZXhhbXBsZXMvZ2VuL3Nlc3Npb24vdjE7c2Vzc2lvbnYxogIDU1hYqgIKU2Vzc2lvbi5WMcoCClNlc3Npb25cVjHiAhZTZXNzaW9uXFYxXEdQQk1ldGFkYXRh6gILU2Vzc2lvbjo6VjFiBnByb3RvMw", [file_xo_game_v1_xo]);
+  fileDesc("ChhzZXNzaW9uL3YxL3Nlc3Npb24ucHJvdG8SCnNlc3Npb24udjEiIgoSQ2hhdE1lc3NhZ2VSZXF1ZXN0EgwKBHRleHQYASABKAkiLgoLQ2hhdE1lc3NhZ2USEQoJcGxheWVyX2lkGAEgASgFEgwKBHRleHQYAiABKAkiQwoLR2FtZU1lc3NhZ2USJwoCeG8YASABKAsyGS54b19nYW1lLnYxLlhvR2FtZU1lc3NhZ2VIAEILCglnYW1lX3R5cGUioQEKDlNlc3Npb25NZXNzYWdlEicKBGNoYXQYASABKAsyFy5zZXNzaW9uLnYxLkNoYXRNZXNzYWdlSAASMgoIY2hhdF9yZXEYAiABKAsyHi5zZXNzaW9uLnYxLkNoYXRNZXNzYWdlUmVxdWVzdEgAEicKBGdhbWUYAyABKAsyFy5zZXNzaW9uLnYxLkdhbWVNZXNzYWdlSABCCQoHY29udGVudEKlAQoOY29tLnNlc3Npb24udjFCDFNlc3Npb25Qcm90b1ABWjxnaXRodWIuY29tL2FyaWFuLW5qL2NoaWJhemkvYmFja2VuZC9nZW4vc2Vzc2lvbi92MTtzZXNzaW9udjGiAgNTWFiqAgpTZXNzaW9uLlYxygIKU2Vzc2lvblxWMeICFlNlc3Npb25cVjFcR1BCTWV0YWRhdGHqAgtTZXNzaW9uOjpWMWIGcHJvdG8z", [file_xo_game_v1_xo]);
+
+/**
+ * Describes the message session.v1.ChatMessageRequest.
+ * Use `create(ChatMessageRequestSchema)` to create a new message.
+ */
+export const ChatMessageRequestSchema = /*@__PURE__*/
+  messageDesc(file_session_v1_session, 0);
 
 /**
  * Describes the message session.v1.ChatMessage.
  * Use `create(ChatMessageSchema)` to create a new message.
  */
 export const ChatMessageSchema = /*@__PURE__*/
-  messageDesc(file_session_v1_session, 0);
+  messageDesc(file_session_v1_session, 1);
 
 /**
  * Describes the message session.v1.GameMessage.
  * Use `create(GameMessageSchema)` to create a new message.
  */
 export const GameMessageSchema = /*@__PURE__*/
-  messageDesc(file_session_v1_session, 1);
+  messageDesc(file_session_v1_session, 2);
 
 /**
  * Describes the message session.v1.SessionMessage.
  * Use `create(SessionMessageSchema)` to create a new message.
  */
 export const SessionMessageSchema = /*@__PURE__*/
-  messageDesc(file_session_v1_session, 2);
+  messageDesc(file_session_v1_session, 3);
 

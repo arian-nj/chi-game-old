@@ -7,10 +7,10 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/arian-nj/chibazi/database"
-	gametype "github.com/arian-nj/chibazi/internals/game_type"
-	keybul "github.com/arian-nj/chibazi/internals/keybul"
-	matchmaking "github.com/arian-nj/chibazi/match_making"
+	"github.com/arian-nj/chibazi/backend/database"
+	gametype "github.com/arian-nj/chibazi/backend/internals/game_type"
+	keybul "github.com/arian-nj/chibazi/backend/internals/keybul"
+	matchmaking "github.com/arian-nj/chibazi/backend/match_making"
 	"github.com/jackc/pgx/v5/pgtype"
 	"gopkg.in/telebot.v4"
 )

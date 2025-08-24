@@ -133,8 +133,8 @@ const file_finder_v1_finder_proto_rawDesc = "" +
 	"\x11FINDER_TYPE_ADDED\x10\x01\x12\x15\n" +
 	"\x11FINDER_TYPE_FOUND\x10\x02\x12\x17\n" +
 	"\x13FINDER_TYPE_TIMEOUT\x10\x03\x12\x16\n" +
-	"\x12FINDER_TYPE_CANCEL\x10\x04B\x9a\x01\n" +
-	"\rcom.finder.v1B\vFinderProtoP\x01Z7github.com/bufbuild/buf-examples/gen/finder/v1;finderv1\xa2\x02\x03FXX\xaa\x02\tFinder.V1\xca\x02\tFinder\\V1\xe2\x02\x15Finder\\V1\\GPBMetadata\xea\x02\n" +
+	"\x12FINDER_TYPE_CANCEL\x10\x04B\x9d\x01\n" +
+	"\rcom.finder.v1B\vFinderProtoP\x01Z:github.com/arian-nj/chibazi/backend/gen/finder/v1;finderv1\xa2\x02\x03FXX\xaa\x02\tFinder.V1\xca\x02\tFinder\\V1\xe2\x02\x15Finder\\V1\\GPBMetadata\xea\x02\n" +
 	"Finder::V1b\x06proto3"
 
 var (

@@ -11,12 +11,12 @@ import (
 
 	"log/slog"
 
-	"github.com/arian-nj/chibazi/database"
-	gamesessions "github.com/arian-nj/chibazi/game_sessions"
-	"github.com/arian-nj/chibazi/internals/config"
-	"github.com/arian-nj/chibazi/internals/keybul"
-	"github.com/arian-nj/chibazi/internals/utils"
-	matchmaking "github.com/arian-nj/chibazi/match_making"
+	"github.com/arian-nj/chibazi/backend/database"
+	gamesessions "github.com/arian-nj/chibazi/backend/game_sessions"
+	"github.com/arian-nj/chibazi/backend/internals/config"
+	"github.com/arian-nj/chibazi/backend/internals/keybul"
+	"github.com/arian-nj/chibazi/backend/internals/utils"
+	matchmaking "github.com/arian-nj/chibazi/backend/match_making"
 	"gopkg.in/telebot.v4"
 )
 

@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/arian-nj/chibazi/database"
+	"github.com/arian-nj/chibazi/backend/database"
 	"github.com/jackc/pgx/v5"
 )
 

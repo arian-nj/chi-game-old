@@ -18,8 +18,6 @@ class FinderSocket extends WebSocket {
 		super(url, [])
 		this.binaryType = 'arraybuffer'
 	}
-	SendMessage() {
-	}
 }
 
 

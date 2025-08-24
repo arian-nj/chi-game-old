@@ -215,8 +215,8 @@ const file_xo_game_v1_xo_proto_rawDesc = "" +
 	"\rXoGameMessage\x12&\n" +
 	"\x04move\x18\x01 \x01(\v2\x10.xo_game.v1.MoveH\x00R\x04move\x12&\n" +
 	"\x04play\x18\x02 \x01(\v2\x10.xo_game.v1.PlayH\x00R\x04playB\t\n" +
-	"\apayloadB\x99\x01\n" +
-	"\x0ecom.xo_game.v1B\aXoProtoP\x01Z9github.com/bufbuild/buf-examples/gen/xo_game/v1;xo_gamev1\xa2\x02\x03XXX\xaa\x02\tXoGame.V1\xca\x02\tXoGame\\V1\xe2\x02\x15XoGame\\V1\\GPBMetadata\xea\x02\n" +
+	"\apayloadB\x9c\x01\n" +
+	"\x0ecom.xo_game.v1B\aXoProtoP\x01Z<github.com/arian-nj/chibazi/backend/gen/xo_game/v1;xo_gamev1\xa2\x02\x03XXX\xaa\x02\tXoGame.V1\xca\x02\tXoGame\\V1\xe2\x02\x15XoGame\\V1\\GPBMetadata\xea\x02\n" +
 	"XoGame::V1b\x06proto3"
 
 var (

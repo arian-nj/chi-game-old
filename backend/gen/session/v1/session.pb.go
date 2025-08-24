@@ -7,7 +7,7 @@
 package sessionv1
 
 import (
-	v1 "github.com/bufbuild/buf-examples/gen/xo_game/v1"
+	v1 "github.com/arian-nj/chibazi/backend/gen/xo_game/v1"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	reflect "reflect"
@@ -22,6 +22,50 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
+type ChatMessageRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Text          string                 `protobuf:"bytes,1,opt,name=text,proto3" json:"text,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ChatMessageRequest) Reset() {
+	*x = ChatMessageRequest{}
+	mi := &file_session_v1_session_proto_msgTypes[0]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ChatMessageRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ChatMessageRequest) ProtoMessage() {}
+
+func (x *ChatMessageRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_session_v1_session_proto_msgTypes[0]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ChatMessageRequest.ProtoReflect.Descriptor instead.
+func (*ChatMessageRequest) Descriptor() ([]byte, []int) {
+	return file_session_v1_session_proto_rawDescGZIP(), []int{0}
+}
+
+func (x *ChatMessageRequest) GetText() string {
+	if x != nil {
+		return x.Text
+	}
+	return ""
+}
+
 type ChatMessage struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	PlayerId      int32                  `protobuf:"varint,1,opt,name=player_id,json=playerId,proto3" json:"player_id,omitempty"`
@@ -32,7 +76,7 @@ type ChatMessage struct {
 
 func (x *ChatMessage) Reset() {
 	*x = ChatMessage{}
-	mi := &file_session_v1_session_proto_msgTypes[0]
+	mi := &file_session_v1_session_proto_msgTypes[1]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -44,7 +88,7 @@ func (x *ChatMessage) String() string {
 func (*ChatMessage) ProtoMessage() {}
 
 func (x *ChatMessage) ProtoReflect() protoreflect.Message {
-	mi := &file_session_v1_session_proto_msgTypes[0]
+	mi := &file_session_v1_session_proto_msgTypes[1]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -57,7 +101,7 @@ func (x *ChatMessage) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ChatMessage.ProtoReflect.Descriptor instead.
 func (*ChatMessage) Descriptor() ([]byte, []int) {
-	return file_session_v1_session_proto_rawDescGZIP(), []int{0}
+	return file_session_v1_session_proto_rawDescGZIP(), []int{1}
 }
 
 func (x *ChatMessage) GetPlayerId() int32 {
@@ -86,7 +130,7 @@ type GameMessage struct {
 
 func (x *GameMessage) Reset() {
 	*x = GameMessage{}
-	mi := &file_session_v1_session_proto_msgTypes[1]
+	mi := &file_session_v1_session_proto_msgTypes[2]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -98,7 +142,7 @@ func (x *GameMessage) String() string {
 func (*GameMessage) ProtoMessage() {}
 
 func (x *GameMessage) ProtoReflect() protoreflect.Message {
-	mi := &file_session_v1_session_proto_msgTypes[1]
+	mi := &file_session_v1_session_proto_msgTypes[2]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -111,7 +155,7 @@ func (x *GameMessage) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GameMessage.ProtoReflect.Descriptor instead.
 func (*GameMessage) Descriptor() ([]byte, []int) {
-	return file_session_v1_session_proto_rawDescGZIP(), []int{1}
+	return file_session_v1_session_proto_rawDescGZIP(), []int{2}
 }
 
 func (x *GameMessage) GetGameType() isGameMessage_GameType {
@@ -145,6 +189,7 @@ type SessionMessage struct {
 	// Types that are valid to be assigned to Content:
 	//
 	//	*SessionMessage_Chat
+	//	*SessionMessage_ChatReq
 	//	*SessionMessage_Game
 	Content       isSessionMessage_Content `protobuf_oneof:"content"`
 	unknownFields protoimpl.UnknownFields
@@ -153,7 +198,7 @@ type SessionMessage struct {
 
 func (x *SessionMessage) Reset() {
 	*x = SessionMessage{}
-	mi := &file_session_v1_session_proto_msgTypes[2]
+	mi := &file_session_v1_session_proto_msgTypes[3]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -165,7 +210,7 @@ func (x *SessionMessage) String() string {
 func (*SessionMessage) ProtoMessage() {}
 
 func (x *SessionMessage) ProtoReflect() protoreflect.Message {
-	mi := &file_session_v1_session_proto_msgTypes[2]
+	mi := &file_session_v1_session_proto_msgTypes[3]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -178,7 +223,7 @@ func (x *SessionMessage) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SessionMessage.ProtoReflect.Descriptor instead.
 func (*SessionMessage) Descriptor() ([]byte, []int) {
-	return file_session_v1_session_proto_rawDescGZIP(), []int{2}
+	return file_session_v1_session_proto_rawDescGZIP(), []int{3}
 }
 
 func (x *SessionMessage) GetContent() isSessionMessage_Content {
@@ -192,6 +237,15 @@ func (x *SessionMessage) GetChat() *ChatMessage {
 	if x != nil {
 		if x, ok := x.Content.(*SessionMessage_Chat); ok {
 			return x.Chat
+		}
+	}
+	return nil
+}
+
+func (x *SessionMessage) GetChatReq() *ChatMessageRequest {
+	if x != nil {
+		if x, ok := x.Content.(*SessionMessage_ChatReq); ok {
+			return x.ChatReq
 		}
 	}
 	return nil
@@ -214,11 +268,17 @@ type SessionMessage_Chat struct {
 	Chat *ChatMessage `protobuf:"bytes,1,opt,name=chat,proto3,oneof"`
 }
 
+type SessionMessage_ChatReq struct {
+	ChatReq *ChatMessageRequest `protobuf:"bytes,2,opt,name=chat_req,json=chatReq,proto3,oneof"`
+}
+
 type SessionMessage_Game struct {
-	Game *GameMessage `protobuf:"bytes,2,opt,name=game,proto3,oneof"`
+	Game *GameMessage `protobuf:"bytes,3,opt,name=game,proto3,oneof"`
 }
 
 func (*SessionMessage_Chat) isSessionMessage_Content() {}
+
+func (*SessionMessage_ChatReq) isSessionMessage_Content() {}
 
 func (*SessionMessage_Game) isSessionMessage_Content() {}
 
@@ -227,18 +287,21 @@ var File_session_v1_session_proto protoreflect.FileDescriptor
 const file_session_v1_session_proto_rawDesc = "" +
 	"\n" +
 	"\x18session/v1/session.proto\x12\n" +
-	"session.v1\x1a\x13xo_game/v1/xo.proto\">\n" +
+	"session.v1\x1a\x13xo_game/v1/xo.proto\"(\n" +
+	"\x12ChatMessageRequest\x12\x12\n" +
+	"\x04text\x18\x01 \x01(\tR\x04text\">\n" +
 	"\vChatMessage\x12\x1b\n" +
 	"\tplayer_id\x18\x01 \x01(\x05R\bplayerId\x12\x12\n" +
 	"\x04text\x18\x02 \x01(\tR\x04text\"G\n" +
 	"\vGameMessage\x12+\n" +
 	"\x02xo\x18\x01 \x01(\v2\x19.xo_game.v1.XoGameMessageH\x00R\x02xoB\v\n" +
-	"\tgame_type\"y\n" +
+	"\tgame_type\"\xb6\x01\n" +
 	"\x0eSessionMessage\x12-\n" +
-	"\x04chat\x18\x01 \x01(\v2\x17.session.v1.ChatMessageH\x00R\x04chat\x12-\n" +
-	"\x04game\x18\x02 \x01(\v2\x17.session.v1.GameMessageH\x00R\x04gameB\t\n" +
-	"\acontentB\xa2\x01\n" +
-	"\x0ecom.session.v1B\fSessionProtoP\x01Z9github.com/bufbuild/buf-examples/gen/session/v1;sessionv1\xa2\x02\x03SXX\xaa\x02\n" +
+	"\x04chat\x18\x01 \x01(\v2\x17.session.v1.ChatMessageH\x00R\x04chat\x12;\n" +
+	"\bchat_req\x18\x02 \x01(\v2\x1e.session.v1.ChatMessageRequestH\x00R\achatReq\x12-\n" +
+	"\x04game\x18\x03 \x01(\v2\x17.session.v1.GameMessageH\x00R\x04gameB\t\n" +
+	"\acontentB\xa5\x01\n" +
+	"\x0ecom.session.v1B\fSessionProtoP\x01Z<github.com/arian-nj/chibazi/backend/gen/session/v1;sessionv1\xa2\x02\x03SXX\xaa\x02\n" +
 	"Session.V1\xca\x02\n" +
 	"Session\\V1\xe2\x02\x16Session\\V1\\GPBMetadata\xea\x02\vSession::V1b\x06proto3"
 
@@ -254,22 +317,24 @@ func file_session_v1_session_proto_rawDescGZIP() []byte {
 	return file_session_v1_session_proto_rawDescData
 }
 
-var file_session_v1_session_proto_msgTypes = make([]protoimpl.MessageInfo, 3)
+var file_session_v1_session_proto_msgTypes = make([]protoimpl.MessageInfo, 4)
 var file_session_v1_session_proto_goTypes = []any{
-	(*ChatMessage)(nil),      // 0: session.v1.ChatMessage
-	(*GameMessage)(nil),      // 1: session.v1.GameMessage
-	(*SessionMessage)(nil),   // 2: session.v1.SessionMessage
-	(*v1.XoGameMessage)(nil), // 3: xo_game.v1.XoGameMessage
+	(*ChatMessageRequest)(nil), // 0: session.v1.ChatMessageRequest
+	(*ChatMessage)(nil),        // 1: session.v1.ChatMessage
+	(*GameMessage)(nil),        // 2: session.v1.GameMessage
+	(*SessionMessage)(nil),     // 3: session.v1.SessionMessage
+	(*v1.XoGameMessage)(nil),   // 4: xo_game.v1.XoGameMessage
 }
 var file_session_v1_session_proto_depIdxs = []int32{
-	3, // 0: session.v1.GameMessage.xo:type_name -> xo_game.v1.XoGameMessage
-	0, // 1: session.v1.SessionMessage.chat:type_name -> session.v1.ChatMessage
-	1, // 2: session.v1.SessionMessage.game:type_name -> session.v1.GameMessage
-	3, // [3:3] is the sub-list for method output_type
-	3, // [3:3] is the sub-list for method input_type
-	3, // [3:3] is the sub-list for extension type_name
-	3, // [3:3] is the sub-list for extension extendee
-	0, // [0:3] is the sub-list for field type_name
+	4, // 0: session.v1.GameMessage.xo:type_name -> xo_game.v1.XoGameMessage
+	1, // 1: session.v1.SessionMessage.chat:type_name -> session.v1.ChatMessage
+	0, // 2: session.v1.SessionMessage.chat_req:type_name -> session.v1.ChatMessageRequest
+	2, // 3: session.v1.SessionMessage.game:type_name -> session.v1.GameMessage
+	4, // [4:4] is the sub-list for method output_type
+	4, // [4:4] is the sub-list for method input_type
+	4, // [4:4] is the sub-list for extension type_name
+	4, // [4:4] is the sub-list for extension extendee
+	0, // [0:4] is the sub-list for field type_name
 }
 
 func init() { file_session_v1_session_proto_init() }
@@ -277,11 +342,12 @@ func file_session_v1_session_proto_init() {
 	if File_session_v1_session_proto != nil {
 		return
 	}
-	file_session_v1_session_proto_msgTypes[1].OneofWrappers = []any{
+	file_session_v1_session_proto_msgTypes[2].OneofWrappers = []any{
 		(*GameMessage_Xo)(nil),
 	}
-	file_session_v1_session_proto_msgTypes[2].OneofWrappers = []any{
+	file_session_v1_session_proto_msgTypes[3].OneofWrappers = []any{
 		(*SessionMessage_Chat)(nil),
+		(*SessionMessage_ChatReq)(nil),
 		(*SessionMessage_Game)(nil),
 	}
 	type x struct{}
@@ -290,7 +356,7 @@ func file_session_v1_session_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_session_v1_session_proto_rawDesc), len(file_session_v1_session_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   3,
+			NumMessages:   4,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

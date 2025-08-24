@@ -4,7 +4,7 @@ import (
 	"log/slog"
 	"net/http"
 
-	"github.com/arian-nj/chibazi/pkg/response"
+	"github.com/arian-nj/chibazi/backend/pkg/response"
 )
 
 func (app *ApiApplication) statusHandler(w http.ResponseWriter, r *http.Request) {

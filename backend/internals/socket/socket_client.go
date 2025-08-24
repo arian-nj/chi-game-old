@@ -8,7 +8,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/arian-nj/chibazi/internals/utils"
+	"github.com/arian-nj/chibazi/backend/internals/utils"
 	"github.com/coder/websocket"
 	"golang.org/x/time/rate"
 	"google.golang.org/protobuf/proto"
