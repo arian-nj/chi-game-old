@@ -120,10 +120,10 @@ func (x *ChatMessage) GetText() string {
 
 type GameMessage struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
-	// Types that are valid to be assigned to GameType:
+	// Types that are valid to be assigned to Game:
 	//
 	//	*GameMessage_Xo
-	GameType      isGameMessage_GameType `protobuf_oneof:"game_type"`
+	Game          isGameMessage_Game `protobuf_oneof:"game"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -158,31 +158,31 @@ func (*GameMessage) Descriptor() ([]byte, []int) {
 	return file_session_v1_session_proto_rawDescGZIP(), []int{2}
 }
 
-func (x *GameMessage) GetGameType() isGameMessage_GameType {
+func (x *GameMessage) GetGame() isGameMessage_Game {
 	if x != nil {
-		return x.GameType
+		return x.Game
 	}
 	return nil
 }
 
 func (x *GameMessage) GetXo() *v1.XoGameMessage {
 	if x != nil {
-		if x, ok := x.GameType.(*GameMessage_Xo); ok {
+		if x, ok := x.Game.(*GameMessage_Xo); ok {
 			return x.Xo
 		}
 	}
 	return nil
 }
 
-type isGameMessage_GameType interface {
-	isGameMessage_GameType()
+type isGameMessage_Game interface {
+	isGameMessage_Game()
 }
 
 type GameMessage_Xo struct {
 	Xo *v1.XoGameMessage `protobuf:"bytes,1,opt,name=xo,proto3,oneof"`
 }
 
-func (*GameMessage_Xo) isGameMessage_GameType() {}
+func (*GameMessage_Xo) isGameMessage_Game() {}
 
 type SessionMessage struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
@@ -292,10 +292,10 @@ const file_session_v1_session_proto_rawDesc = "" +
 	"\x04text\x18\x01 \x01(\tR\x04text\">\n" +
 	"\vChatMessage\x12\x1b\n" +
 	"\tplayer_id\x18\x01 \x01(\x05R\bplayerId\x12\x12\n" +
-	"\x04text\x18\x02 \x01(\tR\x04text\"G\n" +
+	"\x04text\x18\x02 \x01(\tR\x04text\"B\n" +
 	"\vGameMessage\x12+\n" +
-	"\x02xo\x18\x01 \x01(\v2\x19.xo_game.v1.XoGameMessageH\x00R\x02xoB\v\n" +
-	"\tgame_type\"\xb6\x01\n" +
+	"\x02xo\x18\x01 \x01(\v2\x19.xo_game.v1.XoGameMessageH\x00R\x02xoB\x06\n" +
+	"\x04game\"\xb6\x01\n" +
 	"\x0eSessionMessage\x12-\n" +
 	"\x04chat\x18\x01 \x01(\v2\x17.session.v1.ChatMessageH\x00R\x04chat\x12;\n" +
 	"\bchat_req\x18\x02 \x01(\v2\x1e.session.v1.ChatMessageRequestH\x00R\achatReq\x12-\n" +

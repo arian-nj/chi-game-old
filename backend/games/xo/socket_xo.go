@@ -4,67 +4,26 @@ import (
 	"encoding/json"
 	"log/slog"
 
+	sessionv1 "github.com/arian-nj/chibazi/backend/gen/session/v1"
+	xo_gamev1 "github.com/arian-nj/chibazi/backend/gen/xo_game/v1"
 	"github.com/arian-nj/chibazi/backend/internals/socket"
 )
 
 // FIXME: make it map handler with auto Converting inputs
-func (game *XOGame) SocketRouter(actionRawData json.RawMessage, playerId int) {
-	newGameAction := &socket.GameAction{}
-	err := json.Unmarshal(actionRawData, newGameAction)
-	if err != nil {
-		slog.Error("can't unmarshal action raw data", "err", err)
-		return
+func (game *XOGame) SocketRouter(newGameMsg *sessionv1.GameMessage, playerId int) {
+	newXoMessage := newGameMsg.GetXo()
+	switch newXoMessage.Payload.(type) {
+	case *xo_gamev1.XoGameMessage_Play:
+		playData := newXoMessage.GetPlay()
+		game.PlayHandlerSocket(playData, playerId)
 	}
-	AData, ok := newGameAction.AData.([]byte)
-	if !ok {
-		slog.Error("can't use adata as byte", "data", AData)
-		return
-	}
-
-	switch newGameAction.Action {
-	case PlayActionType:
-		newPlayInput := &PlayActionInput{}
-		err := json.Unmarshal(AData, newPlayInput)
-		if err != nil {
-			slog.Error("can't unmarshal play action input", "error", err)
-			return
-		}
-		game.PlayHandlerSocket(newPlayInput, playerId)
-	}
-}
-
-type PlayActionInput struct {
-	MoveIndex int `json:"index"`
-}
-
-func (game *XOGame) PlayHandlerSocket(playInput *PlayActionInput, playerID int) {
-	if game.IsPlayersTurn(playerID) == false {
-		slog.Error("not players turn")
-		return
-	}
-
-	moveType := game.GetCurrentPlayer().Move
-
-	isValid, errMsg := game.Board.IsMoveValid(playInput.MoveIndex, moveType)
-	if !isValid {
-		slog.Error("move is not valid", "err", errMsg)
-		return
-	}
-
-	player := game.Find(playerID)
-	if player == nil {
-		slog.Error("can't find player in socjet play handler")
-		return
-	}
-	playCommand := NewPlayCommand(playInput.MoveIndex, moveType, player.ID)
-	game.PushCommand(playCommand)
 }
 
 type SocketListener struct{}
 
 func (sl *SocketListener) Update(game *XOGame, command Command) {
 	switch a := command.(type) {
-	case *PlayCommand:
+	case *MoveCommand:
 		sl.SocketBrodcastNewMove(game, a.Pos, a.MoveType, a.PlayerID)
 	case *StartCommand:
 	case *EndGameCommand:
@@ -74,12 +33,32 @@ func (sl *SocketListener) Update(game *XOGame, command Command) {
 	}
 }
 
+func (game *XOGame) PlayHandlerSocket(playInput *xo_gamev1.Play, playerID int) {
+	if game.IsPlayersTurnID(playerID) == false {
+		slog.Error("not players turn")
+		return
+	}
+
+	moveType := game.GetCurrentPlayer().Move
+
+	isValid, errMsg := game.Board.IsMoveValid(int(playInput.CellIndex), moveType)
+	if !isValid {
+		slog.Error("move is not valid", "err", errMsg)
+		return
+	}
+
+	player := game.FindByID(playerID)
+	if player == nil {
+		slog.Error("can't find player in socjet play handler")
+		return
+	}
+	playCommand := NewPlayCommand(int(playInput.CellIndex), moveType, player.ID)
+	game.PushCommand(playCommand)
+}
+
 const (
 	StartActionType socket.ActionType = "start"
 	MoveActionType  socket.ActionType = "move"
-	EndActionType   socket.ActionType = "end"
-
-	PlayActionType socket.ActionType = "play"
 )
 
 func (g *XOGame) StartSocket() error {
@@ -111,13 +90,51 @@ func (sl *SocketListener) SocketBrodcastNewMove(game *XOGame, moveIndex int, cel
 			continue
 		}
 
-		err := player.Socket.SendNewAction(
-			MoveActionType, MoveAction{
-				MoveIndex: moveIndex,
-				CellType:  int(cellType),
-			})
-		if err != nil {
-			slog.Error("error broadcasting new move", "error", err)
+		if player.ID == playerID {
+			newSessionMessage := sessionv1.SessionMessage{
+				Content: &sessionv1.SessionMessage_Game{
+					Game: &sessionv1.GameMessage{
+						Game: &sessionv1.GameMessage_Xo{
+							Xo: &xo_gamev1.XoGameMessage{
+								Payload: &xo_gamev1.XoGameMessage_PlayResponse{
+									PlayResponse: &xo_gamev1.PlayResponse{
+										IsValid: true,
+										Play: &xo_gamev1.Play{
+											CellIndex: int32(moveIndex),
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+			}
+
+			err := player.Socket.SendMessage(&newSessionMessage)
+			if err != nil {
+				slog.Error("can't send play response", "err", err)
+			}
+		} else {
+			newSessionMessage := sessionv1.SessionMessage{
+				Content: &sessionv1.SessionMessage_Game{
+					Game: &sessionv1.GameMessage{
+						Game: &sessionv1.GameMessage_Xo{
+							Xo: &xo_gamev1.XoGameMessage{
+								Payload: &xo_gamev1.XoGameMessage_Move{
+									Move: &xo_gamev1.Move{
+										PlayerId:  int32(playerID),
+										CellIndex: int32(moveIndex),
+									},
+								},
+							},
+						},
+					},
+				},
+			}
+			err := player.Socket.SendMessage(&newSessionMessage)
+			if err != nil {
+				slog.Error("can't send new move", "err", err)
+			}
 		}
 	}
 }

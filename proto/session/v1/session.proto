@@ -14,7 +14,7 @@ message ChatMessage {
 }
 
 message GameMessage {
-  oneof game_type {
+  oneof game {
     xo_game.v1.XoGameMessage xo = 1;
   }
 }

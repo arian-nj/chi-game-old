@@ -8,7 +8,7 @@ import { fileDesc, messageDesc } from "@bufbuild/protobuf/codegenv2";
  * Describes the file xo_game/v1/xo.proto.
  */
 export const file_xo_game_v1_xo = /*@__PURE__*/
-  fileDesc("ChN4b19nYW1lL3YxL3hvLnByb3RvEgp4b19nYW1lLnYxIi0KBE1vdmUSEQoJcGxheWVyX2lkGAEgASgFEhIKCmNlbGxfaW5kZXgYAiABKAUiGgoEUGxheRISCgpjZWxsX2luZGV4GAEgASgFIl4KDVhvR2FtZU1lc3NhZ2USIAoEbW92ZRgBIAEoCzIQLnhvX2dhbWUudjEuTW92ZUgAEiAKBHBsYXkYAiABKAsyEC54b19nYW1lLnYxLlBsYXlIAEIJCgdwYXlsb2FkQpwBCg5jb20ueG9fZ2FtZS52MUIHWG9Qcm90b1ABWjxnaXRodWIuY29tL2FyaWFuLW5qL2NoaWJhemkvYmFja2VuZC9nZW4veG9fZ2FtZS92MTt4b19nYW1ldjGiAgNYWFiqAglYb0dhbWUuVjHKAglYb0dhbWVcVjHiAhVYb0dhbWVcVjFcR1BCTWV0YWRhdGHqAgpYb0dhbWU6OlYxYgZwcm90bzM");
+  fileDesc("ChN4b19nYW1lL3YxL3hvLnByb3RvEgp4b19nYW1lLnYxIi0KBE1vdmUSEQoJcGxheWVyX2lkGAEgASgFEhIKCmNlbGxfaW5kZXgYAiABKAUiGgoEUGxheRISCgpjZWxsX2luZGV4GAEgASgFIkAKDFBsYXlSZXNwb25zZRIQCghpc192YWxpZBgBIAEoCBIeCgRwbGF5GAIgASgLMhAueG9fZ2FtZS52MS5QbGF5IpEBCg1Yb0dhbWVNZXNzYWdlEiAKBG1vdmUYASABKAsyEC54b19nYW1lLnYxLk1vdmVIABIgCgRwbGF5GAIgASgLMhAueG9fZ2FtZS52MS5QbGF5SAASMQoNcGxheV9yZXNwb25zZRgDIAEoCzIYLnhvX2dhbWUudjEuUGxheVJlc3BvbnNlSABCCQoHcGF5bG9hZEKcAQoOY29tLnhvX2dhbWUudjFCB1hvUHJvdG9QAVo8Z2l0aHViLmNvbS9hcmlhbi1uai9jaGliYXppL2JhY2tlbmQvZ2VuL3hvX2dhbWUvdjE7eG9fZ2FtZXYxogIDWFhYqgIJWG9HYW1lLlYxygIJWG9HYW1lXFYx4gIVWG9HYW1lXFYxXEdQQk1ldGFkYXRh6gIKWG9HYW1lOjpWMWIGcHJvdG8z");
 
 /**
  * Describes the message xo_game.v1.Move.
@@ -25,9 +25,16 @@ export const PlaySchema = /*@__PURE__*/
   messageDesc(file_xo_game_v1_xo, 1);
 
 /**
+ * Describes the message xo_game.v1.PlayResponse.
+ * Use `create(PlayResponseSchema)` to create a new message.
+ */
+export const PlayResponseSchema = /*@__PURE__*/
+  messageDesc(file_xo_game_v1_xo, 2);
+
+/**
  * Describes the message xo_game.v1.XoGameMessage.
  * Use `create(XoGameMessageSchema)` to create a new message.
  */
 export const XoGameMessageSchema = /*@__PURE__*/
-  messageDesc(file_xo_game_v1_xo, 2);
+  messageDesc(file_xo_game_v1_xo, 3);
 

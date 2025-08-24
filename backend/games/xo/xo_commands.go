@@ -8,21 +8,21 @@ type Command interface {
 	Execute(game *XOGame)
 }
 
-type PlayCommand struct {
+type MoveCommand struct {
 	PlayerID int
 	Pos      int
 	MoveType Cell
 }
 
-func NewPlayCommand(pos int, moveType Cell, playerID int) *PlayCommand {
-	return &PlayCommand{
+func NewPlayCommand(pos int, moveType Cell, playerID int) *MoveCommand {
+	return &MoveCommand{
 		PlayerID: playerID,
 		Pos:      pos,
 		MoveType: moveType,
 	}
 }
 
-func (mv *PlayCommand) Execute(game *XOGame) {
+func (mv *MoveCommand) Execute(game *XOGame) {
 	game.Board.SetCell(mv.Pos, mv.MoveType)
 
 	hasWon := game.Board.HasWon(mv.Pos)

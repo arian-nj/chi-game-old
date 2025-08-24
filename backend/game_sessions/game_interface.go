@@ -2,8 +2,8 @@ package gamesessions
 
 import (
 	"context"
-	"encoding/json"
 
+	sessionv1 "github.com/arian-nj/chibazi/backend/gen/session/v1"
 	"github.com/arian-nj/chibazi/backend/internals/socket"
 	"gopkg.in/telebot.v4"
 )
@@ -11,7 +11,7 @@ import (
 type Game interface {
 	AddPlayer(id int, name string, tgId int, socket *socket.Socket)
 	CallBackRouter(c telebot.Context) error
-	SocketRouter(gameActionData json.RawMessage, playerId int)
+	SocketRouter(session *sessionv1.GameMessage, playerId int)
 	GetContext() context.Context
 	StartGame() error
 	SendJoinPanelAddSender(telebot.Context) error

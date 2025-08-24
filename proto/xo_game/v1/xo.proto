@@ -13,9 +13,15 @@ message Play {
   int32 cell_index = 1;
 }
 
+message PlayResponse {
+  bool is_valid = 1;
+  Play play = 2;
+}
+
 message XoGameMessage {
   oneof payload {
     Move move = 1;
     Play play = 2;
+    PlayResponse play_response = 3;
   }
 }

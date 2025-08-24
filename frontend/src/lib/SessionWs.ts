@@ -52,15 +52,6 @@ export class SessionSocket extends WebSocket {
 		const bytes = toBinary(SessionMessageSchema, sessionMsg);
 		this.send(bytes);
 	}
-	// SendGameAction(gameAction: GameAction) {
-	// 	const data: SessionSocketEvent = {
-	// 		type: GameActionType,
-	// 		data: gameAction,
-	// 	}
-	// 	const stringData = JSON.stringify(data)
-	// 	this.send(stringData)
-	// }
-	// }
 }
 
 

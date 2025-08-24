@@ -48,6 +48,27 @@ export declare type Play = Message<"xo_game.v1.Play"> & {
 export declare const PlaySchema: GenMessage<Play>;
 
 /**
+ * @generated from message xo_game.v1.PlayResponse
+ */
+export declare type PlayResponse = Message<"xo_game.v1.PlayResponse"> & {
+  /**
+   * @generated from field: bool is_valid = 1;
+   */
+  isValid: boolean;
+
+  /**
+   * @generated from field: xo_game.v1.Play play = 2;
+   */
+  play?: Play;
+};
+
+/**
+ * Describes the message xo_game.v1.PlayResponse.
+ * Use `create(PlayResponseSchema)` to create a new message.
+ */
+export declare const PlayResponseSchema: GenMessage<PlayResponse>;
+
+/**
  * @generated from message xo_game.v1.XoGameMessage
  */
 export declare type XoGameMessage = Message<"xo_game.v1.XoGameMessage"> & {
@@ -66,6 +87,12 @@ export declare type XoGameMessage = Message<"xo_game.v1.XoGameMessage"> & {
      */
     value: Play;
     case: "play";
+  } | {
+    /**
+     * @generated from field: xo_game.v1.PlayResponse play_response = 3;
+     */
+    value: PlayResponse;
+    case: "playResponse";
   } | { case: undefined; value?: undefined };
 };
 

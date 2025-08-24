@@ -20,7 +20,7 @@ type TelegramListener struct {
 
 func (tg *TelegramListener) Update(game *XOGame, command Command) {
 	switch c := command.(type) {
-	case *PlayCommand:
+	case *MoveCommand:
 		tg.EditDuringGameBoard(game)
 	case *StartCommand:
 		tg.EditDuringGameBoard(game)
@@ -105,7 +105,7 @@ func (tg *TelegramListener) TieGame(game *XOGame) error {
 func (game *XOGame) XOPlayHandler(c telebot.Context, callbackData string) error {
 	sender := c.Sender()
 
-	if game.IsPlayersTurn(int(sender.ID)) == false {
+	if game.IsPlayersTurnTg(int(sender.ID)) == false {
 		return c.RespondText("نوبت تو نیست!")
 	}
 
@@ -121,10 +121,11 @@ func (game *XOGame) XOPlayHandler(c telebot.Context, callbackData string) error 
 		return c.RespondText(errMsg)
 	}
 
-	player := game.Find(int(sender.ID))
+	player := game.FindByTelegramID(int(sender.ID))
 	if player == nil {
 		return c.RespondText("can't find player")
 	}
+
 	playCommand := NewPlayCommand(cellIndex, moveType, player.ID)
 	game.PushCommand(playCommand)
 	return nil

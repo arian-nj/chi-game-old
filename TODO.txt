@@ -117,14 +117,18 @@
 [X] init protobuff
 [X] finder socket us buff
 [X] chat protobuff
-[ ] xo websocket use protobuff
-[ ] play game web
+[X] xo websocket use protobuff
+[X] play game web
+
+[ ] alert invalid move
+[ ] show user card on top
+[ ] show timer 
 [ ] rejoin game web
-[ ] timer 
 
 [ ] Send Join Panel
 
 [ ] color pallete
+[ ] new message bubble
 
 # bot look
 [ ] better welcome message

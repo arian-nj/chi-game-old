@@ -64,9 +64,18 @@ func NewXOGame(
 		Subscribers: []XoSubscriber{},
 	}
 }
-func (game *XOGame) Find(telegramID int) *XoPlayer {
+func (game *XOGame) FindByTelegramID(telegramID int) *XoPlayer {
 	for _, p := range game.Players {
 		if telegramID == p.TelegramID {
+			return p
+		}
+	}
+	return nil
+}
+
+func (game *XOGame) FindByID(telegramID int) *XoPlayer {
+	for _, p := range game.Players {
+		if telegramID == p.ID {
 			return p
 		}
 	}
@@ -112,8 +121,11 @@ func (cg *XOGame) GetCurrentPlayer() *XoPlayer {
 	return cg.Players[cg.CurrentPlayerIndex]
 }
 
-func (cg *XOGame) IsPlayersTurn(senderId int) bool {
+func (cg *XOGame) IsPlayersTurnTg(senderId int) bool {
 	return cg.GetCurrentPlayer().TelegramID == senderId
+}
+func (cg *XOGame) IsPlayersTurnID(splayerID int) bool {
+	return cg.GetCurrentPlayer().ID == splayerID
 }
 
 func (cg *XOGame) GetOpponentPlayer() *XoPlayer {

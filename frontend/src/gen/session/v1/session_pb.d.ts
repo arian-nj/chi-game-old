@@ -53,9 +53,9 @@ export declare const ChatMessageSchema: GenMessage<ChatMessage>;
  */
 export declare type GameMessage = Message<"session.v1.GameMessage"> & {
   /**
-   * @generated from oneof session.v1.GameMessage.game_type
+   * @generated from oneof session.v1.GameMessage.game
    */
-  gameType: {
+  game: {
     /**
      * @generated from field: xo_game.v1.XoGameMessage xo = 1;
      */

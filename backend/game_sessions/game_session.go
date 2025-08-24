@@ -119,9 +119,8 @@ func (gs *GameSession) MonitorGameSession(allSession *AllSession) {
 			switch newSessionEvent.Event.Content.(type) {
 			case *sessionv1.SessionMessage_ChatReq:
 				gs.HandleWebChatMessage(newSessionEvent.Player, newSessionEvent.Event.GetChatReq())
-				// case socket.GameEventType:
-				// gs.GameState.SocketRouter(newSessionEvent.Event.Data, newSessionEvent.Player.ID)
-				// gs.SocketRouter()
+			case *sessionv1.SessionMessage_Game:
+				gs.GameState.SocketRouter(newSessionEvent.Event.GetGame(), newSessionEvent.Player.ID)
 			}
 
 		case <-gs.GameState.GetContext().Done():
