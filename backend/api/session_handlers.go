@@ -63,14 +63,13 @@ func (app *ApiApplication) gameSessionWS(w http.ResponseWriter, r *http.Request)
 			slog.Info("socket context cancelled", "addr", r.RemoteAddr)
 			return
 		case <-sessionPlayer.Socket.EventChan:
-			slog.Error("session_handler event is no handled it's btyes")
 			// gameSession.MsgChnl <- gamesessions.NewSessionEvent(sessionPlayer, newEvent)
 
 		}
 	}
 }
 
-type messageHistoryOut struct {
+type chatHistoryOut struct {
 	Messages []messageOut `json:"messages"`
 }
 
@@ -102,7 +101,7 @@ func (app *ApiApplication) getChatHistoryHandler(w http.ResponseWriter, r *http.
 	}
 
 	messageLen := len(allMessages)
-	mhOut := messageHistoryOut{
+	mhOut := chatHistoryOut{
 		Messages: make([]messageOut, messageLen),
 	}
 	for index, message := range allMessages {

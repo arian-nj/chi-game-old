@@ -1,8 +1,0 @@
-syntax = "proto3";
-
-package xo_game.v1;
-
-message Move {
-  int32 player_id = 1;
-  int32 cell_index = 2;
-}

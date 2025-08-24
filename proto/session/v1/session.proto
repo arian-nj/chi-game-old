@@ -1,0 +1,23 @@
+syntax = "proto3";
+
+package session.v1;
+
+import "xo_game/v1/xo.proto";
+
+message ChatMessage {
+  int32 player_id = 1;
+  string text = 2;
+}
+
+message GameMessage {
+  oneof game_type {
+    xo_game.v1.XoGameMessage xo = 1;
+  }
+}
+
+message SessionMessage {
+  oneof content {
+    ChatMessage chat = 1;
+    GameMessage game = 2;
+  }
+}
