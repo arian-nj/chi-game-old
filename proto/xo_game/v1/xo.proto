@@ -16,6 +16,7 @@ message Play {
 message PlayResponse {
   bool is_valid = 1;
   Play play = 2;
+  string reason = 3;
 }
 
 message XoGameMessage {

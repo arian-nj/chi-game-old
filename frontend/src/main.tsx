@@ -5,6 +5,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { createRouter, RouterProvider } from '@tanstack/react-router'
 import { routeTree } from './routeTree.gen'
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
+import { Toaster } from 'react-hot-toast'
 
 const router = createRouter({ routeTree })
 
@@ -21,6 +22,7 @@ if (!rootElement.innerHTML) {
 	const root = createRoot(rootElement)
 	root.render(
 		<StrictMode>
+			<Toaster toastOptions={{ duration: 1000 }} />
 			<QueryClientProvider client={queryClient}>
 				<ReactQueryDevtools buttonPosition='top-left' />
 				<RouterProvider router={router} />

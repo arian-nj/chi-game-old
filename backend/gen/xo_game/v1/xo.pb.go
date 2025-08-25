@@ -121,6 +121,7 @@ type PlayResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	IsValid       bool                   `protobuf:"varint,1,opt,name=is_valid,json=isValid,proto3" json:"is_valid,omitempty"`
 	Play          *Play                  `protobuf:"bytes,2,opt,name=play,proto3" json:"play,omitempty"`
+	Reason        string                 `protobuf:"bytes,3,opt,name=reason,proto3" json:"reason,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -167,6 +168,13 @@ func (x *PlayResponse) GetPlay() *Play {
 		return x.Play
 	}
 	return nil
+}
+
+func (x *PlayResponse) GetReason() string {
+	if x != nil {
+		return x.Reason
+	}
+	return ""
 }
 
 type XoGameMessage struct {
@@ -279,10 +287,11 @@ const file_xo_game_v1_xo_proto_rawDesc = "" +
 	"cell_index\x18\x02 \x01(\x05R\tcellIndex\"%\n" +
 	"\x04Play\x12\x1d\n" +
 	"\n" +
-	"cell_index\x18\x01 \x01(\x05R\tcellIndex\"O\n" +
+	"cell_index\x18\x01 \x01(\x05R\tcellIndex\"g\n" +
 	"\fPlayResponse\x12\x19\n" +
 	"\bis_valid\x18\x01 \x01(\bR\aisValid\x12$\n" +
-	"\x04play\x18\x02 \x01(\v2\x10.xo_game.v1.PlayR\x04play\"\xab\x01\n" +
+	"\x04play\x18\x02 \x01(\v2\x10.xo_game.v1.PlayR\x04play\x12\x16\n" +
+	"\x06reason\x18\x03 \x01(\tR\x06reason\"\xab\x01\n" +
 	"\rXoGameMessage\x12&\n" +
 	"\x04move\x18\x01 \x01(\v2\x10.xo_game.v1.MoveH\x00R\x04move\x12&\n" +
 	"\x04play\x18\x02 \x01(\v2\x10.xo_game.v1.PlayH\x00R\x04play\x12?\n" +

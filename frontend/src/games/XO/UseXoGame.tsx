@@ -3,7 +3,7 @@ import type { SessionSocket } from "../../lib/SessionWs"
 import * as XoBuff from "../../gen/xo_game/v1/xo_pb";
 import { create, toBinary } from "@bufbuild/protobuf";
 import { SessionMessageSchema } from "../../gen/session/v1/session_pb";
-
+import toast from 'react-hot-toast';
 
 export function useXoGame(
 	{ socketRef }
@@ -51,7 +51,7 @@ export function useXoGame(
 				DoMove(playResponse.play.cellIndex, 1)
 			}
 		} else {
-			alert("wrong move")
+			toast.error(playResponse.reason)
 		}
 	}
 

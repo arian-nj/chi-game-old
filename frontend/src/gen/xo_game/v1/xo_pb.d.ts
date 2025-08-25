@@ -60,6 +60,11 @@ export declare type PlayResponse = Message<"xo_game.v1.PlayResponse"> & {
    * @generated from field: xo_game.v1.Play play = 2;
    */
   play?: Play;
+
+  /**
+   * @generated from field: string reason = 3;
+   */
+  reason: string;
 };
 
 /**

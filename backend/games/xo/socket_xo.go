@@ -33,9 +33,39 @@ func (sl *SocketListener) Update(game *XOGame, command Command) {
 	}
 }
 
+func sendInvalidResponse(player *XoPlayer, errMsg string, cellIndex int32) error {
+	newSessionMsg := sessionv1.SessionMessage{
+		Content: &sessionv1.SessionMessage_Game{
+			Game: &sessionv1.GameMessage{
+				Game: &sessionv1.GameMessage_Xo{
+					Xo: &xo_gamev1.XoGameMessage{
+						Payload: &xo_gamev1.XoGameMessage_PlayResponse{
+							PlayResponse: &xo_gamev1.PlayResponse{
+								IsValid: false,
+								Reason:  errMsg,
+								Play: &xo_gamev1.Play{
+									CellIndex: cellIndex,
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+	}
+
+	return player.Socket.SendMessage(&newSessionMsg)
+}
+
 func (game *XOGame) PlayHandlerSocket(playInput *xo_gamev1.Play, playerID int) {
+	player := game.FindByID(playerID)
+	if player == nil {
+		slog.Error("can't find player in socjet play handler")
+		return
+	}
+
 	if game.IsPlayersTurnID(playerID) == false {
-		slog.Error("not players turn")
+		sendInvalidResponse(player, "نوبت تو نیست", playInput.CellIndex)
 		return
 	}
 
@@ -43,15 +73,13 @@ func (game *XOGame) PlayHandlerSocket(playInput *xo_gamev1.Play, playerID int) {
 
 	isValid, errMsg := game.Board.IsMoveValid(int(playInput.CellIndex), moveType)
 	if !isValid {
-		slog.Error("move is not valid", "err", errMsg)
+		err := sendInvalidResponse(player, errMsg, playInput.CellIndex)
+		if err != nil {
+			slog.Error("can't send invalid response")
+		}
 		return
 	}
 
-	player := game.FindByID(playerID)
-	if player == nil {
-		slog.Error("can't find player in socjet play handler")
-		return
-	}
 	playCommand := NewPlayCommand(int(playInput.CellIndex), moveType, player.ID)
 	game.PushCommand(playCommand)
 }

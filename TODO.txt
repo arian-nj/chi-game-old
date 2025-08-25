@@ -120,7 +120,7 @@
 [X] xo websocket use protobuff
 [X] play game web
 
-[ ] alert invalid move
+[X] alert invalid move
 [ ] show user card on top
 [ ] show timer 
 [ ] rejoin game web
