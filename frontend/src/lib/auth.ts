@@ -1,5 +1,4 @@
 import { redirect } from "@tanstack/react-router";
-import { GetBaseUrl } from "./baseURL";
 
 export function authBeforeLoad() {
 	const jwtToken = GetJwtToken()
@@ -19,31 +18,4 @@ export function GetJwtToken(): string | null {
 
 export function SetJwtToken(token: string) {
 	sessionStorage.setItem("jwt_token", token);
-}
-
-export function fetchWithAuth(input: RequestInfo, init?: RequestInit) {
-	const token = GetJwtToken();
-
-	const headers = new Headers(init?.headers);
-	if (token) {
-		headers.set("Authorization", `Bearer ${token}`);
-	}
-
-	return fetch(input, {
-		...init,
-		headers,
-	});
-}
-
-interface MeResponse {
-	id: number;
-}
-
-export async function GetMe() {
-	const response = await fetchWithAuth(GetBaseUrl() + "/api/auth/me")
-	if (response.status != 200) {
-		throw new Error(response.statusText)
-	}
-	const json_data: MeResponse = await response.json()
-	return json_data
 }

@@ -1,7 +1,7 @@
 export class Message {
 	text: string
-	userID: number
-	constructor(text: string, userID: number) {
+	userID: bigint
+	constructor(text: string, userID: bigint) {
 		this.text = text
 		this.userID = userID
 	}

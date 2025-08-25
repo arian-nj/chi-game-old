@@ -1,11 +1,11 @@
 import { useEffect, useRef, useState } from "react";
 import { SessionSocket } from "../../lib/SessionWs";
-import { fetchWithAuth, GetMe } from "../../lib/auth";
-import { useQuery } from "@tanstack/react-query";
 import { ChatBubble } from "./ChatBubble";
 import { ChatInput } from "./ChatInput";
-import { GetBaseUrl } from "../../lib/baseURL";
 import { Message } from "../../types/Message";
+import { getMe } from "../../gen/account/v1/account-AccountService_connectquery";
+import { useQuery } from "@connectrpc/connect-query";
+import { getChatHistory } from "../../gen/session/v1/session-SessionService_connectquery";
 
 type ChatProps = {
 	socketRef: React.RefObject<SessionSocket>
@@ -16,29 +16,26 @@ export function Chat({ socketRef }: ChatProps) {
 	const [showMessages, setShowMessages] = useState(false);
 	const [messages, setMessages] = useState<Message[]>([]);
 
-	// Get current user
-	const { isPending, error, data: me } = useQuery({
-		queryKey: ["getMe"],
-		queryFn: GetMe
-	});
+	const { isPending: isMePending, error: meError, data: meData } = useQuery(getMe)
+	const { error: chatError, data: chatHistoryData } = useQuery(getChatHistory)
 
-	// Fetch chat history once on mount
 	useEffect(() => {
-		GetChatHistory()
-			.then(history => {
-				setMessages(history.messages.map(m => new Message(m.text, m.sender_id)));
-			})
-			.catch(err => {
-				console.error("Failed to load chat history:", err);
-			});
-	}, []);
-
-	// Handle click outside chat to hide
-	const handleClick = (event: MouseEvent) => {
-		if (chatRef.current && chatRef.current.contains(event.target as Node)) {
-			setShowMessages(false);
+		if (chatError) {
+			console.error("chat history error", chatError)
 		}
-	};
+		if (chatHistoryData?.messages) {
+			setMessages(
+				chatHistoryData.messages
+					.map(
+						(m) => new Message(m.text, m.playerId)
+					)
+			)
+		}
+	}, [chatHistoryData, chatError])
+
+	// setMessages(chatHistoryData.messages.map(m => new Message(m.text, m.playerId)));
+
+
 	useEffect(() => {
 		document.addEventListener("mousedown", handleClick);
 		return () => document.removeEventListener("mousedown", handleClick);
@@ -51,20 +48,27 @@ export function Chat({ socketRef }: ChatProps) {
 		}
 	}, [messages, showMessages]);
 
-	if (isPending) return <h1>Pending Me ...</h1>;
-	if (error) return <h1>error Me {String(error)}</h1>;
-
+	// Handle click outside chat to hide
+	const handleClick = (event: MouseEvent) => {
+		if (chatRef.current && chatRef.current.contains(event.target as Node)) {
+			setShowMessages(false);
+		}
+	};
 	// Receive new message from socket
 	socketRef.current.HandleChatMessage = (chatMessage) => {
 		setMessages(prev => [...prev, new Message(chatMessage.text, chatMessage.playerId)]);
 	};
 
 
+	if (isMePending) return <h1>Pending Me ...</h1>;
+	if (meError) return <h1>error Me {String(meError)}</h1>;
+
 	// Send message
 	const sendMessage = (message: string) => {
-		setMessages(prev => [...prev, new Message(message, me.id)]);
+		setMessages(prev => [...prev, new Message(message, meData.account!.id)]);
 		socketRef.current.SendChatMessage(message);
 	};
+
 
 	return (
 		<div className="absolute bottom-0" >
@@ -77,7 +81,7 @@ export function Chat({ socketRef }: ChatProps) {
 							ref={chatRef}
 						>
 							{messages.map((msg, index) => (
-								<ChatBubble key={index} message={msg.text} isMe={msg.userID === me.id} />
+								<ChatBubble key={index} message={msg.text} isMe={msg.userID === meData.account!.id} />
 							))}
 						</div>
 					</div>
@@ -86,23 +90,4 @@ export function Chat({ socketRef }: ChatProps) {
 			<ChatInput setShowMessage={setShowMessages} sendMessage={sendMessage} />
 		</div >
 	);
-}
-
-interface MessageResponse {
-	id: number;
-	text: string;
-	sender_id: number;
-}
-
-interface ChatHistoryResponse {
-	messages: Array<MessageResponse>;
-}
-
-export async function GetChatHistory() {
-	const response = await fetchWithAuth(GetBaseUrl() + "/api/session/chat/history");
-	if (response.status !== 200) {
-		throw new Error(response.statusText);
-	}
-	const json_data: ChatHistoryResponse = await response.json();
-	return json_data;
 }

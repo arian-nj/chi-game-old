@@ -5,18 +5,18 @@ import (
 	"crypto/hmac"
 	"crypto/sha256"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"log/slog"
-	"net/http"
 	"net/url"
 	"sort"
 	"strconv"
 	"strings"
 	"time"
 
+	"connectrpc.com/connect"
 	"github.com/arian-nj/chibazi/backend/database"
-	"github.com/arian-nj/chibazi/backend/pkg/request"
-	"github.com/arian-nj/chibazi/backend/pkg/response"
+	authv1 "github.com/arian-nj/chibazi/backend/gen/auth/v1"
 	"github.com/golang-jwt/jwt/v5"
 )
 
@@ -38,187 +38,132 @@ func createToken(userId int) *jwt.Token {
 	return token
 }
 
-func (app *ApiApplication) ValidateToken(w http.ResponseWriter, r *http.Request, tokenString string) *http.Request {
+func (app *ApiApplication) ValidateToken(tokenString string) (int, error) {
 	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (any, error) {
 		return app.Config.Jwt.SecretKey, nil
 	}, jwt.WithValidMethods([]string{jwt.SigningMethodHS256.Alg()}))
 	if err != nil {
 		slog.Error("error parsing token", "err", err)
-		app.InvalidAuthenticationToken(w, r)
-		return nil
+		return 0, err
 	}
 
 	expireAt, err := token.Claims.GetExpirationTime()
 	if err != nil {
 		slog.Error("error getting expiration time", "err", err)
-		app.ServerError(w, r, err)
-		return nil
+		return 0, err
 	}
 	if expireAt.Time.Unix() < time.Now().Unix() {
 		slog.Error("token expired", "expireAt", expireAt)
-		app.InvalidAuthenticationToken(w, r)
-		return nil
+		return 0, err
 	}
 
 	notBefore, err := token.Claims.GetNotBefore()
 	if err != nil {
 		slog.Error("error getting not before", "err", err)
-		app.ServerError(w, r, err)
-		return nil
+		return 0, err
 	}
 
 	if notBefore.Time.Unix() > time.Now().Unix() {
 		slog.Error("token not before is in the future", "notBefore", notBefore)
-		app.InvalidAuthenticationToken(w, r)
-		return nil
+		return 0, err
 	}
 	sub, err := token.Claims.GetSubject()
 	if err != nil {
 		slog.Error("error getting subject", "err", err)
-		app.ServerError(w, r, err)
-		return nil
+		return 0, err
 	}
 
 	userID, err := strconv.Atoi(sub)
 	if err != nil {
 		slog.Error("error converting subject to int", "err", err)
-		app.invalidAuthenticationCreds(w, r)
-		return nil
+		return 0, err
 	}
 	// if user.ID == 0 {
 	// 	app.InvalidAuthenticationToken(w, r)
 	// }
-	return ContextSetAuthenticatedUser(r, &ReqContextUser{UserID: userID})
+
+	return userID, nil
 }
 
-type getMeOut struct {
-	ID int `json:"id"`
-}
+// func (app *ApiApplication) refreshToken(w http.ResponseWriter, r *http.Request) {
+// 	tgUser, err := ContextGetAuthenticatedUser(app.Queries, r)
+// 	if err != nil {
+// 		app.ServerError(w, r, err)
+// 		return
+// 	}
+//
+// 	newToken := createToken(tgUser.ID)
+// 	tokenString, err := newToken.SignedString(app.Config.Jwt.SecretKey)
+// 	if err != nil {
+// 		app.ServerError(w, r, err)
+// 		return
+// 	}
+//
+// 	err = response.JSON(w, http.StatusOK, JWTTokenOutput{
+// 		Token: tokenString,
+// 	})
+// 	if err != nil {
+// 		app.ServerError(w, r, err)
+// 		return
+// 	}
+// }
 
-func (app *ApiApplication) getMe(w http.ResponseWriter, r *http.Request) {
-	tgUser, err := ContextGetAuthenticatedUser(app.Queries, r)
+func (app *ApiApplication) DummyValidate(
+	ctx context.Context,
+	req *connect.Request[authv1.DummyValidateRequest],
+) (*connect.Response[authv1.DummyValidateResponse], error) {
+	_, err := app.Queries.GetTgUserByID(ctx, int(req.Msg.GetId()))
 	if err != nil {
-		app.ServerError(w, r, err)
-		return
-	}
-	out := &getMeOut{
-		ID: tgUser.ID,
+		return nil, connect.NewError(connect.CodeNotFound, errors.New("not user found"))
 	}
 
-	err = response.JSON(w, http.StatusOK, out)
-	if err != nil {
-		app.ServerError(w, r, err)
-		return
-	}
-}
-
-func (app *ApiApplication) refreshToken(w http.ResponseWriter, r *http.Request) {
-	tgUser, err := ContextGetAuthenticatedUser(app.Queries, r)
-	if err != nil {
-		app.ServerError(w, r, err)
-		return
-	}
-
-	newToken := createToken(tgUser.ID)
-	tokenString, err := newToken.SignedString(app.Config.Jwt.SecretKey)
-	if err != nil {
-		app.ServerError(w, r, err)
-		return
-	}
-
-	err = response.JSON(w, http.StatusOK, JWTTokenOutput{
-		Token: tokenString,
-	})
-	if err != nil {
-		app.ServerError(w, r, err)
-		return
-	}
-}
-
-type dummyValidate struct {
-	UserID int `json:"user_id"`
-}
-
-func (app *ApiApplication) dummyValidate(w http.ResponseWriter, r *http.Request) {
-	input := &dummyValidate{}
-	request.DecodeJSON(w, r, input)
-	slog.Info("dummy auth", "userid", input.UserID)
-	_, err := app.Queries.GetTgUserByID(r.Context(), input.UserID)
-	if err != nil {
-		app.NotFound(w, r)
-		return
-	}
-
-	token := createToken(input.UserID)
+	token := createToken(int(req.Msg.Id))
 	tokenString, err := token.SignedString(app.Config.Jwt.SecretKey)
 	if err != nil {
-		app.ServerError(w, r, err)
-		return
+		return nil, connect.NewError(connect.CodeUnknown, errors.New("internal"))
 	}
-
-	err = response.JSON(w, http.StatusOK, JWTTokenOutput{
+	return connect.NewResponse(&authv1.DummyValidateResponse{
 		Token: tokenString,
-	})
-	if err != nil {
-		app.ServerError(w, r, err)
-		return
-	}
+	}), nil
 }
 
-func (app *ApiApplication) validateInitdata(w http.ResponseWriter, r *http.Request) {
-	var input struct {
-		InitData string `json:"init_data"`
-	}
-	err := request.DecodeJSON(w, r, &input)
-	if err != nil {
-		app.ServerError(w, r, err)
-		slog.Error("can't decode init data input ", "err", err)
-		return
-	}
-
-	parsedQuery, _ := url.ParseQuery(input.InitData)
+func (app *ApiApplication) ValidateTelegramInitData(
+	ctx context.Context,
+	req *connect.Request[authv1.ValidateTelegramInitDataRequest],
+) (*connect.Response[authv1.ValidateTelegramInitDataResponse], error) {
+	parsedQuery, _ := url.ParseQuery(req.Msg.InitData)
 	user, ok := ValidateWebappRequest(parsedQuery, app.Config.BotToken)
 	if !ok {
-		app.invalidAuthenticationCreds(w, r)
-		return
+		return nil, connect.NewError(connect.CodeUnauthenticated, fmt.Errorf("can't validate init data"))
 	}
 
-	botUserRow, err := app.Queries.GetTgUserByTgID(r.Context(), int(user.ID))
+	botUserRow, err := app.Queries.GetTgUserByTgID(ctx, int(user.ID))
 	if err != nil {
-		app.ServerError(w, r, err)
-		return
+		return nil, connect.NewError(connect.CodeUnknown, errors.New("internal"))
 	}
 
 	var tgUserRow database.Person
 	if botUserRow.ID == 0 {
 		tgUserRow, err = app.CreateBrandNewPerson(int(user.ID))
 		if err != nil {
-			app.ServerError(w, r, err)
-			return
+			return nil, connect.NewError(connect.CodeUnknown, errors.New("internal"))
 		}
 	} else {
-		tgUserRow, err = app.Queries.GetTgUserByID(r.Context(), int(botUserRow.ID))
+		tgUserRow, err = app.Queries.GetTgUserByID(ctx, int(botUserRow.ID))
 		if err != nil {
-			app.ServerError(w, r, err)
-			return
+			return nil, connect.NewError(connect.CodeUnknown, errors.New("internal"))
 		}
 	}
 
 	token := createToken(tgUserRow.ID)
 	tokenString, err := token.SignedString(app.Config.Jwt.SecretKey)
 	if err != nil {
-		app.ServerError(w, r, err)
-		return
+		return nil, connect.NewError(connect.CodeUnknown, errors.New("internal"))
 	}
 
-	err = response.JSON(w, http.StatusOK, JWTTokenOutput{
+	return connect.NewResponse(&authv1.ValidateTelegramInitDataResponse{
 		Token: tokenString,
-	})
-	if err != nil {
-		app.ServerError(w, r, err)
-		return
-	}
-
+	}), nil
 }
 
 func (app *ApiApplication) CreateBrandNewPerson(tgId int) (database.Person, error) {

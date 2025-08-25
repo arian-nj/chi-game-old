@@ -2,10 +2,12 @@ package api
 
 import (
 	"context"
+	"errors"
 	"log/slog"
 	"net/http"
 	"strconv"
 
+	"connectrpc.com/connect"
 	"github.com/arian-nj/chibazi/backend/database"
 	gamesessions "github.com/arian-nj/chibazi/backend/game_sessions"
 	sessionv1 "github.com/arian-nj/chibazi/backend/gen/session/v1"
@@ -18,7 +20,7 @@ import (
 func (app *ApiApplication) gameSessionWS(w http.ResponseWriter, r *http.Request) {
 	tgUser, err := ContextGetAuthenticatedUser(app.Queries, r)
 	if err != nil {
-		app.ServerError(w, r, err)
+		app.InvalidAuthenticationToken(w, r)
 		return
 	}
 
@@ -76,26 +78,17 @@ func (app *ApiApplication) gameSessionWS(w http.ResponseWriter, r *http.Request)
 	}
 }
 
-type chatHistoryOut struct {
-	Messages []messageOut `json:"messages"`
-}
-
-type messageOut struct {
-	ID       int    `json:"id"`
-	Text     string `json:"text"`
-	SenderID int    `json:"sender_id"`
-}
-
-func (app *ApiApplication) getChatHistoryHandler(w http.ResponseWriter, r *http.Request) {
-	tgUser, err := ContextGetAuthenticatedUser(app.Queries, r)
-	if err != nil {
-		app.ServerError(w, r, err)
-		return
+func (app *ApiApplication) GetChatHistory(
+	ctx context.Context,
+	req *connect.Request[sessionv1.GetChatHistoryRequest],
+) (*connect.Response[sessionv1.GetChatHistoryResponse], error) {
+	person := app.AuthenticateHeader(ctx, req.Header())
+	if person == nil {
+		return nil, connect.NewError(connect.CodeUnauthenticated, errors.New("unknown user"))
 	}
-	gameSession, ok := app.AllSessions.Get(strconv.Itoa(tgUser.TgID))
+	gameSession, ok := app.AllSessions.Get(strconv.Itoa(person.TgID))
 	if !ok {
-		app.NotFound(w, r)
-		return
+		return nil, connect.NewError(connect.CodeNotFound, errors.New("no game found"))
 	}
 	// NOTE: in case of dynamic Limit and offset cap limit by 50
 	allMessages, err := app.Queries.GetSessionMessages(context.Background(), database.GetSessionMessagesParams{
@@ -103,25 +96,24 @@ func (app *ApiApplication) getChatHistoryHandler(w http.ResponseWriter, r *http.
 		Limit:     50,
 	})
 	if err != nil {
-		app.ServerError(w, r, err)
-		return
+		slog.Error("can't get message history", "error", err)
+		return nil, connect.NewError(connect.CodeUnknown, errors.New("internal"))
 	}
 
 	messageLen := len(allMessages)
-	mhOut := chatHistoryOut{
-		Messages: make([]messageOut, messageLen),
+	// mhOut := chatHistoryOut{
+	// 	Messages: make([]messageOut, messageLen),
+	// }
+	response := &sessionv1.GetChatHistoryResponse{
+		Messages: make([]*sessionv1.ChatMessage, messageLen),
 	}
 	for index, message := range allMessages {
-		mhOut.Messages[messageLen-1-index] = messageOut{
-			ID:       message.ID,
+		response.Messages[messageLen-1-index] = &sessionv1.ChatMessage{
+			Id:       int64(message.ID),
 			Text:     message.Message,
-			SenderID: message.PlayerID,
+			PlayerId: int64(message.PlayerID),
 		}
 	}
 
-	err = response.JSON(w, http.StatusOK, &mhOut)
-	if err != nil {
-		app.ServerError(w, r, err)
-		return
-	}
+	return connect.NewResponse(response), nil
 }

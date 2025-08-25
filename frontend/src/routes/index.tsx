@@ -83,5 +83,3 @@ function GameChooser({ name, selected, onSelect }: GameChooserProps) {
 		</button>
 	);
 }
-
-

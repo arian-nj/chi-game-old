@@ -84,7 +84,7 @@ func (gs *GameSession) HandleWebChatMessage(sessionPlayer *SessionPlayer, chatMs
 		newChatMsg := &sessionv1.SessionMessage{
 			Content: &sessionv1.SessionMessage_Chat{
 				Chat: &sessionv1.ChatMessage{
-					PlayerId: int32(senderPlayer.ID),
+					PlayerId: int64(senderPlayer.ID),
 					Text:     messageText,
 				},
 			},

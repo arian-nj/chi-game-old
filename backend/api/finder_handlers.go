@@ -14,11 +14,11 @@ import (
 	"google.golang.org/protobuf/proto"
 )
 
-func (app *ApiApplication) makeMatchMakingTicket(w http.ResponseWriter, r *http.Request) {
+func (app *ApiApplication) makeMatchMakingTicketWS(w http.ResponseWriter, r *http.Request) {
 	tgUser, err := ContextGetAuthenticatedUser(app.Queries, r)
 	if err != nil {
-		app.ServerError(w, r, err)
-		slog.Error("can't get user")
+		app.InvalidAuthenticationToken(w, r)
+		slog.Error("invalid auth", "err", err)
 		return
 	}
 

@@ -2,7 +2,7 @@
 // @generated from file session/v1/session.proto (package session.v1, syntax proto3)
 /* eslint-disable */
 
-import type { GenFile, GenMessage } from "@bufbuild/protobuf/codegenv2";
+import type { GenFile, GenMessage, GenService } from "@bufbuild/protobuf/codegenv2";
 import type { Message } from "@bufbuild/protobuf";
 import type { XoGameMessage } from "../../xo_game/v1/xo_pb";
 
@@ -12,6 +12,8 @@ import type { XoGameMessage } from "../../xo_game/v1/xo_pb";
 export declare const file_session_v1_session: GenFile;
 
 /**
+ * Chat
+ *
  * @generated from message session.v1.ChatMessageRequest
  */
 export declare type ChatMessageRequest = Message<"session.v1.ChatMessageRequest"> & {
@@ -32,14 +34,19 @@ export declare const ChatMessageRequestSchema: GenMessage<ChatMessageRequest>;
  */
 export declare type ChatMessage = Message<"session.v1.ChatMessage"> & {
   /**
-   * @generated from field: int32 player_id = 1;
+   * @generated from field: int64 player_id = 1;
    */
-  playerId: number;
+  playerId: bigint;
 
   /**
    * @generated from field: string text = 2;
    */
   text: string;
+
+  /**
+   * @generated from field: int64 id = 3;
+   */
+  id: bigint;
 };
 
 /**
@@ -49,6 +56,8 @@ export declare type ChatMessage = Message<"session.v1.ChatMessage"> & {
 export declare const ChatMessageSchema: GenMessage<ChatMessage>;
 
 /**
+ * Game Session
+ *
  * @generated from message session.v1.GameMessage
  */
 export declare type GameMessage = Message<"session.v1.GameMessage"> & {
@@ -71,6 +80,8 @@ export declare type GameMessage = Message<"session.v1.GameMessage"> & {
 export declare const GameMessageSchema: GenMessage<GameMessage>;
 
 /**
+ * / Session
+ *
  * @generated from message session.v1.SessionMessage
  */
 export declare type SessionMessage = Message<"session.v1.SessionMessage"> & {
@@ -103,4 +114,46 @@ export declare type SessionMessage = Message<"session.v1.SessionMessage"> & {
  * Use `create(SessionMessageSchema)` to create a new message.
  */
 export declare const SessionMessageSchema: GenMessage<SessionMessage>;
+
+/**
+ * @generated from message session.v1.GetChatHistoryRequest
+ */
+export declare type GetChatHistoryRequest = Message<"session.v1.GetChatHistoryRequest"> & {
+};
+
+/**
+ * Describes the message session.v1.GetChatHistoryRequest.
+ * Use `create(GetChatHistoryRequestSchema)` to create a new message.
+ */
+export declare const GetChatHistoryRequestSchema: GenMessage<GetChatHistoryRequest>;
+
+/**
+ * @generated from message session.v1.GetChatHistoryResponse
+ */
+export declare type GetChatHistoryResponse = Message<"session.v1.GetChatHistoryResponse"> & {
+  /**
+   * @generated from field: repeated session.v1.ChatMessage messages = 1;
+   */
+  messages: ChatMessage[];
+};
+
+/**
+ * Describes the message session.v1.GetChatHistoryResponse.
+ * Use `create(GetChatHistoryResponseSchema)` to create a new message.
+ */
+export declare const GetChatHistoryResponseSchema: GenMessage<GetChatHistoryResponse>;
+
+/**
+ * @generated from service session.v1.SessionService
+ */
+export declare const SessionService: GenService<{
+  /**
+   * @generated from rpc session.v1.SessionService.GetChatHistory
+   */
+  getChatHistory: {
+    methodKind: "unary";
+    input: typeof GetChatHistoryRequestSchema;
+    output: typeof GetChatHistoryResponseSchema;
+  },
+}>;
 

@@ -1,0 +1,26 @@
+syntax = "proto3";
+
+package account.v1;
+
+message Account {
+  int64 id = 1;
+}
+
+service AccountService {
+  rpc GetMe(GetMeRequest) returns (GetMeResponse);
+  // rpc GetUser(GetUserRequest) returns (GetUserResponse);
+}
+
+message GetMeRequest {}
+
+message GetMeResponse {
+  Account account = 1;
+}
+
+// message GetUserRequest {
+//   int64 id = 1;
+// }
+//
+// message GetUserResponse {
+//   Account account = 1;
+// }

@@ -11,6 +11,9 @@ import (
 	gamesessions "github.com/arian-nj/chibazi/backend/game_sessions"
 	"github.com/arian-nj/chibazi/backend/internals/config"
 	matchmaking "github.com/arian-nj/chibazi/backend/match_making"
+
+	"golang.org/x/net/http2"
+	"golang.org/x/net/http2/h2c"
 )
 
 type ApiApplication struct {
@@ -33,15 +36,13 @@ func (app *ApiApplication) RunApi(ctx context.Context, wg *sync.WaitGroup) {
 	wg.Add(1)
 	defer wg.Done()
 	router := app.createRouter()
-
 	srv := &http.Server{
 		Addr:         ":8383",
-		Handler:      router,
+		Handler:      h2c.NewHandler(router, &http2.Server{}),
 		ReadTimeout:  5 * time.Second,
 		WriteTimeout: 10 * time.Second,
 		IdleTimeout:  60 * time.Second,
 	}
-
 	go func() {
 		slog.Info("Starting server on " + srv.Addr)
 		if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {

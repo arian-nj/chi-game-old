@@ -1,0 +1,24 @@
+syntax = "proto3";
+
+package auth.v1;
+
+service AuthService {
+  rpc ValidateTelegramInitData(ValidateTelegramInitDataRequest) returns (ValidateTelegramInitDataResponse) {}
+  rpc DummyValidate(DummyValidateRequest) returns (DummyValidateResponse) {}
+}
+
+message ValidateTelegramInitDataRequest {
+  string init_data = 1;
+}
+
+message ValidateTelegramInitDataResponse {
+  string token = 1;
+}
+
+message DummyValidateRequest {
+  int64 id = 1;
+}
+
+message DummyValidateResponse {
+  string token = 1;
+}

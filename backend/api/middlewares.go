@@ -3,6 +3,7 @@ package api
 import (
 	"context"
 	"errors"
+	"log/slog"
 	"net/http"
 	"strings"
 
@@ -10,31 +11,64 @@ import (
 	"github.com/jackc/pgx/v5"
 )
 
-func (app *ApiApplication) Authenticate(next http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Add("Vary", "Authorization")
+func (app *ApiApplication) AuthenticateHeader(ctx context.Context, header http.Header) *database.Person {
+	header.Add("Vary", "Authorization")
 
-		authorizationHeader := r.Header.Get("Authorization")
-		if authorizationHeader == "" {
-			app.invalidAuthenticationCreds(w, r)
-			return
-		}
+	authorizationHeader := header.Get("Authorization")
+	if authorizationHeader == "" {
+		return nil
+	}
 
-		headerParts := strings.Split(authorizationHeader, " ")
+	headerParts := strings.Split(authorizationHeader, " ")
 
-		if len(headerParts) == 2 && headerParts[0] == "Bearer" {
-			token := headerParts[1]
-			newRequest := app.ValidateToken(w, r, token)
-			if newRequest == nil {
-				return
+	if (len(headerParts) == 2 && headerParts[0] == "Bearer") == false {
+		return nil
+	}
+	token := headerParts[1]
+	userID, err := app.ValidateToken(token)
+	if err != nil {
+		slog.Error("authorize header ", "error", err)
+		return nil
+	}
+
+	person, err := app.Queries.GetTgUserByID(ctx, userID)
+
+	if err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			person, err = app.Queries.CreateTgUser(ctx, userID)
+			if err != nil {
+				return nil
 			}
-			r = newRequest
 		}
-
-		next.ServeHTTP(w, r)
-	})
+		return nil
+	}
+	return &person
 }
 
+//	func (app *ApiApplication) Authenticate(next http.Handler) http.Handler {
+//		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+//			w.Header().Add("Vary", "Authorization")
+//
+//			authorizationHeader := r.Header.Get("Authorization")
+//			if authorizationHeader == "" {
+//				app.invalidAuthenticationCreds(w, r)
+//				return
+//			}
+//
+//			headerParts := strings.Split(authorizationHeader, " ")
+//
+//			if len(headerParts) == 2 && headerParts[0] == "Bearer" {
+//				token := headerParts[1]
+//				newRequest := app.ValidateToken(w, r, token)
+//				if newRequest == nil {
+//					return
+//				}
+//				r = newRequest
+//			}
+//
+//			next.ServeHTTP(w, r)
+//		})
+//	}
 func (app *ApiApplication) AuthenticateQuery(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		token := r.URL.Query().Get("auth_token")
@@ -42,12 +76,14 @@ func (app *ApiApplication) AuthenticateQuery(next http.Handler) http.Handler {
 			app.invalidAuthenticationCreds(w, r)
 			return
 		}
-
-		newRequest := app.ValidateToken(w, r, token)
-
-		if newRequest == nil {
+		userID, err := app.ValidateToken(token)
+		if err != nil {
+			app.invalidAuthenticationCreds(w, r)
 			return
 		}
+
+		reqUser := &ReqContextUser{UserID: userID}
+		newRequest := ContextSetAuthenticatedUser(r, reqUser)
 
 		next.ServeHTTP(w, newRequest)
 	})

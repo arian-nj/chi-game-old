@@ -2,14 +2,14 @@
 // @generated from file session/v1/session.proto (package session.v1, syntax proto3)
 /* eslint-disable */
 
-import { fileDesc, messageDesc } from "@bufbuild/protobuf/codegenv2";
+import { fileDesc, messageDesc, serviceDesc } from "@bufbuild/protobuf/codegenv2";
 import { file_xo_game_v1_xo } from "../../xo_game/v1/xo_pb";
 
 /**
  * Describes the file session/v1/session.proto.
  */
 export const file_session_v1_session = /*@__PURE__*/
-  fileDesc("ChhzZXNzaW9uL3YxL3Nlc3Npb24ucHJvdG8SCnNlc3Npb24udjEiIgoSQ2hhdE1lc3NhZ2VSZXF1ZXN0EgwKBHRleHQYASABKAkiLgoLQ2hhdE1lc3NhZ2USEQoJcGxheWVyX2lkGAEgASgFEgwKBHRleHQYAiABKAkiPgoLR2FtZU1lc3NhZ2USJwoCeG8YASABKAsyGS54b19nYW1lLnYxLlhvR2FtZU1lc3NhZ2VIAEIGCgRnYW1lIqEBCg5TZXNzaW9uTWVzc2FnZRInCgRjaGF0GAEgASgLMhcuc2Vzc2lvbi52MS5DaGF0TWVzc2FnZUgAEjIKCGNoYXRfcmVxGAIgASgLMh4uc2Vzc2lvbi52MS5DaGF0TWVzc2FnZVJlcXVlc3RIABInCgRnYW1lGAMgASgLMhcuc2Vzc2lvbi52MS5HYW1lTWVzc2FnZUgAQgkKB2NvbnRlbnRCpQEKDmNvbS5zZXNzaW9uLnYxQgxTZXNzaW9uUHJvdG9QAVo8Z2l0aHViLmNvbS9hcmlhbi1uai9jaGliYXppL2JhY2tlbmQvZ2VuL3Nlc3Npb24vdjE7c2Vzc2lvbnYxogIDU1hYqgIKU2Vzc2lvbi5WMcoCClNlc3Npb25cVjHiAhZTZXNzaW9uXFYxXEdQQk1ldGFkYXRh6gILU2Vzc2lvbjo6VjFiBnByb3RvMw", [file_xo_game_v1_xo]);
+  fileDesc("ChhzZXNzaW9uL3YxL3Nlc3Npb24ucHJvdG8SCnNlc3Npb24udjEiIgoSQ2hhdE1lc3NhZ2VSZXF1ZXN0EgwKBHRleHQYASABKAkiOgoLQ2hhdE1lc3NhZ2USEQoJcGxheWVyX2lkGAEgASgDEgwKBHRleHQYAiABKAkSCgoCaWQYAyABKAMiPgoLR2FtZU1lc3NhZ2USJwoCeG8YASABKAsyGS54b19nYW1lLnYxLlhvR2FtZU1lc3NhZ2VIAEIGCgRnYW1lIqEBCg5TZXNzaW9uTWVzc2FnZRInCgRjaGF0GAEgASgLMhcuc2Vzc2lvbi52MS5DaGF0TWVzc2FnZUgAEjIKCGNoYXRfcmVxGAIgASgLMh4uc2Vzc2lvbi52MS5DaGF0TWVzc2FnZVJlcXVlc3RIABInCgRnYW1lGAMgASgLMhcuc2Vzc2lvbi52MS5HYW1lTWVzc2FnZUgAQgkKB2NvbnRlbnQiFwoVR2V0Q2hhdEhpc3RvcnlSZXF1ZXN0IkMKFkdldENoYXRIaXN0b3J5UmVzcG9uc2USKQoIbWVzc2FnZXMYASADKAsyFy5zZXNzaW9uLnYxLkNoYXRNZXNzYWdlMmsKDlNlc3Npb25TZXJ2aWNlElkKDkdldENoYXRIaXN0b3J5EiEuc2Vzc2lvbi52MS5HZXRDaGF0SGlzdG9yeVJlcXVlc3QaIi5zZXNzaW9uLnYxLkdldENoYXRIaXN0b3J5UmVzcG9uc2UiAEKlAQoOY29tLnNlc3Npb24udjFCDFNlc3Npb25Qcm90b1ABWjxnaXRodWIuY29tL2FyaWFuLW5qL2NoaWJhemkvYmFja2VuZC9nZW4vc2Vzc2lvbi92MTtzZXNzaW9udjGiAgNTWFiqAgpTZXNzaW9uLlYxygIKU2Vzc2lvblxWMeICFlNlc3Npb25cVjFcR1BCTWV0YWRhdGHqAgtTZXNzaW9uOjpWMWIGcHJvdG8z", [file_xo_game_v1_xo]);
 
 /**
  * Describes the message session.v1.ChatMessageRequest.
@@ -38,4 +38,24 @@ export const GameMessageSchema = /*@__PURE__*/
  */
 export const SessionMessageSchema = /*@__PURE__*/
   messageDesc(file_session_v1_session, 3);
+
+/**
+ * Describes the message session.v1.GetChatHistoryRequest.
+ * Use `create(GetChatHistoryRequestSchema)` to create a new message.
+ */
+export const GetChatHistoryRequestSchema = /*@__PURE__*/
+  messageDesc(file_session_v1_session, 4);
+
+/**
+ * Describes the message session.v1.GetChatHistoryResponse.
+ * Use `create(GetChatHistoryResponseSchema)` to create a new message.
+ */
+export const GetChatHistoryResponseSchema = /*@__PURE__*/
+  messageDesc(file_session_v1_session, 5);
+
+/**
+ * @generated from service session.v1.SessionService
+ */
+export const SessionService = /*@__PURE__*/
+  serviceDesc(file_session_v1_session, 0);
 

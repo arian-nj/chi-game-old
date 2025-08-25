@@ -121,6 +121,7 @@
 [X] play game web
 
 [X] alert invalid move
+[X] move every rest api to rpc
 [ ] show user card on top
 [ ] show timer 
 [ ] rejoin game web

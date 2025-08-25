@@ -3,13 +3,15 @@ module github.com/arian-nj/chibazi/backend
 go 1.24.3
 
 require (
+	connectrpc.com/connect v1.18.1
+	connectrpc.com/cors v0.1.0
 	github.com/coder/websocket v1.8.13
-	github.com/go-chi/chi/v5 v5.2.2
-	github.com/go-chi/cors v1.2.2
 	github.com/golang-jwt/jwt/v5 v5.2.3
 	github.com/jackc/pgx/v5 v5.7.5
 	github.com/pressly/goose/v3 v3.24.3
+	github.com/rs/cors v1.11.1
 	golang.org/x/crypto v0.38.0
+	golang.org/x/net v0.40.0
 	golang.org/x/time v0.0.0-20191024005414-555d28b269f0
 	google.golang.org/protobuf v1.36.6
 	gopkg.in/telebot.v4 v4.0.0-beta.5
