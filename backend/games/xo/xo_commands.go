@@ -1,5 +1,7 @@
 package xo
 
+import "log/slog"
+
 type XoSubscriber interface {
 	Update(state *XOGame, command Command)
 }
@@ -23,6 +25,10 @@ func NewPlayCommand(pos int, moveType Cell, playerID int) *MoveCommand {
 }
 
 func (mv *MoveCommand) Execute(game *XOGame) {
+	if game.GetCurrentPlayer().ID != mv.PlayerID {
+		slog.Error("play commad recieved wrongly")
+		return
+	}
 	game.Board.SetCell(mv.Pos, mv.MoveType)
 
 	hasWon := game.Board.HasWon(mv.Pos)

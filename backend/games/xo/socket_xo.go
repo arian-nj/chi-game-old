@@ -64,7 +64,7 @@ func (game *XOGame) PlayHandlerSocket(playInput *xo_gamev1.Play, playerID int) {
 		return
 	}
 
-	if game.IsPlayersTurnID(playerID) == false {
+	if game.GetCurrentPlayer().ID != playerID {
 		sendInvalidResponse(player, "نوبت تو نیست", playInput.CellIndex)
 		return
 	}

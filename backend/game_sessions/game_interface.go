@@ -10,10 +10,12 @@ import (
 
 type Game interface {
 	AddPlayer(id int, name string, tgId int, socket *socket.Socket)
-	CallBackRouter(c telebot.Context) error
+	SetPlayerSocket(ID int, socket *socket.Socket)
 	SocketRouter(session *sessionv1.GameMessage, playerId int)
-	GetContext() context.Context
-	StartGame() error
+
+	CallBackRouter(c telebot.Context) error
 	SendJoinPanelAddSender(telebot.Context) error
-	SetPlayerSocket(tgId int, socket *socket.Socket)
+
+	StartGame() error
+	GetContext() context.Context
 }

@@ -122,12 +122,12 @@
 
 [X] alert invalid move
 [X] move every rest api to rpc
-[ ] show game session player in front
-[ ] show timer 
+[X] show game players in front
+[ ] show turns
+[ ] timer module
 [ ] rejoin game web
 [ ] Send Join Panel
 
-[ ] color pallete
 [ ] new message bubble
 
 # bot look

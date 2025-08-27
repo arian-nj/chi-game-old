@@ -48,6 +48,18 @@ func (tg *XoTelegramListener) Update(game *XOGame, command Command) {
 	}
 }
 
+func (g *XOGame) CallBackRouter(c telebot.Context) error {
+	callbackData := c.Callback().Data
+	if callbackData == "join" {
+		// return g.XOJoinGameHandler(c)
+
+	} else if after, hasPrefix := strings.CutPrefix(callbackData, "play_"); hasPrefix {
+		return g.XOPlayHandler(c, after)
+	}
+	return c.RespondAlert("no a valid callback")
+}
+
+// send Commands
 func (tg *XoTelegramListener) EditDuringGameBoard(game *XOGame) error {
 	err := tg.Edit(tg, XOStartText+"\n\n"+game.RulesText(),
 		keybul.CreateInlineKeyboard(
@@ -58,17 +70,6 @@ func (tg *XoTelegramListener) EditDuringGameBoard(game *XOGame) error {
 		game.Players,
 	)
 	return err
-}
-
-func (g *XOGame) CallBackRouter(c telebot.Context) error {
-	callbackData := c.Callback().Data
-	if callbackData == "join" {
-		// return g.XOJoinGameHandler(c)
-
-	} else if after, hasPrefix := strings.CutPrefix(callbackData, "play_"); hasPrefix {
-		return g.XOPlayHandler(c, after)
-	}
-	return c.RespondAlert("no a valid callback")
 }
 
 func (tg *XoTelegramListener) TheEnd(game *XOGame, winner *XoPlayer, additionalText string) error {
@@ -96,6 +97,8 @@ func (tg *XoTelegramListener) TieGame(game *XOGame) error {
 	return err
 }
 
+// Reciecves Actions
+
 // func (g *XOGame) XOJoinGameHandler(c telebot.Context) error {
 // 	sender := c.Callback().Sender
 // 	if sender.ID == int64(g.Players[0].TgID) {
@@ -114,7 +117,7 @@ func (tg *XoTelegramListener) TieGame(game *XOGame) error {
 func (game *XOGame) XOPlayHandler(c telebot.Context, callbackData string) error {
 	sender := c.Sender()
 
-	if game.IsPlayersTurnTg(int(sender.ID)) == false {
+	if game.getCurrentPlayer().TelegramID != int(sender.ID) {
 		return c.RespondText("نوبت تو نیست!")
 	}
 
@@ -123,20 +126,20 @@ func (game *XOGame) XOPlayHandler(c telebot.Context, callbackData string) error 
 		c.RespondAlert("یه مشکلی هست")
 	}
 
-	moveType := game.GetCurrentPlayer().Move
+	moveType := game.getCurrentPlayer().Move
 
 	isValid, errMsg := game.Board.IsMoveValid(cellIndex, moveType)
 	if !isValid {
 		return c.RespondText(errMsg)
 	}
 
-	player := game.FindByTelegramID(int(sender.ID))
+	player := game.findByTelegramID(int(sender.ID))
 	if player == nil {
 		return c.RespondText("can't find player")
 	}
 
 	playCommand := NewPlayCommand(cellIndex, moveType, player.ID)
-	game.PushCommand(playCommand)
+	game.pushCommand(playCommand)
 	return nil
 }
 
