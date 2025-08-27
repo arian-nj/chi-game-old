@@ -1,12 +1,10 @@
 package xo
 
 import (
-	"encoding/json"
 	"log/slog"
 
 	sessionv1 "github.com/arian-nj/chibazi/backend/gen/session/v1"
 	xo_gamev1 "github.com/arian-nj/chibazi/backend/gen/xo_game/v1"
-	"github.com/arian-nj/chibazi/backend/internals/socket"
 )
 
 // FIXME: make it map handler with auto Converting inputs
@@ -58,18 +56,18 @@ func sendInvalidResponse(player *XoPlayer, errMsg string, cellIndex int32) error
 }
 
 func (game *XOGame) PlayHandlerSocket(playInput *xo_gamev1.Play, playerID int) {
-	player := game.FindByID(playerID)
+	player := game.findByID(playerID)
 	if player == nil {
 		slog.Error("can't find player in socjet play handler")
 		return
 	}
 
-	if game.GetCurrentPlayer().ID != playerID {
+	if game.getCurrentPlayer().ID != playerID {
 		sendInvalidResponse(player, "نوبت تو نیست", playInput.CellIndex)
 		return
 	}
 
-	moveType := game.GetCurrentPlayer().Move
+	moveType := game.getCurrentPlayer().Move
 
 	isValid, errMsg := game.Board.IsMoveValid(int(playInput.CellIndex), moveType)
 	if !isValid {
@@ -81,35 +79,7 @@ func (game *XOGame) PlayHandlerSocket(playInput *xo_gamev1.Play, playerID int) {
 	}
 
 	playCommand := NewPlayCommand(int(playInput.CellIndex), moveType, player.ID)
-	game.PushCommand(playCommand)
-}
-
-const (
-	StartActionType socket.ActionType = "start"
-	MoveActionType  socket.ActionType = "move"
-)
-
-func (g *XOGame) StartSocket() error {
-	startAction := socket.NewGameAction(StartActionType, json.RawMessage{})
-	data_byte, err := json.Marshal(startAction)
-	if err != nil {
-		return err
-	}
-	for _, player := range g.Players {
-
-		if player.Socket != nil {
-			err := player.Socket.SendNewEvent(socket.GameEventType, string(data_byte))
-			if err != nil {
-				slog.Error("can't send new event to player", "err", err)
-			}
-		}
-	}
-	return nil
-}
-
-type MoveAction struct {
-	MoveIndex int `json:"index"`
-	CellType  int `json:"value"`
+	game.pushCommand(playCommand)
 }
 
 func (sl *SocketListener) SocketBrodcastNewMove(game *XOGame, moveIndex int, cellType Cell, playerID int) {

@@ -23,13 +23,13 @@ var (
 )
 
 func (app *ApiApplication) gameSessionWS(w http.ResponseWriter, r *http.Request) {
-	tgUser, err := ContextGetAuthenticatedUser(app.Queries, r)
+	personRow, err := ContextGetAuthenticatedUser(app.Queries, r)
 	if err != nil {
 		app.InvalidAuthenticationToken(w, r)
 		return
 	}
 
-	gameSession, found := app.AllSessions.Get(strconv.Itoa(tgUser.TgID))
+	gameSession, found := app.AllSessions.Get(strconv.Itoa(personRow.TgID))
 	if found == false {
 		app.NotFound(w, r)
 		return
@@ -56,14 +56,14 @@ func (app *ApiApplication) gameSessionWS(w http.ResponseWriter, r *http.Request)
 	var sessionPlayer *gamesessions.SessionPlayer
 
 	for _, SPlayer := range gameSession.Players {
-		if SPlayer.TgID == tgUser.TgID {
+		if SPlayer.TgID == personRow.TgID {
 			sessionPlayer = SPlayer
 			break
 		}
 	}
 	sessionPlayer.Socket = socketClient
 	if gameSession.GameState != nil {
-		gameSession.GameState.SetPlayerSocket(tgUser.TgID, socketClient)
+		gameSession.GameState.SetPlayerSocket(personRow.ID, socketClient)
 	}
 
 	for {

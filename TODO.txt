@@ -123,9 +123,10 @@
 [X] alert invalid move
 [X] move every rest api to rpc
 [X] show game players in front
-[ ] show turns
+[ ] declare turns
 [ ] timer module
 [ ] rejoin game web
+[ ] 5x5 game
 [ ] Send Join Panel
 
 [ ] new message bubble
@@ -135,17 +136,12 @@
 [ ] add /help
 [ ] add command list
 
-
 ## WARNINGS
 [X] Clean and Disconnect Session
-[ ] set actual tg id in context middleware
-[ ] Remove Game.Players()?
 [ ] Limit Chat Message burst for telegram bot 1per 1s ?
 [X] duplicate ticket sending
 maybe add scroing to make it harder to use other bots
 [ ] create user if came stright to web
-
-[ ] visual notify on new message
 
 # 1.0.0
 [ ] log tickets in database for miss rate

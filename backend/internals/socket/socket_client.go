@@ -2,7 +2,6 @@ package socket
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"log/slog"
 	"net/http"
@@ -72,36 +71,4 @@ func (sc *Socket) SendMessage(message proto.Message) error {
 	}
 	return sc.Conn.Write(sc.Ctx, websocket.MessageBinary, out)
 
-}
-
-func (sc *Socket) WriteText(text string) error {
-	return sc.Conn.Write(sc.Ctx, websocket.MessageText, []byte(text))
-}
-
-func (sc *Socket) sendEvent(newEvent *SocketEvent) error {
-	data_btye, err := json.Marshal(newEvent)
-	if err != nil {
-		slog.Error("can't marshal event %w", "error", err)
-		return err
-	}
-
-	err = sc.Conn.Write(sc.Ctx, websocket.MessageBinary, data_btye)
-	if err != nil {
-		slog.Error("can not write event %w", "error", err)
-		return err
-	}
-	return nil
-}
-
-func (sc *Socket) SendNewEvent(Etype SocketEventType, data any) error {
-	raw, err := json.Marshal(data)
-	if err != nil {
-		return err
-	}
-	return sc.sendEvent(NewSocketEvent(Etype, raw))
-}
-
-func (s *Socket) SendNewAction(AType ActionType, data any) error {
-	newAction := NewGameAction(AType, data)
-	return s.SendNewEvent(GameEventType, newAction)
 }

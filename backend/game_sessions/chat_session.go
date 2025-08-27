@@ -7,7 +7,6 @@ import (
 
 	"github.com/arian-nj/chibazi/backend/database"
 	sessionv1 "github.com/arian-nj/chibazi/backend/gen/session/v1"
-	"github.com/arian-nj/chibazi/backend/internals/socket"
 	"github.com/arian-nj/chibazi/backend/internals/utils"
 	"gopkg.in/telebot.v4"
 )
@@ -36,12 +35,7 @@ func (gs *GameSession) HandleBotChatMessage(bot telebot.API, senderID int, messa
 		slog.Error("can't send chat message from bot", "error", err)
 	}
 
-	if recieverPlayer.Socket != nil {
-		err := recieverPlayer.Socket.SendNewEvent(socket.ChatEventType, messageText)
-		if err != nil {
-			slog.Error("can't send chat message to socket", "error", err, "message", messageText)
-		}
-	}
+	SendChatMessageInWeb(recieverPlayer, senderPlayer, messageText)
 
 	utils.RunBackgroundTask(func() {
 		_, err := gs.Queries.CreateSessionMessage(context.Background(), database.CreateSessionMessageParams{
@@ -80,20 +74,7 @@ func (gs *GameSession) HandleWebChatMessage(sessionPlayer *SessionPlayer, chatMs
 		}
 	}
 
-	if recieverPlayer.Socket != nil {
-		newChatMsg := &sessionv1.SessionMessage{
-			Content: &sessionv1.SessionMessage_Chat{
-				Chat: &sessionv1.ChatMessage{
-					PlayerId: int64(senderPlayer.ID),
-					Text:     messageText,
-				},
-			},
-		}
-		err := recieverPlayer.Socket.SendMessage(newChatMsg)
-		if err != nil {
-			slog.Error("error seding message to socket", "error", err)
-		}
-	}
+	SendChatMessageInWeb(recieverPlayer, senderPlayer, messageText)
 
 	err := SendChatMessageInBot(gs.Bot, recieverPlayer.TgID, string(messageText), senderPlayer.Name)
 	if err != nil {
@@ -121,4 +102,21 @@ func SendChatMessageInBot(bot telebot.API, toId int, text string, senderName str
 	_, err := bot.Send(&telebot.User{ID: int64(toId)},
 		fmt.Sprintf("*_%s:_* %s", senderName, text), telebot.ModeMarkdownV2)
 	return err
+}
+
+func SendChatMessageInWeb(recieverPlayer *SessionPlayer, senderPlayer *SessionPlayer, messageText string) {
+	if recieverPlayer.Socket != nil {
+		newChatMsg := &sessionv1.SessionMessage{
+			Content: &sessionv1.SessionMessage_Chat{
+				Chat: &sessionv1.ChatMessage{
+					PlayerId: int64(senderPlayer.ID),
+					Text:     messageText,
+				},
+			},
+		}
+		err := recieverPlayer.Socket.SendMessage(newChatMsg)
+		if err != nil {
+			slog.Error("error seding message to socket", "error", err)
+		}
+	}
 }

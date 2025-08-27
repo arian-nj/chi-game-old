@@ -25,7 +25,7 @@ func NewPlayCommand(pos int, moveType Cell, playerID int) *MoveCommand {
 }
 
 func (mv *MoveCommand) Execute(game *XOGame) {
-	if game.GetCurrentPlayer().ID != mv.PlayerID {
+	if game.getCurrentPlayer().ID != mv.PlayerID {
 		slog.Error("play commad recieved wrongly")
 		return
 	}
@@ -35,16 +35,16 @@ func (mv *MoveCommand) Execute(game *XOGame) {
 
 	var endGameCommand *EndGameCommand = nil
 	if hasWon {
-		endGameCommand = NewEndGameCommand(game.GetCurrentPlayer(), "")
+		endGameCommand = NewEndGameCommand(game.getCurrentPlayer(), "")
 	} else if !game.Board.IsAnyCellEmpty() {
 		endGameCommand = NewEndGameCommand(nil, "")
 	}
 
 	if endGameCommand != nil {
-		game.InjectCommand(endGameCommand)
+		game.injectCommand(endGameCommand)
 		return
 	}
-	game.NextPlayer()
+	game.nextPlayer()
 	// return g.EditDuringGameBoard(c.Bot())
 }
 
