@@ -11,14 +11,23 @@ import (
 	"gopkg.in/telebot.v4"
 )
 
-type TelegramListener struct {
+type XoTelegramListener struct {
 	Bot *telebot.Bot
 
 	LastEdit     time.Time
 	ViaMessageId string // Via Bots
 }
 
-func (tg *TelegramListener) Update(game *XOGame, command Command) {
+func NewXOTelegramListener(bot *telebot.Bot, viaMessageID string) *XoTelegramListener {
+	return &XoTelegramListener{
+		Bot:          bot,
+		LastEdit:     time.Now(),
+		ViaMessageId: viaMessageID,
+	}
+}
+
+func (tg *XoTelegramListener) Update(game *XOGame, command Command) {
+	return
 	switch c := command.(type) {
 	case *MoveCommand:
 		tg.EditDuringGameBoard(game)
@@ -39,7 +48,7 @@ func (tg *TelegramListener) Update(game *XOGame, command Command) {
 	}
 }
 
-func (tg *TelegramListener) EditDuringGameBoard(game *XOGame) error {
+func (tg *XoTelegramListener) EditDuringGameBoard(game *XOGame) error {
 	err := tg.Edit(tg, XOStartText+"\n\n"+game.RulesText(),
 		keybul.CreateInlineKeyboard(
 			keybul.CreateBotNameInlineButton(),
@@ -62,7 +71,7 @@ func (g *XOGame) CallBackRouter(c telebot.Context) error {
 	return c.RespondAlert("no a valid callback")
 }
 
-func (tg *TelegramListener) TheEnd(game *XOGame, winner *XoPlayer, additionalText string) error {
+func (tg *XoTelegramListener) TheEnd(game *XOGame, winner *XoPlayer, additionalText string) error {
 	text := game.EndGameText() + game.WinGameText(winner) + additionalText
 	err := tg.Edit(tg, text,
 		keybul.CreateInlineKeyboard(
@@ -74,7 +83,7 @@ func (tg *TelegramListener) TheEnd(game *XOGame, winner *XoPlayer, additionalTex
 	return err
 }
 
-func (tg *TelegramListener) TieGame(game *XOGame) error {
+func (tg *XoTelegramListener) TieGame(game *XOGame) error {
 	text := game.EndGameText() + "\nبازی مساوی شد"
 
 	err := tg.Edit(tg, text,
@@ -133,7 +142,7 @@ func (game *XOGame) XOPlayHandler(c telebot.Context, callbackData string) error 
 
 // HELPERS
 
-func (tg *TelegramListener) MessageSig() (string, int64) {
+func (tg *XoTelegramListener) MessageSig() (string, int64) {
 	return tg.ViaMessageId, 0
 }
 
@@ -248,7 +257,7 @@ func (game *XOGame) RulesText() string {
 	return text
 }
 
-func (tg *TelegramListener) Edit(msg telebot.Editable, text string, keyboard *telebot.ReplyMarkup, players []*XoPlayer) error {
+func (tg *XoTelegramListener) Edit(msg telebot.Editable, text string, keyboard *telebot.ReplyMarkup, players []*XoPlayer) error {
 	tg.LastEdit = time.Now()
 	if tg.ViaMessageId != "" {
 		err := keybul.EditGameMessage(tg.Bot, tg, text, keyboard)

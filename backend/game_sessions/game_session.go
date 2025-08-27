@@ -127,12 +127,13 @@ func (gs *GameSession) MonitorGameSession(allSession *AllSession) {
 			gs.IsGameEnded = true
 			if gs.Chat.IsOn {
 				expDur := 30 * time.Second
-
-				text := fmt.Sprintf("چت تا %d ثانیه دیگه بسته میشه", int(expDur.Seconds()))
-				for _, player := range gs.Players {
-					_, err := gs.Bot.Send(&telebot.User{ID: int64(player.TgID)}, text)
-					if err != nil {
-						slog.Error("can't send end game chat message", "err", err)
+				if gs.Bot != nil {
+					text := fmt.Sprintf("چت تا %d ثانیه دیگه بسته میشه", int(expDur.Seconds()))
+					for _, player := range gs.Players {
+						_, err := gs.Bot.Send(&telebot.User{ID: int64(player.TgID)}, text)
+						if err != nil {
+							slog.Error("can't send end game chat message", "err", err)
+						}
 					}
 				}
 				time.Sleep(expDur)

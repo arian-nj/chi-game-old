@@ -32,7 +32,7 @@ export function ChatInput({ setShowMessage, sendMessage }: ChatInputProps) {
 	}
 
 	return (
-		<div className="w-full border-4">
+		<div className="w-full ">
 			<form onSubmit={handleSubmit} >
 				<label htmlFor="chat" className="sr-only">Your message</label>
 				<div className="flex items-center px-3 py-2 rounded-t-lg">

@@ -7,6 +7,7 @@
 package sessionv1
 
 import (
+	v11 "github.com/arian-nj/chibazi/backend/gen/account/v1"
 	v1 "github.com/arian-nj/chibazi/backend/gen/xo_game/v1"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
@@ -373,12 +374,92 @@ func (x *GetChatHistoryResponse) GetMessages() []*ChatMessage {
 	return nil
 }
 
+type GetSessionOpponentRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetSessionOpponentRequest) Reset() {
+	*x = GetSessionOpponentRequest{}
+	mi := &file_session_v1_session_proto_msgTypes[6]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetSessionOpponentRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetSessionOpponentRequest) ProtoMessage() {}
+
+func (x *GetSessionOpponentRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_session_v1_session_proto_msgTypes[6]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetSessionOpponentRequest.ProtoReflect.Descriptor instead.
+func (*GetSessionOpponentRequest) Descriptor() ([]byte, []int) {
+	return file_session_v1_session_proto_rawDescGZIP(), []int{6}
+}
+
+type GetSessionOpponentResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Opponent      *v11.Account           `protobuf:"bytes,1,opt,name=opponent,proto3" json:"opponent,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetSessionOpponentResponse) Reset() {
+	*x = GetSessionOpponentResponse{}
+	mi := &file_session_v1_session_proto_msgTypes[7]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetSessionOpponentResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetSessionOpponentResponse) ProtoMessage() {}
+
+func (x *GetSessionOpponentResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_session_v1_session_proto_msgTypes[7]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetSessionOpponentResponse.ProtoReflect.Descriptor instead.
+func (*GetSessionOpponentResponse) Descriptor() ([]byte, []int) {
+	return file_session_v1_session_proto_rawDescGZIP(), []int{7}
+}
+
+func (x *GetSessionOpponentResponse) GetOpponent() *v11.Account {
+	if x != nil {
+		return x.Opponent
+	}
+	return nil
+}
+
 var File_session_v1_session_proto protoreflect.FileDescriptor
 
 const file_session_v1_session_proto_rawDesc = "" +
 	"\n" +
 	"\x18session/v1/session.proto\x12\n" +
-	"session.v1\x1a\x13xo_game/v1/xo.proto\"(\n" +
+	"session.v1\x1a\x18account/v1/account.proto\x1a\x13xo_game/v1/xo.proto\"(\n" +
 	"\x12ChatMessageRequest\x12\x12\n" +
 	"\x04text\x18\x01 \x01(\tR\x04text\"N\n" +
 	"\vChatMessage\x12\x1b\n" +
@@ -395,9 +476,13 @@ const file_session_v1_session_proto_rawDesc = "" +
 	"\acontent\"\x17\n" +
 	"\x15GetChatHistoryRequest\"M\n" +
 	"\x16GetChatHistoryResponse\x123\n" +
-	"\bmessages\x18\x01 \x03(\v2\x17.session.v1.ChatMessageR\bmessages2k\n" +
+	"\bmessages\x18\x01 \x03(\v2\x17.session.v1.ChatMessageR\bmessages\"\x1b\n" +
+	"\x19GetSessionOpponentRequest\"M\n" +
+	"\x1aGetSessionOpponentResponse\x12/\n" +
+	"\bopponent\x18\x01 \x01(\v2\x13.account.v1.AccountR\bopponent2\xd2\x01\n" +
 	"\x0eSessionService\x12Y\n" +
-	"\x0eGetChatHistory\x12!.session.v1.GetChatHistoryRequest\x1a\".session.v1.GetChatHistoryResponse\"\x00B\xa5\x01\n" +
+	"\x0eGetChatHistory\x12!.session.v1.GetChatHistoryRequest\x1a\".session.v1.GetChatHistoryResponse\"\x00\x12e\n" +
+	"\x12GetSessionOpponent\x12%.session.v1.GetSessionOpponentRequest\x1a&.session.v1.GetSessionOpponentResponse\"\x00B\xa5\x01\n" +
 	"\x0ecom.session.v1B\fSessionProtoP\x01Z<github.com/arian-nj/chibazi/backend/gen/session/v1;sessionv1\xa2\x02\x03SXX\xaa\x02\n" +
 	"Session.V1\xca\x02\n" +
 	"Session\\V1\xe2\x02\x16Session\\V1\\GPBMetadata\xea\x02\vSession::V1b\x06proto3"
@@ -414,29 +499,35 @@ func file_session_v1_session_proto_rawDescGZIP() []byte {
 	return file_session_v1_session_proto_rawDescData
 }
 
-var file_session_v1_session_proto_msgTypes = make([]protoimpl.MessageInfo, 6)
+var file_session_v1_session_proto_msgTypes = make([]protoimpl.MessageInfo, 8)
 var file_session_v1_session_proto_goTypes = []any{
-	(*ChatMessageRequest)(nil),     // 0: session.v1.ChatMessageRequest
-	(*ChatMessage)(nil),            // 1: session.v1.ChatMessage
-	(*GameMessage)(nil),            // 2: session.v1.GameMessage
-	(*SessionMessage)(nil),         // 3: session.v1.SessionMessage
-	(*GetChatHistoryRequest)(nil),  // 4: session.v1.GetChatHistoryRequest
-	(*GetChatHistoryResponse)(nil), // 5: session.v1.GetChatHistoryResponse
-	(*v1.XoGameMessage)(nil),       // 6: xo_game.v1.XoGameMessage
+	(*ChatMessageRequest)(nil),         // 0: session.v1.ChatMessageRequest
+	(*ChatMessage)(nil),                // 1: session.v1.ChatMessage
+	(*GameMessage)(nil),                // 2: session.v1.GameMessage
+	(*SessionMessage)(nil),             // 3: session.v1.SessionMessage
+	(*GetChatHistoryRequest)(nil),      // 4: session.v1.GetChatHistoryRequest
+	(*GetChatHistoryResponse)(nil),     // 5: session.v1.GetChatHistoryResponse
+	(*GetSessionOpponentRequest)(nil),  // 6: session.v1.GetSessionOpponentRequest
+	(*GetSessionOpponentResponse)(nil), // 7: session.v1.GetSessionOpponentResponse
+	(*v1.XoGameMessage)(nil),           // 8: xo_game.v1.XoGameMessage
+	(*v11.Account)(nil),                // 9: account.v1.Account
 }
 var file_session_v1_session_proto_depIdxs = []int32{
-	6, // 0: session.v1.GameMessage.xo:type_name -> xo_game.v1.XoGameMessage
+	8, // 0: session.v1.GameMessage.xo:type_name -> xo_game.v1.XoGameMessage
 	1, // 1: session.v1.SessionMessage.chat:type_name -> session.v1.ChatMessage
 	0, // 2: session.v1.SessionMessage.chat_req:type_name -> session.v1.ChatMessageRequest
 	2, // 3: session.v1.SessionMessage.game:type_name -> session.v1.GameMessage
 	1, // 4: session.v1.GetChatHistoryResponse.messages:type_name -> session.v1.ChatMessage
-	4, // 5: session.v1.SessionService.GetChatHistory:input_type -> session.v1.GetChatHistoryRequest
-	5, // 6: session.v1.SessionService.GetChatHistory:output_type -> session.v1.GetChatHistoryResponse
-	6, // [6:7] is the sub-list for method output_type
-	5, // [5:6] is the sub-list for method input_type
-	5, // [5:5] is the sub-list for extension type_name
-	5, // [5:5] is the sub-list for extension extendee
-	0, // [0:5] is the sub-list for field type_name
+	9, // 5: session.v1.GetSessionOpponentResponse.opponent:type_name -> account.v1.Account
+	4, // 6: session.v1.SessionService.GetChatHistory:input_type -> session.v1.GetChatHistoryRequest
+	6, // 7: session.v1.SessionService.GetSessionOpponent:input_type -> session.v1.GetSessionOpponentRequest
+	5, // 8: session.v1.SessionService.GetChatHistory:output_type -> session.v1.GetChatHistoryResponse
+	7, // 9: session.v1.SessionService.GetSessionOpponent:output_type -> session.v1.GetSessionOpponentResponse
+	8, // [8:10] is the sub-list for method output_type
+	6, // [6:8] is the sub-list for method input_type
+	6, // [6:6] is the sub-list for extension type_name
+	6, // [6:6] is the sub-list for extension extendee
+	0, // [0:6] is the sub-list for field type_name
 }
 
 func init() { file_session_v1_session_proto_init() }
@@ -458,7 +549,7 @@ func file_session_v1_session_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_session_v1_session_proto_rawDesc), len(file_session_v1_session_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   6,
+			NumMessages:   8,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

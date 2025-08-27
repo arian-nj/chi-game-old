@@ -75,13 +75,14 @@ function FinderRouteComponent() {
 	}
 
 	return (
-		<div className="flex flex-col items-center justify-center h-screen bg-gray-100 gap-6">
+		<div className="flex flex-col items-center justify-center h-screen bg-neutral-400 gap-6">
 			<DotLottieReact
 				src={EyesAnimation}
 				loop
 				autoplay
 				className="w-60 sm:w-72"
 			/>
+
 			<h1 className="text-3xl font-semibold text-gray-800 animate-pulse">
 				...دنبال حریفم
 			</h1>

@@ -15,8 +15,8 @@ SELECT * FROM persons;
 SELECT COUNT(*) FROM persons;
 
 -- name: CreateTgUser :one
-INSERT INTO persons (tg_id)
-VALUES ($1)
+INSERT INTO persons (tg_id,name)
+VALUES ($1,$2)
 ON CONFLICT (tg_id) DO UPDATE
 SET updated_at = NOW(),
     is_active = TRUE

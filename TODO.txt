@@ -122,10 +122,9 @@
 
 [X] alert invalid move
 [X] move every rest api to rpc
-[ ] show user card on top
+[ ] show game session player in front
 [ ] show timer 
 [ ] rejoin game web
-
 [ ] Send Join Panel
 
 [ ] color pallete
@@ -144,6 +143,7 @@
 [ ] Limit Chat Message burst for telegram bot 1per 1s ?
 [X] duplicate ticket sending
 maybe add scroing to make it harder to use other bots
+[ ] create user if came stright to web
 
 [ ] visual notify on new message
 

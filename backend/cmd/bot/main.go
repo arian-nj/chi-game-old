@@ -11,7 +11,6 @@ import (
 	"time"
 
 	"github.com/arian-nj/chibazi/backend/api"
-	"github.com/arian-nj/chibazi/backend/bot"
 	"github.com/arian-nj/chibazi/backend/database"
 	"github.com/arian-nj/chibazi/backend/db"
 	gamesessions "github.com/arian-nj/chibazi/backend/game_sessions"
@@ -89,15 +88,15 @@ func main() {
 	app := api.NewApiApplication(GlobalVars.Config, GlobalVars.Queries, GlobalVars.AllSessions, GlobalVars.MatchMaking)
 	go app.RunApi(parentCtx, GlobalVars.Wg)
 
-	botApp := bot.NewBotApplication(GlobalVars.Config, GlobalVars.Queries, GlobalVars.AllSessions, GlobalVars.MatchMaking)
-	bot, err := botApp.MakeBot()
-	if err != nil {
-		slog.Error("Failed to make bot", "err", err)
-		// return
-	}
-	GlobalVars.Bot = bot
-	go botApp.RunBot(bot, parentCtx, GlobalVars.Wg)
-
+	// botApp := bot.NewBotApplication(GlobalVars.Config, GlobalVars.Queries, GlobalVars.AllSessions, GlobalVars.MatchMaking)
+	// bot, err := botApp.MakeBot()
+	// if err != nil {
+	// 	slog.Error("Failed to make bot", "err", err)
+	// 	// return
+	// }
+	// GlobalVars.Bot = bot
+	// go botApp.RunBot(bot, parentCtx, GlobalVars.Wg)
+	//
 	go ClearDeadGamesCron(GlobalVars.AllSessions)
 
 	go GlobalVars.MakeMatches()
@@ -154,13 +153,12 @@ func (gv *GlobalVars) createRandomGame(gameType gametype.GameType, ticketOne *ma
 
 	switch gameType {
 	case gametype.XOGameType3X3, gametype.XOGameType5X5:
-		tgListen := xo.TelegramListener{
-			Bot:      gv.Bot,
-			LastEdit: time.Now(),
-		}
 		newXoGame := xoconsole.NewXOGame(newGameSession.SessionCtx, gametype.XOGameType3X3, gv.Bot, gv.Queries)
-		newXoGame.Register(&tgListen)
+
+		tgListen := xo.NewXOTelegramListener(gv.Bot, "")
+		newXoGame.Register(tgListen)
 		newXoGame.Register(&xo.SocketListener{})
+
 		newGame = newXoGame
 
 	default:

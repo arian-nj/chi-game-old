@@ -52,20 +52,26 @@ func (q *Queries) CountUsersTgCreatedBetween(ctx context.Context, arg CountUsers
 }
 
 const createTgUser = `-- name: CreateTgUser :one
-INSERT INTO persons (tg_id)
-VALUES ($1)
+INSERT INTO persons (tg_id,name)
+VALUES ($1,$2)
 ON CONFLICT (tg_id) DO UPDATE
 SET updated_at = NOW(),
     is_active = TRUE
-RETURNING id, tg_id, is_active, updated_at, created_at
+RETURNING id, tg_id, name, is_active, updated_at, created_at
 `
 
-func (q *Queries) CreateTgUser(ctx context.Context, tgID int) (Person, error) {
-	row := q.db.QueryRow(ctx, createTgUser, tgID)
+type CreateTgUserParams struct {
+	TgID int
+	Name string
+}
+
+func (q *Queries) CreateTgUser(ctx context.Context, arg CreateTgUserParams) (Person, error) {
+	row := q.db.QueryRow(ctx, createTgUser, arg.TgID, arg.Name)
 	var i Person
 	err := row.Scan(
 		&i.ID,
 		&i.TgID,
+		&i.Name,
 		&i.IsActive,
 		&i.UpdatedAt,
 		&i.CreatedAt,
@@ -74,7 +80,7 @@ func (q *Queries) CreateTgUser(ctx context.Context, tgID int) (Person, error) {
 }
 
 const getAllTgUsers = `-- name: GetAllTgUsers :many
-SELECT id, tg_id, is_active, updated_at, created_at FROM persons
+SELECT id, tg_id, name, is_active, updated_at, created_at FROM persons
 `
 
 func (q *Queries) GetAllTgUsers(ctx context.Context) ([]Person, error) {
@@ -89,6 +95,7 @@ func (q *Queries) GetAllTgUsers(ctx context.Context) ([]Person, error) {
 		if err := rows.Scan(
 			&i.ID,
 			&i.TgID,
+			&i.Name,
 			&i.IsActive,
 			&i.UpdatedAt,
 			&i.CreatedAt,
@@ -104,7 +111,7 @@ func (q *Queries) GetAllTgUsers(ctx context.Context) ([]Person, error) {
 }
 
 const getTgUserByID = `-- name: GetTgUserByID :one
-SELECT id, tg_id, is_active, updated_at, created_at FROM persons
+SELECT id, tg_id, name, is_active, updated_at, created_at FROM persons
 WHERE id = $1
 `
 
@@ -114,6 +121,7 @@ func (q *Queries) GetTgUserByID(ctx context.Context, id int) (Person, error) {
 	err := row.Scan(
 		&i.ID,
 		&i.TgID,
+		&i.Name,
 		&i.IsActive,
 		&i.UpdatedAt,
 		&i.CreatedAt,
@@ -122,7 +130,7 @@ func (q *Queries) GetTgUserByID(ctx context.Context, id int) (Person, error) {
 }
 
 const getTgUserByTgID = `-- name: GetTgUserByTgID :one
-SELECT id, tg_id, is_active, updated_at, created_at FROM persons
+SELECT id, tg_id, name, is_active, updated_at, created_at FROM persons
 WHERE tg_id = $1
 `
 
@@ -132,6 +140,7 @@ func (q *Queries) GetTgUserByTgID(ctx context.Context, tgID int) (Person, error)
 	err := row.Scan(
 		&i.ID,
 		&i.TgID,
+		&i.Name,
 		&i.IsActive,
 		&i.UpdatedAt,
 		&i.CreatedAt,

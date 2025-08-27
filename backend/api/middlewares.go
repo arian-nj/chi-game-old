@@ -8,7 +8,6 @@ import (
 	"strings"
 
 	"github.com/arian-nj/chibazi/backend/database"
-	"github.com/jackc/pgx/v5"
 )
 
 func (app *ApiApplication) AuthenticateHeader(ctx context.Context, header http.Header) *database.Person {
@@ -34,12 +33,7 @@ func (app *ApiApplication) AuthenticateHeader(ctx context.Context, header http.H
 	person, err := app.Queries.GetTgUserByID(ctx, userID)
 
 	if err != nil {
-		if errors.Is(err, pgx.ErrNoRows) {
-			person, err = app.Queries.CreateTgUser(ctx, userID)
-			if err != nil {
-				return nil
-			}
-		}
+		slog.Error("no user found auth header middleware", "err", err)
 		return nil
 	}
 	return &person
@@ -116,12 +110,7 @@ func ContextGetAuthenticatedUser(queries *database.Queries, r *http.Request) (*d
 	user, err = queries.GetTgUserByID(r.Context(), reqConUser.UserID)
 
 	if err != nil {
-		if errors.Is(err, pgx.ErrNoRows) {
-			user, err = queries.CreateTgUser(r.Context(), reqConUser.UserID)
-			if err != nil {
-				return nil, err
-			}
-		}
+		slog.Error("no user found in context get authticated user", "err", err)
 		return nil, err
 	}
 

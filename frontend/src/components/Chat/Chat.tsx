@@ -3,20 +3,20 @@ import { SessionSocket } from "../../lib/SessionWs";
 import { ChatBubble } from "./ChatBubble";
 import { ChatInput } from "./ChatInput";
 import { Message } from "../../types/Message";
-import { getMe } from "../../gen/account/v1/account-AccountService_connectquery";
 import { useQuery } from "@connectrpc/connect-query";
 import { getChatHistory } from "../../gen/session/v1/session-SessionService_connectquery";
+import type { Account } from "../../gen/account/v1/account_pb";
 
 type ChatProps = {
 	socketRef: React.RefObject<SessionSocket>
+	meAccount: Account
 };
 
-export function Chat({ socketRef }: ChatProps) {
+export function Chat({ socketRef, meAccount }: ChatProps) {
 	const chatRef = useRef<HTMLDivElement>(null);
 	const [showMessages, setShowMessages] = useState(false);
 	const [messages, setMessages] = useState<Message[]>([]);
 
-	const { isPending: isMePending, error: meError, data: meData } = useQuery(getMe)
 	const { error: chatError, data: chatHistoryData } = useQuery(getChatHistory)
 
 	useEffect(() => {
@@ -59,13 +59,9 @@ export function Chat({ socketRef }: ChatProps) {
 		setMessages(prev => [...prev, new Message(chatMessage.text, chatMessage.playerId)]);
 	};
 
-
-	if (isMePending) return <h1>Pending Me ...</h1>;
-	if (meError) return <h1>error Me {String(meError)}</h1>;
-
 	// Send message
 	const sendMessage = (message: string) => {
-		setMessages(prev => [...prev, new Message(message, meData.account!.id)]);
+		setMessages(prev => [...prev, new Message(message, meAccount.id)]);
 		socketRef.current.SendChatMessage(message);
 	};
 
@@ -81,7 +77,7 @@ export function Chat({ socketRef }: ChatProps) {
 							ref={chatRef}
 						>
 							{messages.map((msg, index) => (
-								<ChatBubble key={index} message={msg.text} isMe={msg.userID === meData.account!.id} />
+								<ChatBubble key={index} message={msg.text} isMe={msg.userID === meAccount.id} />
 							))}
 						</div>
 					</div>

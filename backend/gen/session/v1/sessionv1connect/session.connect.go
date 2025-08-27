@@ -36,11 +36,15 @@ const (
 	// SessionServiceGetChatHistoryProcedure is the fully-qualified name of the SessionService's
 	// GetChatHistory RPC.
 	SessionServiceGetChatHistoryProcedure = "/session.v1.SessionService/GetChatHistory"
+	// SessionServiceGetSessionOpponentProcedure is the fully-qualified name of the SessionService's
+	// GetSessionOpponent RPC.
+	SessionServiceGetSessionOpponentProcedure = "/session.v1.SessionService/GetSessionOpponent"
 )
 
 // SessionServiceClient is a client for the session.v1.SessionService service.
 type SessionServiceClient interface {
 	GetChatHistory(context.Context, *connect.Request[v1.GetChatHistoryRequest]) (*connect.Response[v1.GetChatHistoryResponse], error)
+	GetSessionOpponent(context.Context, *connect.Request[v1.GetSessionOpponentRequest]) (*connect.Response[v1.GetSessionOpponentResponse], error)
 }
 
 // NewSessionServiceClient constructs a client for the session.v1.SessionService service. By
@@ -60,12 +64,19 @@ func NewSessionServiceClient(httpClient connect.HTTPClient, baseURL string, opts
 			connect.WithSchema(sessionServiceMethods.ByName("GetChatHistory")),
 			connect.WithClientOptions(opts...),
 		),
+		getSessionOpponent: connect.NewClient[v1.GetSessionOpponentRequest, v1.GetSessionOpponentResponse](
+			httpClient,
+			baseURL+SessionServiceGetSessionOpponentProcedure,
+			connect.WithSchema(sessionServiceMethods.ByName("GetSessionOpponent")),
+			connect.WithClientOptions(opts...),
+		),
 	}
 }
 
 // sessionServiceClient implements SessionServiceClient.
 type sessionServiceClient struct {
-	getChatHistory *connect.Client[v1.GetChatHistoryRequest, v1.GetChatHistoryResponse]
+	getChatHistory     *connect.Client[v1.GetChatHistoryRequest, v1.GetChatHistoryResponse]
+	getSessionOpponent *connect.Client[v1.GetSessionOpponentRequest, v1.GetSessionOpponentResponse]
 }
 
 // GetChatHistory calls session.v1.SessionService.GetChatHistory.
@@ -73,9 +84,15 @@ func (c *sessionServiceClient) GetChatHistory(ctx context.Context, req *connect.
 	return c.getChatHistory.CallUnary(ctx, req)
 }
 
+// GetSessionOpponent calls session.v1.SessionService.GetSessionOpponent.
+func (c *sessionServiceClient) GetSessionOpponent(ctx context.Context, req *connect.Request[v1.GetSessionOpponentRequest]) (*connect.Response[v1.GetSessionOpponentResponse], error) {
+	return c.getSessionOpponent.CallUnary(ctx, req)
+}
+
 // SessionServiceHandler is an implementation of the session.v1.SessionService service.
 type SessionServiceHandler interface {
 	GetChatHistory(context.Context, *connect.Request[v1.GetChatHistoryRequest]) (*connect.Response[v1.GetChatHistoryResponse], error)
+	GetSessionOpponent(context.Context, *connect.Request[v1.GetSessionOpponentRequest]) (*connect.Response[v1.GetSessionOpponentResponse], error)
 }
 
 // NewSessionServiceHandler builds an HTTP handler from the service implementation. It returns the
@@ -91,10 +108,18 @@ func NewSessionServiceHandler(svc SessionServiceHandler, opts ...connect.Handler
 		connect.WithSchema(sessionServiceMethods.ByName("GetChatHistory")),
 		connect.WithHandlerOptions(opts...),
 	)
+	sessionServiceGetSessionOpponentHandler := connect.NewUnaryHandler(
+		SessionServiceGetSessionOpponentProcedure,
+		svc.GetSessionOpponent,
+		connect.WithSchema(sessionServiceMethods.ByName("GetSessionOpponent")),
+		connect.WithHandlerOptions(opts...),
+	)
 	return "/session.v1.SessionService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
 		case SessionServiceGetChatHistoryProcedure:
 			sessionServiceGetChatHistoryHandler.ServeHTTP(w, r)
+		case SessionServiceGetSessionOpponentProcedure:
+			sessionServiceGetSessionOpponentHandler.ServeHTTP(w, r)
 		default:
 			http.NotFound(w, r)
 		}
@@ -106,4 +131,8 @@ type UnimplementedSessionServiceHandler struct{}
 
 func (UnimplementedSessionServiceHandler) GetChatHistory(context.Context, *connect.Request[v1.GetChatHistoryRequest]) (*connect.Response[v1.GetChatHistoryResponse], error) {
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("session.v1.SessionService.GetChatHistory is not implemented"))
+}
+
+func (UnimplementedSessionServiceHandler) GetSessionOpponent(context.Context, *connect.Request[v1.GetSessionOpponentRequest]) (*connect.Response[v1.GetSessionOpponentResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("session.v1.SessionService.GetSessionOpponent is not implemented"))
 }

@@ -10,6 +10,9 @@ import (
 
 // SendFoundOpponentMessage sends a message to all players that they have found an opponent
 func SendFoundOpponentMessage(players []*SessionPlayer, bot *telebot.Bot) {
+	if bot == nil {
+		return
+	}
 	for _, player := range players {
 		for _, oppPlayer := range players {
 			if player.TgID == oppPlayer.TgID {

@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"log/slog"
-	"time"
 
 	"github.com/arian-nj/chibazi/backend/database"
 	gamesessions "github.com/arian-nj/chibazi/backend/game_sessions"
@@ -16,7 +15,7 @@ import (
 
 func (app *BotApplication) inlineResultFeedbackHandler(c telebot.Context) error {
 	resultId := c.InlineResult().ResultID
-	messageID := c.InlineResult().MessageID
+	viaMessageID := c.InlineResult().MessageID
 
 	newSessionRow, err := app.Queries.CreateSession(context.Background(), string(gamesessions.RandomSession))
 	if err != nil {
@@ -27,20 +26,16 @@ func (app *BotApplication) inlineResultFeedbackHandler(c telebot.Context) error 
 
 	var newGame gamesessions.Game
 	gameType := gametype.GameType(resultId)
-	tgListen := xo.TelegramListener{
-		Bot:          app.Bot,
-		LastEdit:     time.Now(),
-		ViaMessageId: messageID,
-	}
+	tgListen := xo.NewXOTelegramListener(app.Bot, viaMessageID)
 	switch gameType {
 	case gametype.XOGameType3X3:
 		newXOGame := xo.NewXOGame(newGameSession.SessionCtx, gametype.XOGameType3X3, app.Bot, app.Queries)
-		newXOGame.Register(&tgListen)
+		newXOGame.Register(tgListen)
 		newXOGame.Register(&xo.SocketListener{})
 		newGame = newXOGame
 	case gametype.XOGameType5X5:
 		newXOGame := xo.NewXOGame(newGameSession.SessionCtx, gametype.XOGameType5X5, app.Bot, app.Queries)
-		newXOGame.Register(&tgListen)
+		newXOGame.Register(tgListen)
 		newXOGame.Register(&xo.SocketListener{})
 		newGame = newXOGame
 	default:
@@ -56,7 +51,7 @@ func (app *BotApplication) inlineResultFeedbackHandler(c telebot.Context) error 
 	newGameSession.GameState = newGame
 	newGameSession.RunBgTask(app.AllSessions)
 
-	app.AllSessions.Add(messageID, newGameSession)
+	app.AllSessions.Add(viaMessageID, newGameSession)
 
 	err = newGame.SendJoinPanelAddSender(c)
 	if err != nil {

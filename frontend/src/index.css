@@ -20,3 +20,11 @@
 .animate-pop {
 	animation: pop 0.35s ease-out;
 }
+
+@theme {
+  --color-coolgray: #848fa5;
+  --color-pearl: #E5DCC5;
+  --color-bitterred: #c14953;
+  --color-davegray: #4C4C47;
+  --color-jetgray: #2D2D2A;
+}

@@ -1,7 +1,7 @@
 import { createFileRoute, useRouter, useSearch } from '@tanstack/react-router'
 import { useEffect, useState } from 'react'
 import { SetJwtToken } from '../lib/auth'
-import { useQuery } from '@connectrpc/connect-query'
+import { useQuery as connectQuery } from '@connectrpc/connect-query'
 import { dummyValidate } from '../gen/auth/v1/auth-AuthService_connectquery'
 
 export const Route = createFileRoute('/login')({
@@ -20,7 +20,7 @@ function RouteComponent() {
 	// 	queryFn: ValidateDummy
 	// })
 
-	const { isPending, error, data } = useQuery(dummyValidate, { id: BigInt(userID) }, { enabled: userID !== 0 })
+	const { isPending, error, data } = connectQuery(dummyValidate, { id: BigInt(userID) }, { enabled: userID !== 0 })
 
 	useEffect(() => {
 		if (data?.token) {

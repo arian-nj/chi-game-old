@@ -10,11 +10,16 @@ import (
 	"connectrpc.com/connect"
 	"github.com/arian-nj/chibazi/backend/database"
 	gamesessions "github.com/arian-nj/chibazi/backend/game_sessions"
+	accountv1 "github.com/arian-nj/chibazi/backend/gen/account/v1"
 	sessionv1 "github.com/arian-nj/chibazi/backend/gen/session/v1"
 	"github.com/arian-nj/chibazi/backend/internals/socket"
 	"github.com/arian-nj/chibazi/backend/pkg/response"
 	"github.com/coder/websocket"
 	"google.golang.org/protobuf/proto"
+)
+
+var (
+	ErrorUnauthenticated = connect.NewError(connect.CodeUnauthenticated, errors.New("unknown user"))
 )
 
 func (app *ApiApplication) gameSessionWS(w http.ResponseWriter, r *http.Request) {
@@ -84,7 +89,7 @@ func (app *ApiApplication) GetChatHistory(
 ) (*connect.Response[sessionv1.GetChatHistoryResponse], error) {
 	person := app.AuthenticateHeader(ctx, req.Header())
 	if person == nil {
-		return nil, connect.NewError(connect.CodeUnauthenticated, errors.New("unknown user"))
+		return nil, ErrorUnauthenticated
 	}
 	gameSession, ok := app.AllSessions.Get(strconv.Itoa(person.TgID))
 	if !ok {
@@ -116,4 +121,34 @@ func (app *ApiApplication) GetChatHistory(
 	}
 
 	return connect.NewResponse(response), nil
+}
+
+func (app *ApiApplication) GetSessionOpponent(
+	ctx context.Context,
+	req *connect.Request[sessionv1.GetSessionOpponentRequest],
+) (*connect.Response[sessionv1.GetSessionOpponentResponse], error) {
+	person := app.AuthenticateHeader(ctx, req.Header())
+	if person == nil {
+		return nil, ErrorUnauthenticated
+	}
+
+	gs, gsExist := app.AllSessions.Get(strconv.Itoa(person.TgID))
+	if !gsExist {
+		return nil, connect.NewError(connect.CodeNotFound, errors.New("session not found"))
+	}
+
+	var opponents *gamesessions.SessionPlayer
+	for _, p := range gs.Players {
+		if p.ID != person.ID {
+			opponents = p
+			break
+		}
+	}
+
+	return connect.NewResponse(&sessionv1.GetSessionOpponentResponse{
+		Opponent: &accountv1.Account{
+			Id:   int64(opponents.ID),
+			Name: opponents.Name,
+		},
+	}), nil
 }

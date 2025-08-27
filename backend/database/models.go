@@ -11,6 +11,7 @@ import (
 type Person struct {
 	ID        int
 	TgID      int
+	Name      string
 	IsActive  pgtype.Bool
 	UpdatedAt pgtype.Timestamp
 	CreatedAt pgtype.Timestamp

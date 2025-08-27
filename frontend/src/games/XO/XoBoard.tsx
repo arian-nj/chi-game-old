@@ -30,7 +30,7 @@ function Square({ value, onSquareClick, animate }: SquareProps) {
 	return (
 		<button
 			onClick={onSquareClick}
-			className="w-20 h-20 bg-amber-50 hover:bg-gray-200
+			className="w-20 h-20 hover:bg-gray-200
 			flex items-center justify-center border-2 border-gray-700
 			text-red-700 text-5xl font-bold
 			transition-all duration-200 ease-out

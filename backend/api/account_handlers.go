@@ -19,7 +19,8 @@ func (app *ApiApplication) GetMe(
 
 	return connect.NewResponse(&accountv1.GetMeResponse{
 		Account: &accountv1.Account{
-			Id: int64(perosnRow.ID),
+			Id:   int64(perosnRow.ID),
+			Name: perosnRow.Name,
 		},
 	}), nil
 }

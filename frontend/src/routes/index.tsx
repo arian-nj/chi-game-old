@@ -1,9 +1,8 @@
-
 import { createFileRoute, useRouter } from "@tanstack/react-router";
 import { useState } from "react";
 import { authBeforeLoad } from "../lib/auth";
 import { MeComponent } from "../components/MeComponent";
-
+import { motion } from "motion/react"
 export const Route = createFileRoute("/")({
 	component: Index,
 	beforeLoad: authBeforeLoad,
@@ -22,7 +21,7 @@ function Index() {
 
 	return (
 		<>
-			<div className="relative h-screen w-screen bg-gradient-to-br from-blue-50 to-blue-100 overflow-hidden">
+			<div className="relative h-screen w-screen bg-neutral-800 text-pearl overflow-hidden">
 
 				<div className="flex justify-center gap-4 pt-16">
 					{games.map((game) => (
@@ -39,10 +38,12 @@ function Index() {
 					<MeComponent />
 				</div>
 
-				<button
+				<motion.button
 					type="button"
 					onClick={handlePlayClick}
 					disabled={selectedGame === ""}
+					initial={{ y: 100 }}
+					animate={{ y: 0, transition: { duration: 0.3 } }}
 					className={`
 					absolute bottom-0 left-0 w-full
 					py-6 text-4xl font-bold rounded-none
@@ -54,7 +55,7 @@ function Index() {
 				`}
 				>
 					Play
-				</button>
+				</motion.button>
 			</div>
 		</>
 	);
@@ -68,18 +69,19 @@ type GameChooserProps = {
 
 function GameChooser({ name, selected, onSelect }: GameChooserProps) {
 	return (
-		<button
+		<motion.button
 			type="button"
+			initial={{ scale: 0 }}
+			animate={{ scale: 1, transition: { duration: 0.5, delay: 0.5 } }}
 			onClick={onSelect}
 			className={`
-				px-12 py-8 mx-3 rounded-xl text-2xl font-semibold
-				backdrop-blur-md bg-orange-100/60 border
-				transition-all duration-300 ease-in-out
-				hover:scale-105 hover:shadow-md
-				${selected ? 'border-orange-500 shadow-xl text-orange-800' : 'border-transparent text-gray-800'}
+				px-12 py-8 mx-3 rounded-xl text-2xl font-semibold text-pearl
+				backdrop-blur-md bg-coolgray border
+				hover:shadow-md
+				${selected ? 'border-orange-500 shadow-xl text-orange-800' : 'border-gray-300 text-gray-800'}
 			`}
 		>
 			{name}
-		</button>
+		</motion.button>
 	);
 }

@@ -95,7 +95,10 @@ func (app *BotApplication) addUserMiddleware(next telebot.HandlerFunc) telebot.H
 				slog.Error("User is nil")
 				return
 			}
-			_, err := app.Queries.CreateTgUser(context.Background(), int(user.ID))
+			_, err := app.Queries.CreateTgUser(context.Background(), database.CreateTgUserParams{
+				TgID: int(c.Sender().ID),
+				Name: c.Sender().FirstName,
+			})
 			if err != nil {
 				slog.Error("Failed to create user", "err", err)
 				return
