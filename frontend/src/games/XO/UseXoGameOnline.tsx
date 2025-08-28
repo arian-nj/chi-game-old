@@ -5,7 +5,7 @@ import { create, toBinary } from "@bufbuild/protobuf";
 import { SessionMessageSchema } from "../../gen/session/v1/session_pb";
 import toast from 'react-hot-toast';
 
-export function useXoGame(
+export function useXoGameOnline(
 	{ socketRef }
 		: {
 			socketRef: React.RefObject<SessionSocket>
