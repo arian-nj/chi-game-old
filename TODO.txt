@@ -123,9 +123,10 @@
 [X] alert invalid move
 [X] move every rest api to rpc
 [X] show game players in front
+[ ] rejoin game web
+
 [ ] declare turns
 [ ] timer module
-[ ] rejoin game web
 [ ] 5x5 game
 [ ] Send Join Panel
 
