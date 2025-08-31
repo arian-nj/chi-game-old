@@ -25,5 +25,5 @@ export default defineConfig({
     },
   },
 
-  assetsInclude: ['**/*.lottie'],
+  assetsInclude: ['**/*.lottie', '**/*.wasm'],
 })

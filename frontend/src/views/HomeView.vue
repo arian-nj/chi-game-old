@@ -7,6 +7,13 @@ import GameSelectorBtn from '@/components/Home/GameSelectorBtn.vue';
 import gsap from 'gsap'
 
 
+import wasmUrl from "@lottiefiles/dotlottie-web/dist/dotlottie-player.wasm?url";
+
+onMounted(() => {
+  // Prefetch About page component
+  import('../views/FinderView.vue')
+  import(wasmUrl)
+})
 const router = useRouter()
 const token = GetJwtToken()
 

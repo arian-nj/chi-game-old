@@ -8,8 +8,11 @@ import { useRouter } from 'vue-router'
 
 import EyesAnimation from '../assets/lottie/Eyes.lottie';
 import { DotLottieVue } from '@lottiefiles/dotlottie-vue'
+import { DotLottie as DotLottieWeb } from '@lottiefiles/dotlottie-web'
 
-console.log(EyesAnimation)
+import wasmUrl from "@lottiefiles/dotlottie-web/dist/dotlottie-player.wasm?url";
+
+DotLottieWeb.setWasmUrl(wasmUrl)
 const router = useRouter()
 
 const url = GetBaseUrl() + "/api/match_making/ticket/?auth_token=" + GetJwtToken()
