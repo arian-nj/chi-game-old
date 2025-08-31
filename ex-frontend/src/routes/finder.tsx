@@ -62,8 +62,6 @@ function FinderRouteComponent() {
 	}, [router])
 
 	function cancelClicked() {
-
-
 		if (socketRef.current) {
 			// socketRef.current.SendMessage(FinderMessages.Cancel)
 			const finderEvent = create(FinderEventSchema, { type: FinderType.CANCEL })

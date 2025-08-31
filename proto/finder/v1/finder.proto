@@ -8,8 +8,18 @@ enum FinderType {
   FINDER_TYPE_FOUND = 2;
   FINDER_TYPE_TIMEOUT = 3;
   FINDER_TYPE_CANCEL = 4;
+  FINDER_TYPE_ERROR = 5;
 }
+
+enum FinderErrorType {
+  FINDER_ERROR_TYPE_UNSPECIFIED = 0;
+  FINDER_ERROR_TYPE_AUTH = 1;
+  FINDER_ERROR_TYPE_HAS_TICKET = 2;
+  FINDER_ERROR_TYPE_HAS_SESSION = 3;
+}
+
 
 message FinderEvent {
   FinderType type = 1;
+  FinderErrorType err_type = 2;
 }

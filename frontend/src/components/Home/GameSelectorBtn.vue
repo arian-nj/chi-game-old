@@ -27,7 +27,7 @@ onMounted(() => {
     ` px-12 py-8 mx-3 rounded-xl text-2xl font-semibold text-pearl backdrop-blur-md
           bg-coolgray border`
     ,
-    props.selected ? 'border-orange-500 border-2 shadow-xl text-orange-800' : 'border-gray-300 text-gray-800'
+    props.selected ? 'border-orange-500 border-4 shadow-xl text-orange-800' : 'border-gray-300 text-gray-800'
   ]">
     {{ props.gameName }}
   </button>

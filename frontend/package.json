@@ -18,6 +18,7 @@
   "dependencies": {
     "@connectrpc/connect-query": "^2.1.1",
     "@connectrpc/connect-web": "^2.1.0",
+    "@lottiefiles/dotlottie-vue": "^0.9.2",
     "@tailwindcss/vite": "^4.1.12",
     "@tanstack/vue-query": "^5.85.6",
     "gsap": "^3.13.0",

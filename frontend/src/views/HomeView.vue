@@ -6,11 +6,10 @@ import { GetJwtToken } from '@/lib/auth';
 import GameSelectorBtn from '@/components/Home/GameSelectorBtn.vue';
 import gsap from 'gsap'
 
+
 const router = useRouter()
 const token = GetJwtToken()
 
-
-console.log("setup is run")
 if (token == null || token == "") {
   router.push("login")
 }
@@ -20,8 +19,9 @@ const games = ["3X3", "5X5"];
 
 const playBtnRef = ref<HTMLButtonElement | null>(null)
 
-function handlePlayClick() {
 
+function handlePlayClick() {
+  router.push("/finder")
 }
 
 onMounted(() => {
@@ -33,6 +33,7 @@ onMounted(() => {
     })
   }
 })
+
 </script>
 
 

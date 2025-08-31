@@ -12,5 +12,5 @@ export const GetBaseUrl = () => {
   // 		url = 'https://google.com';
   // }
   // console.log("base url is ", apiUrl)
-  return "http://localhost:8383/";
+  return "http://localhost:8383";
 }

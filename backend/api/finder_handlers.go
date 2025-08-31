@@ -1,7 +1,6 @@
 package api
 
 import (
-	"errors"
 	"log/slog"
 	"net/http"
 	"time"
@@ -14,30 +13,23 @@ import (
 	"google.golang.org/protobuf/proto"
 )
 
-func (app *ApiApplication) makeMatchMakingTicketWS(w http.ResponseWriter, r *http.Request) {
-	tgUser, err := ContextGetAuthenticatedUser(app.Queries, r)
+func sendFinderSocketError(socketClient *socket.Socket, errType finderv1.FinderErrorType) {
+	addEvent := finderv1.FinderEvent{
+		Type:    finderv1.FinderType_FINDER_TYPE_ERROR,
+		ErrType: errType,
+	}
+	err := socketClient.SendMessage(&addEvent)
 	if err != nil {
-		app.InvalidAuthenticationToken(w, r)
-		slog.Error("invalid auth", "err", err)
-		return
+		slog.Error("", "error", err)
 	}
+}
 
-	hasTicket := app.MatchMaking.HasTicket(tgUser.TgID)
-	if hasTicket {
-		app.BadRequest(w, r, errors.New("user already have ticket can't make another one"))
-		slog.Error("user already have ticket can't make another one")
-		return
-	}
-
-	if app.AllSessions.IsSessionEmpty(tgUser.TgID) == false {
-		app.BadRequest(w, r, errors.New("user already have active session can't make another one"))
-		slog.Error("user already have ticket can't make another one")
-		return
-	}
+func (app *ApiApplication) makeMatchMakingTicketWS(w http.ResponseWriter, r *http.Request) {
 
 	conn, err := websocket.Accept(w, r, &websocket.AcceptOptions{
 		OriginPatterns: CORS_PATTERNS,
 	})
+
 	if err != nil {
 		slog.Error("error accepting new connection", "err", err)
 		return
@@ -45,6 +37,27 @@ func (app *ApiApplication) makeMatchMakingTicketWS(w http.ResponseWriter, r *htt
 	defer conn.CloseNow()
 
 	socketClient := socket.NewSocketClient(conn)
+
+	tgUser, err := ContextGetAuthenticatedUser(app.Queries, r)
+	if err != nil {
+		sendFinderSocketError(socketClient, finderv1.FinderErrorType_FINDER_ERROR_TYPE_AUTH)
+		slog.Error("invalid auth", "err", err)
+		return
+	}
+
+	hasTicket := app.MatchMaking.HasTicket(tgUser.TgID)
+	if hasTicket {
+		sendFinderSocketError(socketClient, finderv1.FinderErrorType_FINDER_ERROR_TYPE_HAS_TICKET)
+		slog.Error("user already have ticket can't make another one")
+		return
+	}
+
+	if app.AllSessions.IsSessionEmpty(tgUser.TgID) == false {
+		sendFinderSocketError(socketClient, finderv1.FinderErrorType_FINDER_ERROR_TYPE_HAS_SESSION)
+		slog.Error("user already have ticket can't make another one")
+		return
+	}
+	// Every thing is ok
 	socketClient.Listen(r)
 
 	NewTicket := matchmaking.NewTicket(tgUser.Name, tgUser.ID, tgUser.TgID, gametype.XOGameType3X3)

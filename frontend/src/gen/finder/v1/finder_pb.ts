@@ -10,7 +10,7 @@ import type { Message } from "@bufbuild/protobuf";
  * Describes the file finder/v1/finder.proto.
  */
 export const file_finder_v1_finder: GenFile = /*@__PURE__*/
-  fileDesc("ChZmaW5kZXIvdjEvZmluZGVyLnByb3RvEglmaW5kZXIudjEiMgoLRmluZGVyRXZlbnQSIwoEdHlwZRgBIAEoDjIVLmZpbmRlci52MS5GaW5kZXJUeXBlKogBCgpGaW5kZXJUeXBlEhsKF0ZJTkRFUl9UWVBFX1VOU1BFQ0lGSUVEEAASFQoRRklOREVSX1RZUEVfQURERUQQARIVChFGSU5ERVJfVFlQRV9GT1VORBACEhcKE0ZJTkRFUl9UWVBFX1RJTUVPVVQQAxIWChJGSU5ERVJfVFlQRV9DQU5DRUwQBEKdAQoNY29tLmZpbmRlci52MUILRmluZGVyUHJvdG9QAVo6Z2l0aHViLmNvbS9hcmlhbi1uai9jaGliYXppL2JhY2tlbmQvZ2VuL2ZpbmRlci92MTtmaW5kZXJ2MaICA0ZYWKoCCUZpbmRlci5WMcoCCUZpbmRlclxWMeICFUZpbmRlclxWMVxHUEJNZXRhZGF0YeoCCkZpbmRlcjo6VjFiBnByb3RvMw");
+  fileDesc("ChZmaW5kZXIvdjEvZmluZGVyLnByb3RvEglmaW5kZXIudjEiYAoLRmluZGVyRXZlbnQSIwoEdHlwZRgBIAEoDjIVLmZpbmRlci52MS5GaW5kZXJUeXBlEiwKCGVycl90eXBlGAIgASgOMhouZmluZGVyLnYxLkZpbmRlckVycm9yVHlwZSqfAQoKRmluZGVyVHlwZRIbChdGSU5ERVJfVFlQRV9VTlNQRUNJRklFRBAAEhUKEUZJTkRFUl9UWVBFX0FEREVEEAESFQoRRklOREVSX1RZUEVfRk9VTkQQAhIXChNGSU5ERVJfVFlQRV9USU1FT1VUEAMSFgoSRklOREVSX1RZUEVfQ0FOQ0VMEAQSFQoRRklOREVSX1RZUEVfRVJST1IQBSqVAQoPRmluZGVyRXJyb3JUeXBlEiEKHUZJTkRFUl9FUlJPUl9UWVBFX1VOU1BFQ0lGSUVEEAASGgoWRklOREVSX0VSUk9SX1RZUEVfQVVUSBABEiAKHEZJTkRFUl9FUlJPUl9UWVBFX0hBU19USUNLRVQQAhIhCh1GSU5ERVJfRVJST1JfVFlQRV9IQVNfU0VTU0lPThADQp0BCg1jb20uZmluZGVyLnYxQgtGaW5kZXJQcm90b1ABWjpnaXRodWIuY29tL2FyaWFuLW5qL2NoaWJhemkvYmFja2VuZC9nZW4vZmluZGVyL3YxO2ZpbmRlcnYxogIDRlhYqgIJRmluZGVyLlYxygIJRmluZGVyXFYx4gIVRmluZGVyXFYxXEdQQk1ldGFkYXRh6gIKRmluZGVyOjpWMWIGcHJvdG8z");
 
 /**
  * @generated from message finder.v1.FinderEvent
@@ -20,6 +20,11 @@ export type FinderEvent = Message<"finder.v1.FinderEvent"> & {
    * @generated from field: finder.v1.FinderType type = 1;
    */
   type: FinderType;
+
+  /**
+   * @generated from field: finder.v1.FinderErrorType err_type = 2;
+   */
+  errType: FinderErrorType;
 };
 
 /**
@@ -57,6 +62,11 @@ export enum FinderType {
    * @generated from enum value: FINDER_TYPE_CANCEL = 4;
    */
   CANCEL = 4,
+
+  /**
+   * @generated from enum value: FINDER_TYPE_ERROR = 5;
+   */
+  ERROR = 5,
 }
 
 /**
@@ -64,4 +74,35 @@ export enum FinderType {
  */
 export const FinderTypeSchema: GenEnum<FinderType> = /*@__PURE__*/
   enumDesc(file_finder_v1_finder, 0);
+
+/**
+ * @generated from enum finder.v1.FinderErrorType
+ */
+export enum FinderErrorType {
+  /**
+   * @generated from enum value: FINDER_ERROR_TYPE_UNSPECIFIED = 0;
+   */
+  UNSPECIFIED = 0,
+
+  /**
+   * @generated from enum value: FINDER_ERROR_TYPE_AUTH = 1;
+   */
+  AUTH = 1,
+
+  /**
+   * @generated from enum value: FINDER_ERROR_TYPE_HAS_TICKET = 2;
+   */
+  HAS_TICKET = 2,
+
+  /**
+   * @generated from enum value: FINDER_ERROR_TYPE_HAS_SESSION = 3;
+   */
+  HAS_SESSION = 3,
+}
+
+/**
+ * Describes the enum finder.v1.FinderErrorType.
+ */
+export const FinderErrorTypeSchema: GenEnum<FinderErrorType> = /*@__PURE__*/
+  enumDesc(file_finder_v1_finder, 1);
 

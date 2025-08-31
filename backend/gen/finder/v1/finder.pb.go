@@ -29,6 +29,7 @@ const (
 	FinderType_FINDER_TYPE_FOUND       FinderType = 2
 	FinderType_FINDER_TYPE_TIMEOUT     FinderType = 3
 	FinderType_FINDER_TYPE_CANCEL      FinderType = 4
+	FinderType_FINDER_TYPE_ERROR       FinderType = 5
 )
 
 // Enum value maps for FinderType.
@@ -39,6 +40,7 @@ var (
 		2: "FINDER_TYPE_FOUND",
 		3: "FINDER_TYPE_TIMEOUT",
 		4: "FINDER_TYPE_CANCEL",
+		5: "FINDER_TYPE_ERROR",
 	}
 	FinderType_value = map[string]int32{
 		"FINDER_TYPE_UNSPECIFIED": 0,
@@ -46,6 +48,7 @@ var (
 		"FINDER_TYPE_FOUND":       2,
 		"FINDER_TYPE_TIMEOUT":     3,
 		"FINDER_TYPE_CANCEL":      4,
+		"FINDER_TYPE_ERROR":       5,
 	}
 )
 
@@ -76,9 +79,62 @@ func (FinderType) EnumDescriptor() ([]byte, []int) {
 	return file_finder_v1_finder_proto_rawDescGZIP(), []int{0}
 }
 
+type FinderErrorType int32
+
+const (
+	FinderErrorType_FINDER_ERROR_TYPE_UNSPECIFIED FinderErrorType = 0
+	FinderErrorType_FINDER_ERROR_TYPE_AUTH        FinderErrorType = 1
+	FinderErrorType_FINDER_ERROR_TYPE_HAS_TICKET  FinderErrorType = 2
+	FinderErrorType_FINDER_ERROR_TYPE_HAS_SESSION FinderErrorType = 3
+)
+
+// Enum value maps for FinderErrorType.
+var (
+	FinderErrorType_name = map[int32]string{
+		0: "FINDER_ERROR_TYPE_UNSPECIFIED",
+		1: "FINDER_ERROR_TYPE_AUTH",
+		2: "FINDER_ERROR_TYPE_HAS_TICKET",
+		3: "FINDER_ERROR_TYPE_HAS_SESSION",
+	}
+	FinderErrorType_value = map[string]int32{
+		"FINDER_ERROR_TYPE_UNSPECIFIED": 0,
+		"FINDER_ERROR_TYPE_AUTH":        1,
+		"FINDER_ERROR_TYPE_HAS_TICKET":  2,
+		"FINDER_ERROR_TYPE_HAS_SESSION": 3,
+	}
+)
+
+func (x FinderErrorType) Enum() *FinderErrorType {
+	p := new(FinderErrorType)
+	*p = x
+	return p
+}
+
+func (x FinderErrorType) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (FinderErrorType) Descriptor() protoreflect.EnumDescriptor {
+	return file_finder_v1_finder_proto_enumTypes[1].Descriptor()
+}
+
+func (FinderErrorType) Type() protoreflect.EnumType {
+	return &file_finder_v1_finder_proto_enumTypes[1]
+}
+
+func (x FinderErrorType) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use FinderErrorType.Descriptor instead.
+func (FinderErrorType) EnumDescriptor() ([]byte, []int) {
+	return file_finder_v1_finder_proto_rawDescGZIP(), []int{1}
+}
+
 type FinderEvent struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Type          FinderType             `protobuf:"varint,1,opt,name=type,proto3,enum=finder.v1.FinderType" json:"type,omitempty"`
+	ErrType       FinderErrorType        `protobuf:"varint,2,opt,name=err_type,json=errType,proto3,enum=finder.v1.FinderErrorType" json:"err_type,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -120,20 +176,34 @@ func (x *FinderEvent) GetType() FinderType {
 	return FinderType_FINDER_TYPE_UNSPECIFIED
 }
 
+func (x *FinderEvent) GetErrType() FinderErrorType {
+	if x != nil {
+		return x.ErrType
+	}
+	return FinderErrorType_FINDER_ERROR_TYPE_UNSPECIFIED
+}
+
 var File_finder_v1_finder_proto protoreflect.FileDescriptor
 
 const file_finder_v1_finder_proto_rawDesc = "" +
 	"\n" +
-	"\x16finder/v1/finder.proto\x12\tfinder.v1\"8\n" +
+	"\x16finder/v1/finder.proto\x12\tfinder.v1\"o\n" +
 	"\vFinderEvent\x12)\n" +
-	"\x04type\x18\x01 \x01(\x0e2\x15.finder.v1.FinderTypeR\x04type*\x88\x01\n" +
+	"\x04type\x18\x01 \x01(\x0e2\x15.finder.v1.FinderTypeR\x04type\x125\n" +
+	"\berr_type\x18\x02 \x01(\x0e2\x1a.finder.v1.FinderErrorTypeR\aerrType*\x9f\x01\n" +
 	"\n" +
 	"FinderType\x12\x1b\n" +
 	"\x17FINDER_TYPE_UNSPECIFIED\x10\x00\x12\x15\n" +
 	"\x11FINDER_TYPE_ADDED\x10\x01\x12\x15\n" +
 	"\x11FINDER_TYPE_FOUND\x10\x02\x12\x17\n" +
 	"\x13FINDER_TYPE_TIMEOUT\x10\x03\x12\x16\n" +
-	"\x12FINDER_TYPE_CANCEL\x10\x04B\x9d\x01\n" +
+	"\x12FINDER_TYPE_CANCEL\x10\x04\x12\x15\n" +
+	"\x11FINDER_TYPE_ERROR\x10\x05*\x95\x01\n" +
+	"\x0fFinderErrorType\x12!\n" +
+	"\x1dFINDER_ERROR_TYPE_UNSPECIFIED\x10\x00\x12\x1a\n" +
+	"\x16FINDER_ERROR_TYPE_AUTH\x10\x01\x12 \n" +
+	"\x1cFINDER_ERROR_TYPE_HAS_TICKET\x10\x02\x12!\n" +
+	"\x1dFINDER_ERROR_TYPE_HAS_SESSION\x10\x03B\x9d\x01\n" +
 	"\rcom.finder.v1B\vFinderProtoP\x01Z:github.com/arian-nj/chibazi/backend/gen/finder/v1;finderv1\xa2\x02\x03FXX\xaa\x02\tFinder.V1\xca\x02\tFinder\\V1\xe2\x02\x15Finder\\V1\\GPBMetadata\xea\x02\n" +
 	"Finder::V1b\x06proto3"
 
@@ -149,19 +219,21 @@ func file_finder_v1_finder_proto_rawDescGZIP() []byte {
 	return file_finder_v1_finder_proto_rawDescData
 }
 
-var file_finder_v1_finder_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
+var file_finder_v1_finder_proto_enumTypes = make([]protoimpl.EnumInfo, 2)
 var file_finder_v1_finder_proto_msgTypes = make([]protoimpl.MessageInfo, 1)
 var file_finder_v1_finder_proto_goTypes = []any{
-	(FinderType)(0),     // 0: finder.v1.FinderType
-	(*FinderEvent)(nil), // 1: finder.v1.FinderEvent
+	(FinderType)(0),      // 0: finder.v1.FinderType
+	(FinderErrorType)(0), // 1: finder.v1.FinderErrorType
+	(*FinderEvent)(nil),  // 2: finder.v1.FinderEvent
 }
 var file_finder_v1_finder_proto_depIdxs = []int32{
 	0, // 0: finder.v1.FinderEvent.type:type_name -> finder.v1.FinderType
-	1, // [1:1] is the sub-list for method output_type
-	1, // [1:1] is the sub-list for method input_type
-	1, // [1:1] is the sub-list for extension type_name
-	1, // [1:1] is the sub-list for extension extendee
-	0, // [0:1] is the sub-list for field type_name
+	1, // 1: finder.v1.FinderEvent.err_type:type_name -> finder.v1.FinderErrorType
+	2, // [2:2] is the sub-list for method output_type
+	2, // [2:2] is the sub-list for method input_type
+	2, // [2:2] is the sub-list for extension type_name
+	2, // [2:2] is the sub-list for extension extendee
+	0, // [0:2] is the sub-list for field type_name
 }
 
 func init() { file_finder_v1_finder_proto_init() }
@@ -174,7 +246,7 @@ func file_finder_v1_finder_proto_init() {
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_finder_v1_finder_proto_rawDesc), len(file_finder_v1_finder_proto_rawDesc)),
-			NumEnums:      1,
+			NumEnums:      2,
 			NumMessages:   1,
 			NumExtensions: 0,
 			NumServices:   0,
