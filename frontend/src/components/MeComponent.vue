@@ -1,0 +1,22 @@
+<script setup lang="ts">
+import { AccountService } from '@/gen/account/v1/account_pb';
+import { authTransport } from '@/lib/transport';
+import { createClient } from "@connectrpc/connect";
+import { useQuery } from '@tanstack/vue-query';
+
+const client = createClient(AccountService, authTransport)
+const { isPending, error, data } = useQuery({
+  queryKey: ['me'],
+  queryFn: async () => {
+    const data = await client.getMe({})
+    return data
+  }
+})
+</script>
+
+
+<template>
+  <span v-if="isPending">Loading...</span>
+  <span v-else-if="error">{{ error.message }}</span>
+  <h1 v-else>user id:{{ data?.account?.id }}</h1>
+</template>

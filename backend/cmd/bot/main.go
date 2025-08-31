@@ -25,6 +25,7 @@ import (
 )
 
 // NOTE: use matchmaking as a package not to run code u fucking idiot
+
 type GlobalVars struct {
 	Config      *config.Config
 	Queries     *database.Queries

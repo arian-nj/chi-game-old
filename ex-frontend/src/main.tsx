@@ -11,6 +11,11 @@ import { Toaster } from 'react-hot-toast'
 import { GetBaseUrl } from './lib/baseURL';
 import { GetJwtToken } from './lib/auth';
 
+import gsap from 'gsap';
+import { useGSAP } from '@gsap/react';
+
+gsap.registerPlugin(useGSAP);
+
 const router = createRouter({ routeTree })
 
 

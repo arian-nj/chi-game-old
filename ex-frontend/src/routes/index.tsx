@@ -1,8 +1,10 @@
 import { createFileRoute, useRouter } from "@tanstack/react-router";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { authBeforeLoad } from "../lib/auth";
 import { MeComponent } from "../components/MeComponent";
 import { motion } from "motion/react"
+import gsap from "gsap";
+import { useGSAP } from "@gsap/react";
 export const Route = createFileRoute("/")({
 	component: Index,
 	beforeLoad: authBeforeLoad,
@@ -14,6 +16,12 @@ function Index() {
 	const router = useRouter();
 
 	const games = ["3X3", "5X5"];
+
+	const playBtnRef = useRef(null)
+	useGSAP(() => {
+		gsap.set(playBtnRef.current, { y: 1200 })
+		gsap.to(playBtnRef.current, { y: 0, duration: 1 })
+	})
 
 	function handlePlayClick() {
 		router.navigate({ to: "/finder" });
@@ -38,13 +46,13 @@ function Index() {
 					<MeComponent />
 				</div>
 
-				<motion.button
+				<button
+					ref={playBtnRef}
 					type="button"
 					onClick={handlePlayClick}
 					disabled={selectedGame === ""}
-					initial={{ y: 100 }}
-					animate={{ y: 0, transition: { duration: 0.3 } }}
 					className={`
+				play-btn
 					absolute bottom-0 left-0 w-full
 					py-6 text-4xl font-bold rounded-none
 					transition-all duration-300 ease-in-out
@@ -55,7 +63,8 @@ function Index() {
 				`}
 				>
 					Play
-				</motion.button>
+				</button>
+
 			</div>
 		</>
 	);
