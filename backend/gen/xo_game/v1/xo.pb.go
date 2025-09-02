@@ -23,7 +23,7 @@ const (
 
 type Move struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	PlayerId      int32                  `protobuf:"varint,1,opt,name=player_id,json=playerId,proto3" json:"player_id,omitempty"`
+	CellValue     int32                  `protobuf:"varint,1,opt,name=cell_value,json=cellValue,proto3" json:"cell_value,omitempty"`
 	CellIndex     int32                  `protobuf:"varint,2,opt,name=cell_index,json=cellIndex,proto3" json:"cell_index,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -59,9 +59,9 @@ func (*Move) Descriptor() ([]byte, []int) {
 	return file_xo_game_v1_xo_proto_rawDescGZIP(), []int{0}
 }
 
-func (x *Move) GetPlayerId() int32 {
+func (x *Move) GetCellValue() int32 {
 	if x != nil {
-		return x.PlayerId
+		return x.CellValue
 	}
 	return 0
 }
@@ -120,7 +120,7 @@ func (x *Play) GetCellIndex() int32 {
 type PlayResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	IsValid       bool                   `protobuf:"varint,1,opt,name=is_valid,json=isValid,proto3" json:"is_valid,omitempty"`
-	Play          *Play                  `protobuf:"bytes,2,opt,name=play,proto3" json:"play,omitempty"`
+	Move          *Move                  `protobuf:"bytes,2,opt,name=move,proto3" json:"move,omitempty"`
 	Reason        string                 `protobuf:"bytes,3,opt,name=reason,proto3" json:"reason,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -163,9 +163,9 @@ func (x *PlayResponse) GetIsValid() bool {
 	return false
 }
 
-func (x *PlayResponse) GetPlay() *Play {
+func (x *PlayResponse) GetMove() *Move {
 	if x != nil {
-		return x.Play
+		return x.Move
 	}
 	return nil
 }
@@ -280,9 +280,10 @@ var File_xo_game_v1_xo_proto protoreflect.FileDescriptor
 const file_xo_game_v1_xo_proto_rawDesc = "" +
 	"\n" +
 	"\x13xo_game/v1/xo.proto\x12\n" +
-	"xo_game.v1\"B\n" +
-	"\x04Move\x12\x1b\n" +
-	"\tplayer_id\x18\x01 \x01(\x05R\bplayerId\x12\x1d\n" +
+	"xo_game.v1\"D\n" +
+	"\x04Move\x12\x1d\n" +
+	"\n" +
+	"cell_value\x18\x01 \x01(\x05R\tcellValue\x12\x1d\n" +
 	"\n" +
 	"cell_index\x18\x02 \x01(\x05R\tcellIndex\"%\n" +
 	"\x04Play\x12\x1d\n" +
@@ -290,7 +291,7 @@ const file_xo_game_v1_xo_proto_rawDesc = "" +
 	"cell_index\x18\x01 \x01(\x05R\tcellIndex\"g\n" +
 	"\fPlayResponse\x12\x19\n" +
 	"\bis_valid\x18\x01 \x01(\bR\aisValid\x12$\n" +
-	"\x04play\x18\x02 \x01(\v2\x10.xo_game.v1.PlayR\x04play\x12\x16\n" +
+	"\x04move\x18\x02 \x01(\v2\x10.xo_game.v1.MoveR\x04move\x12\x16\n" +
 	"\x06reason\x18\x03 \x01(\tR\x06reason\"\xab\x01\n" +
 	"\rXoGameMessage\x12&\n" +
 	"\x04move\x18\x01 \x01(\v2\x10.xo_game.v1.MoveH\x00R\x04move\x12&\n" +
@@ -320,7 +321,7 @@ var file_xo_game_v1_xo_proto_goTypes = []any{
 	(*XoGameMessage)(nil), // 3: xo_game.v1.XoGameMessage
 }
 var file_xo_game_v1_xo_proto_depIdxs = []int32{
-	1, // 0: xo_game.v1.PlayResponse.play:type_name -> xo_game.v1.Play
+	0, // 0: xo_game.v1.PlayResponse.move:type_name -> xo_game.v1.Move
 	0, // 1: xo_game.v1.XoGameMessage.move:type_name -> xo_game.v1.Move
 	1, // 2: xo_game.v1.XoGameMessage.play:type_name -> xo_game.v1.Play
 	2, // 3: xo_game.v1.XoGameMessage.play_response:type_name -> xo_game.v1.PlayResponse

@@ -2,8 +2,8 @@
 // @generated from file session/v1/session.proto (package session.v1, syntax proto3)
 /* eslint-disable */
 
-import type { GenFile, GenMessage, GenService } from "@bufbuild/protobuf/codegenv2";
-import { fileDesc, messageDesc, serviceDesc } from "@bufbuild/protobuf/codegenv2";
+import type { GenEnum, GenFile, GenMessage, GenService } from "@bufbuild/protobuf/codegenv2";
+import { enumDesc, fileDesc, messageDesc, serviceDesc } from "@bufbuild/protobuf/codegenv2";
 import type { Account } from "../../account/v1/account_pb";
 import { file_account_v1_account } from "../../account/v1/account_pb";
 import type { XoGameMessage } from "../../xo_game/v1/xo_pb";
@@ -14,7 +14,7 @@ import type { Message } from "@bufbuild/protobuf";
  * Describes the file session/v1/session.proto.
  */
 export const file_session_v1_session: GenFile = /*@__PURE__*/
-  fileDesc("ChhzZXNzaW9uL3YxL3Nlc3Npb24ucHJvdG8SCnNlc3Npb24udjEiIgoSQ2hhdE1lc3NhZ2VSZXF1ZXN0EgwKBHRleHQYASABKAkiOgoLQ2hhdE1lc3NhZ2USEQoJcGxheWVyX2lkGAEgASgDEgwKBHRleHQYAiABKAkSCgoCaWQYAyABKAMiPgoLR2FtZU1lc3NhZ2USJwoCeG8YASABKAsyGS54b19nYW1lLnYxLlhvR2FtZU1lc3NhZ2VIAEIGCgRnYW1lIqEBCg5TZXNzaW9uTWVzc2FnZRInCgRjaGF0GAEgASgLMhcuc2Vzc2lvbi52MS5DaGF0TWVzc2FnZUgAEjIKCGNoYXRfcmVxGAIgASgLMh4uc2Vzc2lvbi52MS5DaGF0TWVzc2FnZVJlcXVlc3RIABInCgRnYW1lGAMgASgLMhcuc2Vzc2lvbi52MS5HYW1lTWVzc2FnZUgAQgkKB2NvbnRlbnQiFwoVR2V0Q2hhdEhpc3RvcnlSZXF1ZXN0IkMKFkdldENoYXRIaXN0b3J5UmVzcG9uc2USKQoIbWVzc2FnZXMYASADKAsyFy5zZXNzaW9uLnYxLkNoYXRNZXNzYWdlIhsKGUdldFNlc3Npb25PcHBvbmVudFJlcXVlc3QiQwoaR2V0U2Vzc2lvbk9wcG9uZW50UmVzcG9uc2USJQoIb3Bwb25lbnQYASABKAsyEy5hY2NvdW50LnYxLkFjY291bnQy0gEKDlNlc3Npb25TZXJ2aWNlElkKDkdldENoYXRIaXN0b3J5EiEuc2Vzc2lvbi52MS5HZXRDaGF0SGlzdG9yeVJlcXVlc3QaIi5zZXNzaW9uLnYxLkdldENoYXRIaXN0b3J5UmVzcG9uc2UiABJlChJHZXRTZXNzaW9uT3Bwb25lbnQSJS5zZXNzaW9uLnYxLkdldFNlc3Npb25PcHBvbmVudFJlcXVlc3QaJi5zZXNzaW9uLnYxLkdldFNlc3Npb25PcHBvbmVudFJlc3BvbnNlIgBCpQEKDmNvbS5zZXNzaW9uLnYxQgxTZXNzaW9uUHJvdG9QAVo8Z2l0aHViLmNvbS9hcmlhbi1uai9jaGliYXppL2JhY2tlbmQvZ2VuL3Nlc3Npb24vdjE7c2Vzc2lvbnYxogIDU1hYqgIKU2Vzc2lvbi5WMcoCClNlc3Npb25cVjHiAhZTZXNzaW9uXFYxXEdQQk1ldGFkYXRh6gILU2Vzc2lvbjo6VjFiBnByb3RvMw", [file_account_v1_account, file_xo_game_v1_xo]);
+  fileDesc("ChhzZXNzaW9uL3YxL3Nlc3Npb24ucHJvdG8SCnNlc3Npb24udjEiIgoSQ2hhdE1lc3NhZ2VSZXF1ZXN0EgwKBHRleHQYASABKAkiOgoLQ2hhdE1lc3NhZ2USEQoJcGxheWVyX2lkGAEgASgDEgwKBHRleHQYAiABKAkSCgoCaWQYAyABKAMiPgoLR2FtZU1lc3NhZ2USJwoCeG8YASABKAsyGS54b19nYW1lLnYxLlhvR2FtZU1lc3NhZ2VIAEIGCgRnYW1lItABCg5TZXNzaW9uTWVzc2FnZRInCgRjaGF0GAEgASgLMhcuc2Vzc2lvbi52MS5DaGF0TWVzc2FnZUgAEjIKCGNoYXRfcmVxGAIgASgLMh4uc2Vzc2lvbi52MS5DaGF0TWVzc2FnZVJlcXVlc3RIABInCgRnYW1lGAMgASgLMhcuc2Vzc2lvbi52MS5HYW1lTWVzc2FnZUgAEi0KBWVycm9yGAQgASgOMhwuc2Vzc2lvbi52MS5TZXNzaW9uRXJyb3JUeXBlSABCCQoHY29udGVudCIXChVHZXRDaGF0SGlzdG9yeVJlcXVlc3QiQwoWR2V0Q2hhdEhpc3RvcnlSZXNwb25zZRIpCghtZXNzYWdlcxgBIAMoCzIXLnNlc3Npb24udjEuQ2hhdE1lc3NhZ2UiGwoZR2V0U2Vzc2lvbk9wcG9uZW50UmVxdWVzdCJDChpHZXRTZXNzaW9uT3Bwb25lbnRSZXNwb25zZRIlCghvcHBvbmVudBgBIAEoCzITLmFjY291bnQudjEuQWNjb3VudCp1ChBTZXNzaW9uRXJyb3JUeXBlEiIKHlNFU1NJT05fRVJST1JfVFlQRV9VTlNQRUNJRklFRBAAEhsKF1NFU1NJT05fRVJST1JfVFlQRV9BVVRIEAESIAocU0VTU0lPTl9FUlJPUl9UWVBFX05PU0VTU0lPThACMtIBCg5TZXNzaW9uU2VydmljZRJZCg5HZXRDaGF0SGlzdG9yeRIhLnNlc3Npb24udjEuR2V0Q2hhdEhpc3RvcnlSZXF1ZXN0GiIuc2Vzc2lvbi52MS5HZXRDaGF0SGlzdG9yeVJlc3BvbnNlIgASZQoSR2V0U2Vzc2lvbk9wcG9uZW50EiUuc2Vzc2lvbi52MS5HZXRTZXNzaW9uT3Bwb25lbnRSZXF1ZXN0GiYuc2Vzc2lvbi52MS5HZXRTZXNzaW9uT3Bwb25lbnRSZXNwb25zZSIAQqUBCg5jb20uc2Vzc2lvbi52MUIMU2Vzc2lvblByb3RvUAFaPGdpdGh1Yi5jb20vYXJpYW4tbmovY2hpYmF6aS9iYWNrZW5kL2dlbi9zZXNzaW9uL3YxO3Nlc3Npb252MaICA1NYWKoCClNlc3Npb24uVjHKAgpTZXNzaW9uXFYx4gIWU2Vzc2lvblxWMVxHUEJNZXRhZGF0YeoCC1Nlc3Npb246OlYxYgZwcm90bzM", [file_account_v1_account, file_xo_game_v1_xo]);
 
 /**
  * Chat
@@ -114,6 +114,12 @@ export type SessionMessage = Message<"session.v1.SessionMessage"> & {
      */
     value: GameMessage;
     case: "game";
+  } | {
+    /**
+     * @generated from field: session.v1.SessionErrorType error = 4;
+     */
+    value: SessionErrorType;
+    case: "error";
   } | { case: undefined; value?: undefined };
 };
 
@@ -183,6 +189,32 @@ export type GetSessionOpponentResponse = Message<"session.v1.GetSessionOpponentR
  */
 export const GetSessionOpponentResponseSchema: GenMessage<GetSessionOpponentResponse> = /*@__PURE__*/
   messageDesc(file_session_v1_session, 7);
+
+/**
+ * @generated from enum session.v1.SessionErrorType
+ */
+export enum SessionErrorType {
+  /**
+   * @generated from enum value: SESSION_ERROR_TYPE_UNSPECIFIED = 0;
+   */
+  UNSPECIFIED = 0,
+
+  /**
+   * @generated from enum value: SESSION_ERROR_TYPE_AUTH = 1;
+   */
+  AUTH = 1,
+
+  /**
+   * @generated from enum value: SESSION_ERROR_TYPE_NOSESSION = 2;
+   */
+  NOSESSION = 2,
+}
+
+/**
+ * Describes the enum session.v1.SessionErrorType.
+ */
+export const SessionErrorTypeSchema: GenEnum<SessionErrorType> = /*@__PURE__*/
+  enumDesc(file_session_v1_session, 0);
 
 /**
  * @generated from service session.v1.SessionService

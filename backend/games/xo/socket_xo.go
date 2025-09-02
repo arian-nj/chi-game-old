@@ -31,7 +31,7 @@ func (sl *SocketListener) Update(game *XOGame, command Command) {
 	}
 }
 
-func sendInvalidResponse(player *XoPlayer, errMsg string, cellIndex int32) error {
+func sendInvalidResponse(player *XoPlayer, errMsg string, cellIndex int32, cellType Cell) error {
 	newSessionMsg := sessionv1.SessionMessage{
 		Content: &sessionv1.SessionMessage_Game{
 			Game: &sessionv1.GameMessage{
@@ -41,8 +41,9 @@ func sendInvalidResponse(player *XoPlayer, errMsg string, cellIndex int32) error
 							PlayResponse: &xo_gamev1.PlayResponse{
 								IsValid: false,
 								Reason:  errMsg,
-								Play: &xo_gamev1.Play{
+								Move: &xo_gamev1.Move{
 									CellIndex: cellIndex,
+									CellValue: int32(cellType),
 								},
 							},
 						},
@@ -63,7 +64,7 @@ func (game *XOGame) PlayHandlerSocket(playInput *xo_gamev1.Play, playerID int) {
 	}
 
 	if game.getCurrentPlayer().ID != playerID {
-		sendInvalidResponse(player, "نوبت تو نیست", playInput.CellIndex)
+		sendInvalidResponse(player, "نوبت تو نیست", playInput.CellIndex, 0)
 		return
 	}
 
@@ -71,7 +72,7 @@ func (game *XOGame) PlayHandlerSocket(playInput *xo_gamev1.Play, playerID int) {
 
 	isValid, errMsg := game.Board.IsMoveValid(int(playInput.CellIndex), moveType)
 	if !isValid {
-		err := sendInvalidResponse(player, errMsg, playInput.CellIndex)
+		err := sendInvalidResponse(player, errMsg, playInput.CellIndex, 0)
 		if err != nil {
 			slog.Error("can't send invalid response")
 		}
@@ -97,8 +98,9 @@ func (sl *SocketListener) SocketBrodcastNewMove(game *XOGame, moveIndex int, cel
 								Payload: &xo_gamev1.XoGameMessage_PlayResponse{
 									PlayResponse: &xo_gamev1.PlayResponse{
 										IsValid: true,
-										Play: &xo_gamev1.Play{
+										Move: &xo_gamev1.Move{
 											CellIndex: int32(moveIndex),
+											CellValue: int32(cellType),
 										},
 									},
 								},
@@ -120,8 +122,8 @@ func (sl *SocketListener) SocketBrodcastNewMove(game *XOGame, moveIndex int, cel
 							Xo: &xo_gamev1.XoGameMessage{
 								Payload: &xo_gamev1.XoGameMessage_Move{
 									Move: &xo_gamev1.Move{
-										PlayerId:  int32(playerID),
 										CellIndex: int32(moveIndex),
+										CellValue: int32(cellType),
 									},
 								},
 							},

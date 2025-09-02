@@ -161,10 +161,10 @@ func (game *XOGame) SendJoinPanelAddSender(c telebot.Context) error {
 }
 
 const (
-	XOStartText  = `❌ *دوز بازی* ⭕️`
-	ticRulesText = `
-	قوانین 🎮
-	یک سطر یا ستون یا قطر رو با علامتت پر کن`
+	XOStartText = `❌ *دوز بازی* ⭕️`
+	// ticRulesText = `
+	// قوانین 🎮
+	// یک سطر یا ستون یا قطر رو با علامتت پر کن`
 )
 const (
 	EmptyEmoji = "◽️"

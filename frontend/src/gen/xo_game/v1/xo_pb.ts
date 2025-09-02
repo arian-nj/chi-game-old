@@ -10,16 +10,16 @@ import type { Message } from "@bufbuild/protobuf";
  * Describes the file xo_game/v1/xo.proto.
  */
 export const file_xo_game_v1_xo: GenFile = /*@__PURE__*/
-  fileDesc("ChN4b19nYW1lL3YxL3hvLnByb3RvEgp4b19nYW1lLnYxIi0KBE1vdmUSEQoJcGxheWVyX2lkGAEgASgFEhIKCmNlbGxfaW5kZXgYAiABKAUiGgoEUGxheRISCgpjZWxsX2luZGV4GAEgASgFIlAKDFBsYXlSZXNwb25zZRIQCghpc192YWxpZBgBIAEoCBIeCgRwbGF5GAIgASgLMhAueG9fZ2FtZS52MS5QbGF5Eg4KBnJlYXNvbhgDIAEoCSKRAQoNWG9HYW1lTWVzc2FnZRIgCgRtb3ZlGAEgASgLMhAueG9fZ2FtZS52MS5Nb3ZlSAASIAoEcGxheRgCIAEoCzIQLnhvX2dhbWUudjEuUGxheUgAEjEKDXBsYXlfcmVzcG9uc2UYAyABKAsyGC54b19nYW1lLnYxLlBsYXlSZXNwb25zZUgAQgkKB3BheWxvYWRCnAEKDmNvbS54b19nYW1lLnYxQgdYb1Byb3RvUAFaPGdpdGh1Yi5jb20vYXJpYW4tbmovY2hpYmF6aS9iYWNrZW5kL2dlbi94b19nYW1lL3YxO3hvX2dhbWV2MaICA1hYWKoCCVhvR2FtZS5WMcoCCVhvR2FtZVxWMeICFVhvR2FtZVxWMVxHUEJNZXRhZGF0YeoCClhvR2FtZTo6VjFiBnByb3RvMw");
+  fileDesc("ChN4b19nYW1lL3YxL3hvLnByb3RvEgp4b19nYW1lLnYxIi4KBE1vdmUSEgoKY2VsbF92YWx1ZRgBIAEoBRISCgpjZWxsX2luZGV4GAIgASgFIhoKBFBsYXkSEgoKY2VsbF9pbmRleBgBIAEoBSJQCgxQbGF5UmVzcG9uc2USEAoIaXNfdmFsaWQYASABKAgSHgoEbW92ZRgCIAEoCzIQLnhvX2dhbWUudjEuTW92ZRIOCgZyZWFzb24YAyABKAkikQEKDVhvR2FtZU1lc3NhZ2USIAoEbW92ZRgBIAEoCzIQLnhvX2dhbWUudjEuTW92ZUgAEiAKBHBsYXkYAiABKAsyEC54b19nYW1lLnYxLlBsYXlIABIxCg1wbGF5X3Jlc3BvbnNlGAMgASgLMhgueG9fZ2FtZS52MS5QbGF5UmVzcG9uc2VIAEIJCgdwYXlsb2FkQpwBCg5jb20ueG9fZ2FtZS52MUIHWG9Qcm90b1ABWjxnaXRodWIuY29tL2FyaWFuLW5qL2NoaWJhemkvYmFja2VuZC9nZW4veG9fZ2FtZS92MTt4b19nYW1ldjGiAgNYWFiqAglYb0dhbWUuVjHKAglYb0dhbWVcVjHiAhVYb0dhbWVcVjFcR1BCTWV0YWRhdGHqAgpYb0dhbWU6OlYxYgZwcm90bzM");
 
 /**
  * @generated from message xo_game.v1.Move
  */
 export type Move = Message<"xo_game.v1.Move"> & {
   /**
-   * @generated from field: int32 player_id = 1;
+   * @generated from field: int32 cell_value = 1;
    */
-  playerId: number;
+  cellValue: number;
 
   /**
    * @generated from field: int32 cell_index = 2;
@@ -61,9 +61,9 @@ export type PlayResponse = Message<"xo_game.v1.PlayResponse"> & {
   isValid: boolean;
 
   /**
-   * @generated from field: xo_game.v1.Play play = 2;
+   * @generated from field: xo_game.v1.Move move = 2;
    */
-  play?: Play;
+  move?: Move;
 
   /**
    * @generated from field: string reason = 3;

@@ -12,7 +12,7 @@ import wasmUrl from "@lottiefiles/dotlottie-web/dist/dotlottie-player.wasm?url";
 onMounted(() => {
   // Prefetch About page component
   import('../views/FinderView.vue')
-  import(wasmUrl)
+  import(/* @vite-ignore */  wasmUrl)
 })
 const router = useRouter()
 const token = GetJwtToken()

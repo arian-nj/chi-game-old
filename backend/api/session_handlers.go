@@ -13,7 +13,6 @@ import (
 	accountv1 "github.com/arian-nj/chibazi/backend/gen/account/v1"
 	sessionv1 "github.com/arian-nj/chibazi/backend/gen/session/v1"
 	"github.com/arian-nj/chibazi/backend/internals/socket"
-	"github.com/arian-nj/chibazi/backend/pkg/response"
 	"github.com/coder/websocket"
 	"google.golang.org/protobuf/proto"
 )
@@ -22,24 +21,19 @@ var (
 	ErrorUnauthenticated = connect.NewError(connect.CodeUnauthenticated, errors.New("unknown user"))
 )
 
-func (app *ApiApplication) gameSessionWS(w http.ResponseWriter, r *http.Request) {
-	personRow, err := ContextGetAuthenticatedUser(app.Queries, r)
+func sendSessionSocketError(socketClient *socket.Socket, errType sessionv1.SessionErrorType) {
+	addEvent := sessionv1.SessionMessage{
+		Content: &sessionv1.SessionMessage_Error{
+			Error: errType,
+		},
+	}
+	err := socketClient.SendMessage(&addEvent)
 	if err != nil {
-		app.InvalidAuthenticationToken(w, r)
-		return
+		slog.Error("", "error", err)
 	}
+}
 
-	gameSession, found := app.AllSessions.Get(strconv.Itoa(personRow.TgID))
-	if found == false {
-		app.NotFound(w, r)
-		return
-	}
-
-	noconnct := r.URL.Query().Get("noconn")
-	if noconnct != "" {
-		response.JSON(w, http.StatusOK, nil)
-		return
-	}
+func (app *ApiApplication) gameSessionWS(w http.ResponseWriter, r *http.Request) {
 
 	conn, err := websocket.Accept(w, r, &websocket.AcceptOptions{
 		OriginPatterns: CORS_PATTERNS,
@@ -51,6 +45,19 @@ func (app *ApiApplication) gameSessionWS(w http.ResponseWriter, r *http.Request)
 	defer conn.CloseNow()
 
 	socketClient := socket.NewSocketClient(conn)
+
+	personRow, err := ContextGetAuthenticatedUser(app.Queries, r)
+	if err != nil {
+		sendSessionSocketError(socketClient, sessionv1.SessionErrorType_SESSION_ERROR_TYPE_AUTH)
+		return
+	}
+
+	gameSession, found := app.AllSessions.Get(strconv.Itoa(personRow.TgID))
+	if found == false {
+		sendSessionSocketError(socketClient, sessionv1.SessionErrorType_SESSION_ERROR_TYPE_NOSESSION)
+		return
+	}
+
 	socketClient.Listen(r)
 
 	var sessionPlayer *gamesessions.SessionPlayer

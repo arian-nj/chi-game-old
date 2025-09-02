@@ -122,7 +122,9 @@
 
 [X] alert invalid move
 [X] move every rest api to rpc
-[X] show game players in front
+[X] move to vue
+[ ] show game players in front
+[ ] vue chat
 [ ] rejoin game web
 
 [ ] declare turns

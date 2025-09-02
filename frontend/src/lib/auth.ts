@@ -1,3 +1,4 @@
+
 export function GetJwtToken(): string | null {
   return sessionStorage.getItem("jwt_token");
 }

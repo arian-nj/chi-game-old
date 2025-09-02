@@ -28,6 +28,7 @@ message SessionMessage {
     ChatMessage chat = 1;
     ChatMessageRequest chat_req = 2;
     GameMessage game = 3;
+    SessionErrorType error = 4;
   }
 }
 
@@ -45,4 +46,10 @@ message GetChatHistoryResponse {
 message GetSessionOpponentRequest {}
 message GetSessionOpponentResponse {
   account.v1.Account opponent = 1;
+}
+
+enum SessionErrorType {
+  SESSION_ERROR_TYPE_UNSPECIFIED = 0;
+  SESSION_ERROR_TYPE_AUTH = 1;
+  SESSION_ERROR_TYPE_NOSESSION = 2;
 }
