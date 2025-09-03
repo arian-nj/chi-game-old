@@ -123,7 +123,8 @@
 [X] alert invalid move
 [X] move every rest api to rpc
 [X] move to vue
-[ ] show game players in front
+[X] show game players in front
+[ ] profile pic
 [ ] vue chat
 [ ] rejoin game web
 
@@ -139,6 +140,8 @@
 [ ] add /help
 [ ] add command list
 
+[ ] Go Code Maxes cpu usage after a While !!!
+[X] command monitor sleep fix this
 ## WARNINGS
 [X] Clean and Disconnect Session
 [ ] Limit Chat Message burst for telegram bot 1per 1s ?

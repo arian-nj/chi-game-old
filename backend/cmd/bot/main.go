@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"log/slog"
+	_ "net/http/pprof"
 	"os"
 	"os/signal"
 	"strconv"
@@ -47,6 +48,9 @@ func NewGlobalVars() *GlobalVars {
 }
 
 func main() {
+	// go func() {
+	// 	log.Println(http.ListenAndServe("localhost:6060", nil))
+	// }()
 	GlobalVars := NewGlobalVars()
 
 	var err error

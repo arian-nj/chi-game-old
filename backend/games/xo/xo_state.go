@@ -30,6 +30,7 @@ type XOGame struct { // of GameInterface type
 
 	Commands     []Command
 	DoneCommands []Command
+	CommandCh    chan any
 
 	Subscribers []XoSubscriber
 
@@ -64,7 +65,9 @@ func NewXOGame(
 
 		Commands:     []Command{},
 		DoneCommands: []Command{},
-		Subscribers:  []XoSubscriber{},
+		CommandCh:    make(chan any, 6),
+
+		Subscribers: []XoSubscriber{},
 	}
 }
 
@@ -96,10 +99,12 @@ func (game *XOGame) monitorTimeout() {
 		// 	}
 		case <-game.Ctx.Done():
 			return
-		default:
+		case <-game.CommandCh:
 			if len(game.Commands) > 0 {
 				action := game.popCommand()
 				game.applyCommand(action)
+			} else {
+				time.Sleep(50 * time.Millisecond)
 			}
 		}
 	}
@@ -138,12 +143,14 @@ func (g *XOGame) nextPlayer() {
 }
 
 // Commands
-func (game *XOGame) pushCommand(newAction Command) {
-	game.Commands = append(game.Commands, newAction)
+func (game *XOGame) pushCommand(newCommand Command) {
+	game.Commands = append(game.Commands, newCommand)
+	game.CommandCh <- nil
 }
 
 func (game *XOGame) injectCommand(newAction Command) {
 	game.Commands = append([]Command{newAction}, game.Commands...)
+	game.CommandCh <- nil
 }
 func (game *XOGame) popCommand() Command {
 	firstAction := game.Commands[0]

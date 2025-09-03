@@ -4,10 +4,10 @@ import { authTransport } from '@/lib/transport';
 import { createClient } from "@connectrpc/connect";
 import { useQuery } from '@tanstack/vue-query';
 
-const client = createClient(AccountService, authTransport)
 const { isPending, error, data } = useQuery({
   queryKey: ['me'],
   queryFn: async () => {
+    const client = createClient(AccountService, authTransport)
     const data = await client.getMe({})
     return data
   }
