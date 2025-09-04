@@ -3,11 +3,11 @@ package xo
 import "log/slog"
 
 type XoSubscriber interface {
-	Update(state *XOGame, command Command)
+	Update(state *XOState, command Command)
 }
 
 type Command interface {
-	Execute(game *XOGame)
+	Execute(game *XOState)
 }
 
 type MoveCommand struct {
@@ -24,18 +24,18 @@ func NewPlayCommand(pos int, moveType Cell, playerID int) *MoveCommand {
 	}
 }
 
-func (mv *MoveCommand) Execute(game *XOGame) {
-	if game.getCurrentPlayer().ID != mv.PlayerID {
+func (move *MoveCommand) Execute(game *XOState) {
+	if game.CurrentPlayer().ID != move.PlayerID {
 		slog.Error("play commad recieved wrongly")
 		return
 	}
-	game.Board.SetCell(mv.Pos, mv.MoveType)
+	game.Board.SetCell(move.Pos, move.MoveType)
 
-	hasWon := game.Board.HasWon(mv.Pos)
+	hasWon := game.Board.HasWon(move.Pos)
 
 	var endGameCommand *EndGameCommand = nil
 	if hasWon {
-		endGameCommand = NewEndGameCommand(game.getCurrentPlayer(), "")
+		endGameCommand = NewEndGameCommand(game.CurrentPlayer(), "")
 	} else if !game.Board.IsAnyCellEmpty() {
 		endGameCommand = NewEndGameCommand(nil, "")
 	}
@@ -54,7 +54,7 @@ func NewStartCommand() *StartCommand {
 	return &StartCommand{}
 }
 
-func (mv *StartCommand) Execute(game *XOGame) {
+func (start *StartCommand) Execute(game *XOState) {
 
 }
 
@@ -70,6 +70,16 @@ func NewEndGameCommand(winner *XoPlayer, text string) *EndGameCommand {
 	}
 }
 
-func (mv *EndGameCommand) Execute(game *XOGame) {
+func (endGame *EndGameCommand) Execute(game *XOState) {
 	game.CancelGame()
+}
+
+type SyncTimeCommand struct {
+}
+
+func NewSyncTimeCommand() *SyncTimeCommand {
+	return &SyncTimeCommand{}
+}
+
+func (syncTime *SyncTimeCommand) Execute(game *XOState) {
 }

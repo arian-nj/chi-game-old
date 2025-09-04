@@ -8,7 +8,7 @@ import (
 )
 
 // FIXME: make it map handler with auto Converting inputs
-func (game *XOGame) SocketRouter(newGameMsg *sessionv1.GameMessage, playerId int) {
+func (game *XOState) SocketRouter(newGameMsg *sessionv1.GameMessage, playerId int) {
 	newXoMessage := newGameMsg.GetXo()
 	switch newXoMessage.Payload.(type) {
 	case *xo_gamev1.XoGameMessage_Play:
@@ -19,7 +19,7 @@ func (game *XOGame) SocketRouter(newGameMsg *sessionv1.GameMessage, playerId int
 
 type SocketListener struct{}
 
-func (sl *SocketListener) Update(game *XOGame, command Command) {
+func (sl *SocketListener) Update(game *XOState, command Command) {
 	switch a := command.(type) {
 	case *MoveCommand:
 		sl.SocketBrodcastNewMove(game, a.Pos, a.MoveType, a.PlayerID)
@@ -28,6 +28,8 @@ func (sl *SocketListener) Update(game *XOGame, command Command) {
 		if a.Winner == nil {
 		} else {
 		}
+	case *SyncTimeCommand:
+		sl.SocketBrodcastSyncTime(game)
 	}
 }
 
@@ -56,19 +58,19 @@ func sendInvalidResponse(player *XoPlayer, errMsg string, cellIndex int32, cellT
 	return player.Socket.SendMessage(&newSessionMsg)
 }
 
-func (game *XOGame) PlayHandlerSocket(playInput *xo_gamev1.Play, playerID int) {
+func (game *XOState) PlayHandlerSocket(playInput *xo_gamev1.Play, playerID int) {
 	player := game.findByID(playerID)
 	if player == nil {
 		slog.Error("can't find player in socjet play handler")
 		return
 	}
 
-	if game.getCurrentPlayer().ID != playerID {
+	if game.CurrentPlayer().ID != playerID {
 		sendInvalidResponse(player, "نوبت تو نیست", playInput.CellIndex, 0)
 		return
 	}
 
-	moveType := game.getCurrentPlayer().Move
+	moveType := game.CurrentPlayer().Move
 
 	isValid, errMsg := game.Board.IsMoveValid(int(playInput.CellIndex), moveType)
 	if !isValid {
@@ -83,7 +85,7 @@ func (game *XOGame) PlayHandlerSocket(playInput *xo_gamev1.Play, playerID int) {
 	game.pushCommand(playCommand)
 }
 
-func (sl *SocketListener) SocketBrodcastNewMove(game *XOGame, moveIndex int, cellType Cell, playerID int) {
+func (sl *SocketListener) SocketBrodcastNewMove(game *XOState, moveIndex int, cellType Cell, playerID int) {
 	for _, player := range game.Players {
 		if player.Socket == nil {
 			continue
@@ -135,6 +137,30 @@ func (sl *SocketListener) SocketBrodcastNewMove(game *XOGame, moveIndex int, cel
 			if err != nil {
 				slog.Error("can't send new move", "err", err)
 			}
+		}
+	}
+}
+func (sl *SocketListener) SocketBrodcastSyncTime(gameState *XOState) {
+	for _, player := range gameState.Players {
+		newSessionMessage := sessionv1.SessionMessage{
+			Content: &sessionv1.SessionMessage_Game{
+				Game: &sessionv1.GameMessage{
+					Game: &sessionv1.GameMessage_Xo{
+						Xo: &xo_gamev1.XoGameMessage{
+							Payload: &xo_gamev1.XoGameMessage_SyncTime{
+								SyncTime: &xo_gamev1.Time{
+									SpentTime: int32(player.SpentTime),
+									TotalTime: int32(MaxAllowedTimeSecond),
+								},
+							},
+						},
+					},
+				},
+			},
+		}
+		err := player.Socket.SendMessage(&newSessionMessage)
+		if err != nil {
+			slog.Error("can't send new move", "err", err)
 		}
 	}
 }

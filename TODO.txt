@@ -124,7 +124,6 @@
 [X] move every rest api to rpc
 [X] move to vue
 [X] show game players in front
-[ ] profile pic
 [ ] vue chat
 [ ] rejoin game web
 

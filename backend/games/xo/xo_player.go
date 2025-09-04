@@ -17,8 +17,8 @@ type XoPlayer struct {
 
 	Socket *socket.Socket
 
-	SpentTime     time.Duration
-	TurnStartedAt time.Time
+	SpentTime         time.Duration
+	LastTurnStartedAt time.Time
 
 	Move Cell
 }

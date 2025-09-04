@@ -19,10 +19,17 @@ message PlayResponse {
   string reason = 3;
 }
 
+message Time {
+  int32 spent_time = 1;
+  int32 total_time = 2;
+}
+
 message XoGameMessage {
   oneof payload {
     Move move = 1;
     Play play = 2;
     PlayResponse play_response = 3;
+    Time sync_time= 4;
   }
 }
+

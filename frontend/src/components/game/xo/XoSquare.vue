@@ -16,8 +16,7 @@ function onSquareClick() {
 </script>
 
 <template>
-  <button @click="onSquareClick" :class="[`aspect-square w-full hover:bg-gray-200 focus:bg-gray-200
-      border-0
+  <button @click="onSquareClick" :class="[`aspect-square w-full hover:bg-gray-200 border-0
 			flex items-center justify-center
 			text-6xl lg:text-4xl sm:text-3xl font-extrabold
       bg-[#14bd96]

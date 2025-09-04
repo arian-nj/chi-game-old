@@ -13,9 +13,9 @@ import (
 	"gopkg.in/telebot.v4"
 )
 
-const MaxPlayerTime = time.Minute * 2
+const MaxAllowedTimeSecond = 120
 
-type XOGame struct { // of GameInterface type
+type XOState struct { // of GameInterface type
 	GameType gametype.GameType
 
 	Board *XoBoard
@@ -28,9 +28,9 @@ type XOGame struct { // of GameInterface type
 	CancelGame context.CancelFunc
 	Ctx        context.Context
 
-	Commands     []Command
-	DoneCommands []Command
-	CommandCh    chan any
+	Commands        []Command
+	DoneCommands    []Command
+	CommandNotifire chan any
 
 	Subscribers []XoSubscriber
 
@@ -39,7 +39,7 @@ type XOGame struct { // of GameInterface type
 
 func NewXOGame(
 	sessionCtx context.Context, gameType gametype.GameType,
-	bot *telebot.Bot, queries *database.Queries) *XOGame {
+	bot *telebot.Bot, queries *database.Queries) *XOState {
 
 	maxBoardSize := 3
 	winSize := 3
@@ -51,7 +51,7 @@ func NewXOGame(
 
 	ctx, cancel := context.WithCancel(sessionCtx)
 
-	return &XOGame{
+	return &XOState{
 
 		CurrentPlayerIndex: randIndex,
 		Players:            []*XoPlayer{},
@@ -63,46 +63,42 @@ func NewXOGame(
 
 		Queries: queries,
 
-		Commands:     []Command{},
-		DoneCommands: []Command{},
-		CommandCh:    make(chan any, 6),
+		Commands:        []Command{},
+		DoneCommands:    []Command{},
+		CommandNotifire: make(chan any, 6),
 
 		Subscribers: []XoSubscriber{},
 	}
 }
 
-func (game *XOGame) monitorTimeout() {
-	// ticker := time.NewTicker(time.Second * 1)
-	// defer ticker.Stop()
+func (gameState *XOState) monitorXoGame() {
+	tickerDuration := time.Millisecond * 500
+	ticker := time.NewTicker(tickerDuration)
+	lastSyncTime := time.Now()
+	defer ticker.Stop()
 	for {
 		select {
-		// case <-ticker.C:
-		//
-		// 	now := time.Now()
-		// 	player := g.GetCurrentPlayer()
-		// 	player.SpentTime += now.Sub(player.TurnStartedAt)
-		// 	player.TurnStartedAt = time.Now()
-		//
-		// 	if player.SpentTime >= MaxPlayerTime {
-		// 		g.NextPlayer()
-		// 		err := g.TheEnd(bot, "\n برنده زمانی")
-		// 		if err != nil {
-		// 			slog.Error("error ending game with time out", "err", err)
-		// 		}
-		// 		return
-		// 	}
-		// 	if now.Sub(g.LastEdit) > time.Second*10 {
-		// 		err := g.EditDuringGameBoard(bot)
-		// 		if err != nil {
-		// 			slog.Error("can't edit message in time monitor", "err", err)
-		// 		}
-		// 	}
-		case <-game.Ctx.Done():
+		case <-ticker.C:
+			now := time.Now()
+			currentPlayer := gameState.CurrentPlayer()
+			currentPlayer.SpentTime += now.Sub(currentPlayer.LastTurnStartedAt)
+			currentPlayer.LastTurnStartedAt = now
+
+			if currentPlayer.SpentTime >= MaxAllowedTimeSecond*time.Second {
+				newEndCommand := NewEndGameCommand(gameState.OpponentPlayer(), "\n برنده زمانی")
+				gameState.injectCommand(newEndCommand)
+				return
+			}
+			if now.Sub(lastSyncTime) > time.Second*5 {
+				newSyncCommand := NewSyncTimeCommand()
+				gameState.pushCommand(newSyncCommand)
+			}
+		case <-gameState.Ctx.Done():
 			return
-		case <-game.CommandCh:
-			if len(game.Commands) > 0 {
-				action := game.popCommand()
-				game.applyCommand(action)
+		case <-gameState.CommandNotifire:
+			if len(gameState.Commands) > 0 {
+				action := gameState.popCommand()
+				gameState.applyCommand(action)
 			} else {
 				time.Sleep(50 * time.Millisecond)
 			}
@@ -111,7 +107,7 @@ func (game *XOGame) monitorTimeout() {
 }
 
 // helper functions
-func (game *XOGame) findByTelegramID(telegramID int) *XoPlayer {
+func (game *XOState) findByTelegramID(telegramID int) *XoPlayer {
 	for _, p := range game.Players {
 		if telegramID == p.TelegramID {
 			return p
@@ -120,7 +116,7 @@ func (game *XOGame) findByTelegramID(telegramID int) *XoPlayer {
 	return nil
 }
 
-func (game *XOGame) findByID(telegramID int) *XoPlayer {
+func (game *XOState) findByID(telegramID int) *XoPlayer {
 	for _, p := range game.Players {
 		if telegramID == p.ID {
 			return p
@@ -129,36 +125,44 @@ func (game *XOGame) findByID(telegramID int) *XoPlayer {
 	return nil
 }
 
-func (cg *XOGame) getCurrentPlayer() *XoPlayer {
+func (cg *XOState) CurrentPlayer() *XoPlayer {
 	return cg.Players[cg.CurrentPlayerIndex]
 }
 
-func (g *XOGame) nextPlayer() {
+func (gameState *XOState) OpponentPlayer() *XoPlayer {
+	index := 0
+	if gameState.CurrentPlayerIndex == 0 {
+		index = 1
+	}
+	return gameState.Players[index]
+}
+
+func (g *XOState) nextPlayer() {
 	if g.CurrentPlayerIndex == len(g.Players)-1 {
 		g.CurrentPlayerIndex = 0
 	} else {
 		g.CurrentPlayerIndex += 1
 	}
-	g.getCurrentPlayer().TurnStartedAt = time.Now()
+	g.CurrentPlayer().LastTurnStartedAt = time.Now()
 }
 
 // Commands
-func (game *XOGame) pushCommand(newCommand Command) {
+func (game *XOState) pushCommand(newCommand Command) {
 	game.Commands = append(game.Commands, newCommand)
-	game.CommandCh <- nil
+	game.CommandNotifire <- nil
 }
 
-func (game *XOGame) injectCommand(newAction Command) {
+func (game *XOState) injectCommand(newAction Command) {
 	game.Commands = append([]Command{newAction}, game.Commands...)
-	game.CommandCh <- nil
+	game.CommandNotifire <- nil
 }
-func (game *XOGame) popCommand() Command {
+func (game *XOState) popCommand() Command {
 	firstAction := game.Commands[0]
 	game.Commands = game.Commands[1:]
 	return firstAction
 }
 
-func (gs *XOGame) applyCommand(newCommand Command) {
+func (gs *XOState) applyCommand(newCommand Command) {
 	gs.mu.Lock()
 	defer gs.mu.Unlock()
 
@@ -168,40 +172,40 @@ func (gs *XOGame) applyCommand(newCommand Command) {
 }
 
 // Subscription
-func (gs *XOGame) Notify(command Command) {
+func (gs *XOState) Notify(command Command) {
 	for _, sub := range gs.Subscribers {
 		sub.Update(gs, command) // pass both state + action
 	}
 }
 
-func (game *XOGame) Register(subscriber XoSubscriber) {
+func (game *XOState) Register(subscriber XoSubscriber) {
 	game.Subscribers = append(game.Subscribers, subscriber)
 }
 
 // game interface
-func (g *XOGame) AddPlayer(id int, name string, tgId int, socket *socket.Socket) {
+func (g *XOState) AddPlayer(id int, name string, tgId int, socket *socket.Socket) {
 	player := NewXoPlayer(id, name, tgId, socket)
 	g.Players = append(g.Players, player)
 }
 
-func (cg *XOGame) GetContext() context.Context {
+func (cg *XOState) GetContext() context.Context {
 	return cg.Ctx
 }
 
-func (game *XOGame) SetPlayerSocket(ID int, newSocket *socket.Socket) {
+func (game *XOState) SetPlayerSocket(ID int, newSocket *socket.Socket) {
 	foundPlayer := game.findByID(ID)
 	if foundPlayer != nil {
 		foundPlayer.Socket = newSocket
 	}
 }
 
-func (game *XOGame) StartGame() error {
+func (game *XOState) StartGame() error {
 	utils.RunBackgroundTask(func() {
-		game.monitorTimeout()
+		game.monitorXoGame()
 	})
 	for _, player := range game.Players {
 		now := time.Now()
-		player.TurnStartedAt = now
+		player.LastTurnStartedAt = now
 	}
 	game.Players[0].Move = X
 	game.Players[1].Move = O

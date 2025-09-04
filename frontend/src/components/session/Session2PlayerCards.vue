@@ -6,7 +6,10 @@ import { createClient } from '@connectrpc/connect'
 import { SessionService } from '@/gen/session/v1/session_pb';
 import PlayerCard from './PlayerCard.vue';
 import gsap from 'gsap'
-import { onMounted, ref } from 'vue';
+import { onMounted, useTemplateRef, watch } from 'vue';
+
+const mePlayerCardRef = useTemplateRef('me-card-ref')
+const oppPlayerCardRef = useTemplateRef('opp-card-ref')
 
 const { isPending: meIsPending, error: meErr, data: meData } = useQuery({
   queryKey: ['me'],
@@ -16,6 +19,7 @@ const { isPending: meIsPending, error: meErr, data: meData } = useQuery({
     return data
   }
 })
+
 const { isPending: oppIsPending, error: oppErr, data: oppData } = useQuery({
   queryKey: ['session_opponent'],
   queryFn: async () => {
@@ -26,7 +30,7 @@ const { isPending: oppIsPending, error: oppErr, data: oppData } = useQuery({
   staleTime: 0
 })
 
-const playerBoardRef = ref<HTMLDivElement | null>(null)
+const playerBoardRef = useTemplateRef("player-board-ref")
 
 onMounted(() => {
   if (playerBoardRef.value) {
@@ -38,26 +42,38 @@ onMounted(() => {
   }
 })
 
+watch(meData, (val) => {
+  if (val!.account) {
+    mePlayerCardRef!.value!.AnimateTimer()
+  }
+})
+watch(oppData, (val) => {
+  if (val!.opponent) {
+
+    oppPlayerCardRef!.value!.AnimateTimer()
+  }
+})
+
 </script>
 
 <template>
-  <div ref="playerBoardRef" class="absolute top-0 left-1/2 -translate-x-1/2
-              flex justify-between px-1 py-2
-             bg-[#a7412b] border-b-4 border-x-4 border-[#2E3228]
-              rounded-b-2xl shadow-md shadow-gray-700/30 w-[85%] min-h-[10%] z-50">
+  <div ref="player-board-ref" class="absolute top-0 left-1/2 -translate-x-1/2
+    flex px-1 py-2
+    w-[85%] min-h-[10%] z-50
+    border-b-4 border-x-4 border-[#2E3228]
+    bg-gray-700 rounded-b-2xl shadow-md shadow-gray-700/30
+    ">
 
     <span v-if="meIsPending">Loading ...</span>
     <span v-if="meErr">Error {{ meErr?.message }}</span>
-    <PlayerCard v-if="meData?.account" :account="meData.account" :isActive="true" />
+    <PlayerCard v-else-if="meData?.account" :account="meData?.account" :isActive="true" ref="me-card-ref" />
 
-    <div class="flex justify-center items-center bg-amber-200 p-2">
+    <div class="flex justify-center items-center bg-amber-200 p-2 mx-2 text-sm opacity-0">
       <p>new chat message</p>
     </div>
 
     <span v-if="oppIsPending">Loading ...</span>
     <span v-if="oppErr">Error {{ oppErr?.message }}</span>
-    <PlayerCard v-else-if="oppData?.opponent" :account="oppData?.opponent" :isActive="false" />
-
-
+    <PlayerCard v-else-if="oppData?.opponent" :account="oppData?.opponent" :isActive="false" ref="opp-card-ref" />
   </div>
 </template>

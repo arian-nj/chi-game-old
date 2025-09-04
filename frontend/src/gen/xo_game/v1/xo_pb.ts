@@ -10,7 +10,7 @@ import type { Message } from "@bufbuild/protobuf";
  * Describes the file xo_game/v1/xo.proto.
  */
 export const file_xo_game_v1_xo: GenFile = /*@__PURE__*/
-  fileDesc("ChN4b19nYW1lL3YxL3hvLnByb3RvEgp4b19nYW1lLnYxIi4KBE1vdmUSEgoKY2VsbF92YWx1ZRgBIAEoBRISCgpjZWxsX2luZGV4GAIgASgFIhoKBFBsYXkSEgoKY2VsbF9pbmRleBgBIAEoBSJQCgxQbGF5UmVzcG9uc2USEAoIaXNfdmFsaWQYASABKAgSHgoEbW92ZRgCIAEoCzIQLnhvX2dhbWUudjEuTW92ZRIOCgZyZWFzb24YAyABKAkikQEKDVhvR2FtZU1lc3NhZ2USIAoEbW92ZRgBIAEoCzIQLnhvX2dhbWUudjEuTW92ZUgAEiAKBHBsYXkYAiABKAsyEC54b19nYW1lLnYxLlBsYXlIABIxCg1wbGF5X3Jlc3BvbnNlGAMgASgLMhgueG9fZ2FtZS52MS5QbGF5UmVzcG9uc2VIAEIJCgdwYXlsb2FkQpwBCg5jb20ueG9fZ2FtZS52MUIHWG9Qcm90b1ABWjxnaXRodWIuY29tL2FyaWFuLW5qL2NoaWJhemkvYmFja2VuZC9nZW4veG9fZ2FtZS92MTt4b19nYW1ldjGiAgNYWFiqAglYb0dhbWUuVjHKAglYb0dhbWVcVjHiAhVYb0dhbWVcVjFcR1BCTWV0YWRhdGHqAgpYb0dhbWU6OlYxYgZwcm90bzM");
+  fileDesc("ChN4b19nYW1lL3YxL3hvLnByb3RvEgp4b19nYW1lLnYxIi4KBE1vdmUSEgoKY2VsbF92YWx1ZRgBIAEoBRISCgpjZWxsX2luZGV4GAIgASgFIhoKBFBsYXkSEgoKY2VsbF9pbmRleBgBIAEoBSJQCgxQbGF5UmVzcG9uc2USEAoIaXNfdmFsaWQYASABKAgSHgoEbW92ZRgCIAEoCzIQLnhvX2dhbWUudjEuTW92ZRIOCgZyZWFzb24YAyABKAkiLgoEVGltZRISCgpzcGVudF90aW1lGAEgASgFEhIKCnRvdGFsX3RpbWUYAiABKAUiuAEKDVhvR2FtZU1lc3NhZ2USIAoEbW92ZRgBIAEoCzIQLnhvX2dhbWUudjEuTW92ZUgAEiAKBHBsYXkYAiABKAsyEC54b19nYW1lLnYxLlBsYXlIABIxCg1wbGF5X3Jlc3BvbnNlGAMgASgLMhgueG9fZ2FtZS52MS5QbGF5UmVzcG9uc2VIABIlCglzeW5jX3RpbWUYBCABKAsyEC54b19nYW1lLnYxLlRpbWVIAEIJCgdwYXlsb2FkQpwBCg5jb20ueG9fZ2FtZS52MUIHWG9Qcm90b1ABWjxnaXRodWIuY29tL2FyaWFuLW5qL2NoaWJhemkvYmFja2VuZC9nZW4veG9fZ2FtZS92MTt4b19nYW1ldjGiAgNYWFiqAglYb0dhbWUuVjHKAglYb0dhbWVcVjHiAhVYb0dhbWVcVjFcR1BCTWV0YWRhdGHqAgpYb0dhbWU6OlYxYgZwcm90bzM");
 
 /**
  * @generated from message xo_game.v1.Move
@@ -79,6 +79,28 @@ export const PlayResponseSchema: GenMessage<PlayResponse> = /*@__PURE__*/
   messageDesc(file_xo_game_v1_xo, 2);
 
 /**
+ * @generated from message xo_game.v1.Time
+ */
+export type Time = Message<"xo_game.v1.Time"> & {
+  /**
+   * @generated from field: int32 spent_time = 1;
+   */
+  spentTime: number;
+
+  /**
+   * @generated from field: int32 total_time = 2;
+   */
+  totalTime: number;
+};
+
+/**
+ * Describes the message xo_game.v1.Time.
+ * Use `create(TimeSchema)` to create a new message.
+ */
+export const TimeSchema: GenMessage<Time> = /*@__PURE__*/
+  messageDesc(file_xo_game_v1_xo, 3);
+
+/**
  * @generated from message xo_game.v1.XoGameMessage
  */
 export type XoGameMessage = Message<"xo_game.v1.XoGameMessage"> & {
@@ -103,6 +125,12 @@ export type XoGameMessage = Message<"xo_game.v1.XoGameMessage"> & {
      */
     value: PlayResponse;
     case: "playResponse";
+  } | {
+    /**
+     * @generated from field: xo_game.v1.Time sync_time = 4;
+     */
+    value: Time;
+    case: "syncTime";
   } | { case: undefined; value?: undefined };
 };
 
@@ -111,5 +139,5 @@ export type XoGameMessage = Message<"xo_game.v1.XoGameMessage"> & {
  * Use `create(XoGameMessageSchema)` to create a new message.
  */
 export const XoGameMessageSchema: GenMessage<XoGameMessage> = /*@__PURE__*/
-  messageDesc(file_xo_game_v1_xo, 3);
+  messageDesc(file_xo_game_v1_xo, 4);
 

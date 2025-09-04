@@ -26,29 +26,42 @@ func NewXOTelegramListener(bot *telebot.Bot, viaMessageID string) *XoTelegramLis
 	}
 }
 
-func (tg *XoTelegramListener) Update(game *XOGame, command Command) {
+func (tg *XoTelegramListener) Update(gameState *XOState, command Command) {
 	return
 	switch c := command.(type) {
 	case *MoveCommand:
-		tg.EditDuringGameBoard(game)
+		err := tg.EditDuringGameBoard(gameState)
+		if err != nil {
+			slog.Error("can't edit durning move command", "err", err)
+		}
 	case *StartCommand:
-		tg.EditDuringGameBoard(game)
+		err := tg.EditDuringGameBoard(gameState)
+		if err != nil {
+			slog.Error("can't edit during start command", "err", err)
+		}
 	case *EndGameCommand:
 		if c.Winner == nil {
-			err := tg.TieGame(game)
+			err := tg.TieGame(gameState)
 			if err != nil {
 				slog.Error("tie failed", "error", err)
 			}
 		} else {
-			err := tg.TheEnd(game, c.Winner, c.Text)
+			err := tg.TheEnd(gameState, c.Winner, c.Text)
 			if err != nil {
 				slog.Error("the end failed", "error", err)
+			}
+		}
+	case *SyncTimeCommand:
+		if time.Since(tg.LastEdit) > 10*time.Second {
+			err := tg.EditDuringGameBoard(gameState)
+			if err != nil {
+				slog.Error("can't edit sync Time", "err", err)
 			}
 		}
 	}
 }
 
-func (g *XOGame) CallBackRouter(c telebot.Context) error {
+func (g *XOState) CallBackRouter(c telebot.Context) error {
 	callbackData := c.Callback().Data
 	if callbackData == "join" {
 		// return g.XOJoinGameHandler(c)
@@ -60,7 +73,7 @@ func (g *XOGame) CallBackRouter(c telebot.Context) error {
 }
 
 // send Commands
-func (tg *XoTelegramListener) EditDuringGameBoard(game *XOGame) error {
+func (tg *XoTelegramListener) EditDuringGameBoard(game *XOState) error {
 	err := tg.Edit(tg, XOStartText+"\n\n"+game.RulesText(),
 		keybul.CreateInlineKeyboard(
 			keybul.CreateBotNameInlineButton(),
@@ -72,7 +85,7 @@ func (tg *XoTelegramListener) EditDuringGameBoard(game *XOGame) error {
 	return err
 }
 
-func (tg *XoTelegramListener) TheEnd(game *XOGame, winner *XoPlayer, additionalText string) error {
+func (tg *XoTelegramListener) TheEnd(game *XOState, winner *XoPlayer, additionalText string) error {
 	text := game.EndGameText() + game.WinGameText(winner) + additionalText
 	err := tg.Edit(tg, text,
 		keybul.CreateInlineKeyboard(
@@ -84,7 +97,7 @@ func (tg *XoTelegramListener) TheEnd(game *XOGame, winner *XoPlayer, additionalT
 	return err
 }
 
-func (tg *XoTelegramListener) TieGame(game *XOGame) error {
+func (tg *XoTelegramListener) TieGame(game *XOState) error {
 	text := game.EndGameText() + "\nبازی مساوی شد"
 
 	err := tg.Edit(tg, text,
@@ -114,10 +127,10 @@ func (tg *XoTelegramListener) TieGame(game *XOGame) error {
 // 	return g.StartGame()
 // }
 
-func (game *XOGame) XOPlayHandler(c telebot.Context, callbackData string) error {
+func (game *XOState) XOPlayHandler(c telebot.Context, callbackData string) error {
 	sender := c.Sender()
 
-	if game.getCurrentPlayer().TelegramID != int(sender.ID) {
+	if game.CurrentPlayer().TelegramID != int(sender.ID) {
 		return c.RespondText("نوبت تو نیست!")
 	}
 
@@ -126,7 +139,7 @@ func (game *XOGame) XOPlayHandler(c telebot.Context, callbackData string) error 
 		c.RespondAlert("یه مشکلی هست")
 	}
 
-	moveType := game.getCurrentPlayer().Move
+	moveType := game.CurrentPlayer().Move
 
 	isValid, errMsg := game.Board.IsMoveValid(cellIndex, moveType)
 	if !isValid {
@@ -149,7 +162,7 @@ func (tg *XoTelegramListener) MessageSig() (string, int64) {
 	return tg.ViaMessageId, 0
 }
 
-func (game *XOGame) SendJoinPanelAddSender(c telebot.Context) error {
+func (game *XOState) SendJoinPanelAddSender(c telebot.Context) error {
 	// sender := c.Sender()
 	// game.AddPlayer(sender.FirstName, int(sender.ID), nil)
 	// inlineKeyboard := keybul.CreateInlineKeyboard(
@@ -172,11 +185,11 @@ const (
 	OEmoji     = "⭕️" // player two
 )
 
-func (game *XOGame) WinGameText(winner *XoPlayer) string {
+func (game *XOState) WinGameText(winner *XoPlayer) string {
 	return "\n🏆برنده بازی:" + "*" + winner.Name + "*"
 
 }
-func (game *XOGame) EndGameText() string {
+func (game *XOState) EndGameText() string {
 	players := game.Players
 	return XOStartText + "\nبازیکن ها:\n" + players[0].Name + " " + XEmoji + "\n" + players[1].Name + " " + OEmoji + "\n\n" + game.CreateBoardAsEmoji()
 }
@@ -187,7 +200,7 @@ var xoBoardSymbols = map[Cell]string{
 	O:     "⭕️",
 }
 
-func (game *XOGame) CreateBoardAsEmoji() string {
+func (game *XOState) CreateBoardAsEmoji() string {
 	text := ""
 	for cellIndex, cell := range game.Board.Board {
 		if cellIndex%3 == 0 {
@@ -216,7 +229,7 @@ func CreateTicBoardInlineButton(board *XoBoard) [][]telebot.InlineButton {
 	return buttons
 }
 
-func (game *XOGame) CreatePlayersInlineButton(humanPlayers []*XoPlayer, CurrentPlayerTurn int) [][]telebot.InlineButton {
+func (game *XOState) CreatePlayersInlineButton(humanPlayers []*XoPlayer, CurrentPlayerTurn int) [][]telebot.InlineButton {
 	buttons := make([][]telebot.InlineButton, 0)
 	for index, hplayer := range humanPlayers {
 
@@ -237,7 +250,7 @@ func (game *XOGame) CreatePlayersInlineButton(humanPlayers []*XoPlayer, CurrentP
 			name = name[:20] + "..."
 		}
 
-		remainedTime := MaxPlayerTime - hplayer.SpentTime
+		remainedTime := (MaxAllowedTimeSecond * time.Second) - hplayer.SpentTime
 		timeText := fmt.Sprintf("%d:%d", int(remainedTime.Minutes()), int(remainedTime.Seconds())%60)
 
 		row := make([]telebot.InlineButton, 2)
@@ -252,7 +265,7 @@ func (game *XOGame) CreatePlayersInlineButton(humanPlayers []*XoPlayer, CurrentP
 	return buttons
 }
 
-func (game *XOGame) RulesText() string {
+func (game *XOState) RulesText() string {
 	text := ""
 	// text += "قوانین:\د"
 	text += fmt.Sprintf("❕اندازه *%dX%d*\n", game.Board.MaxCellSize, game.Board.MaxCellSize)

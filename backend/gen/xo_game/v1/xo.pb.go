@@ -177,6 +177,58 @@ func (x *PlayResponse) GetReason() string {
 	return ""
 }
 
+type Time struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	SpentTime     int32                  `protobuf:"varint,1,opt,name=spent_time,json=spentTime,proto3" json:"spent_time,omitempty"`
+	TotalTime     int32                  `protobuf:"varint,2,opt,name=total_time,json=totalTime,proto3" json:"total_time,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *Time) Reset() {
+	*x = Time{}
+	mi := &file_xo_game_v1_xo_proto_msgTypes[3]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *Time) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*Time) ProtoMessage() {}
+
+func (x *Time) ProtoReflect() protoreflect.Message {
+	mi := &file_xo_game_v1_xo_proto_msgTypes[3]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use Time.ProtoReflect.Descriptor instead.
+func (*Time) Descriptor() ([]byte, []int) {
+	return file_xo_game_v1_xo_proto_rawDescGZIP(), []int{3}
+}
+
+func (x *Time) GetSpentTime() int32 {
+	if x != nil {
+		return x.SpentTime
+	}
+	return 0
+}
+
+func (x *Time) GetTotalTime() int32 {
+	if x != nil {
+		return x.TotalTime
+	}
+	return 0
+}
+
 type XoGameMessage struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// Types that are valid to be assigned to Payload:
@@ -184,6 +236,7 @@ type XoGameMessage struct {
 	//	*XoGameMessage_Move
 	//	*XoGameMessage_Play
 	//	*XoGameMessage_PlayResponse
+	//	*XoGameMessage_SyncTime
 	Payload       isXoGameMessage_Payload `protobuf_oneof:"payload"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -191,7 +244,7 @@ type XoGameMessage struct {
 
 func (x *XoGameMessage) Reset() {
 	*x = XoGameMessage{}
-	mi := &file_xo_game_v1_xo_proto_msgTypes[3]
+	mi := &file_xo_game_v1_xo_proto_msgTypes[4]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -203,7 +256,7 @@ func (x *XoGameMessage) String() string {
 func (*XoGameMessage) ProtoMessage() {}
 
 func (x *XoGameMessage) ProtoReflect() protoreflect.Message {
-	mi := &file_xo_game_v1_xo_proto_msgTypes[3]
+	mi := &file_xo_game_v1_xo_proto_msgTypes[4]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -216,7 +269,7 @@ func (x *XoGameMessage) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use XoGameMessage.ProtoReflect.Descriptor instead.
 func (*XoGameMessage) Descriptor() ([]byte, []int) {
-	return file_xo_game_v1_xo_proto_rawDescGZIP(), []int{3}
+	return file_xo_game_v1_xo_proto_rawDescGZIP(), []int{4}
 }
 
 func (x *XoGameMessage) GetPayload() isXoGameMessage_Payload {
@@ -253,6 +306,15 @@ func (x *XoGameMessage) GetPlayResponse() *PlayResponse {
 	return nil
 }
 
+func (x *XoGameMessage) GetSyncTime() *Time {
+	if x != nil {
+		if x, ok := x.Payload.(*XoGameMessage_SyncTime); ok {
+			return x.SyncTime
+		}
+	}
+	return nil
+}
+
 type isXoGameMessage_Payload interface {
 	isXoGameMessage_Payload()
 }
@@ -269,11 +331,17 @@ type XoGameMessage_PlayResponse struct {
 	PlayResponse *PlayResponse `protobuf:"bytes,3,opt,name=play_response,json=playResponse,proto3,oneof"`
 }
 
+type XoGameMessage_SyncTime struct {
+	SyncTime *Time `protobuf:"bytes,4,opt,name=sync_time,json=syncTime,proto3,oneof"`
+}
+
 func (*XoGameMessage_Move) isXoGameMessage_Payload() {}
 
 func (*XoGameMessage_Play) isXoGameMessage_Payload() {}
 
 func (*XoGameMessage_PlayResponse) isXoGameMessage_Payload() {}
+
+func (*XoGameMessage_SyncTime) isXoGameMessage_Payload() {}
 
 var File_xo_game_v1_xo_proto protoreflect.FileDescriptor
 
@@ -292,11 +360,17 @@ const file_xo_game_v1_xo_proto_rawDesc = "" +
 	"\fPlayResponse\x12\x19\n" +
 	"\bis_valid\x18\x01 \x01(\bR\aisValid\x12$\n" +
 	"\x04move\x18\x02 \x01(\v2\x10.xo_game.v1.MoveR\x04move\x12\x16\n" +
-	"\x06reason\x18\x03 \x01(\tR\x06reason\"\xab\x01\n" +
+	"\x06reason\x18\x03 \x01(\tR\x06reason\"D\n" +
+	"\x04Time\x12\x1d\n" +
+	"\n" +
+	"spent_time\x18\x01 \x01(\x05R\tspentTime\x12\x1d\n" +
+	"\n" +
+	"total_time\x18\x02 \x01(\x05R\ttotalTime\"\xdc\x01\n" +
 	"\rXoGameMessage\x12&\n" +
 	"\x04move\x18\x01 \x01(\v2\x10.xo_game.v1.MoveH\x00R\x04move\x12&\n" +
 	"\x04play\x18\x02 \x01(\v2\x10.xo_game.v1.PlayH\x00R\x04play\x12?\n" +
-	"\rplay_response\x18\x03 \x01(\v2\x18.xo_game.v1.PlayResponseH\x00R\fplayResponseB\t\n" +
+	"\rplay_response\x18\x03 \x01(\v2\x18.xo_game.v1.PlayResponseH\x00R\fplayResponse\x12/\n" +
+	"\tsync_time\x18\x04 \x01(\v2\x10.xo_game.v1.TimeH\x00R\bsyncTimeB\t\n" +
 	"\apayloadB\x9c\x01\n" +
 	"\x0ecom.xo_game.v1B\aXoProtoP\x01Z<github.com/arian-nj/chibazi/backend/gen/xo_game/v1;xo_gamev1\xa2\x02\x03XXX\xaa\x02\tXoGame.V1\xca\x02\tXoGame\\V1\xe2\x02\x15XoGame\\V1\\GPBMetadata\xea\x02\n" +
 	"XoGame::V1b\x06proto3"
@@ -313,23 +387,25 @@ func file_xo_game_v1_xo_proto_rawDescGZIP() []byte {
 	return file_xo_game_v1_xo_proto_rawDescData
 }
 
-var file_xo_game_v1_xo_proto_msgTypes = make([]protoimpl.MessageInfo, 4)
+var file_xo_game_v1_xo_proto_msgTypes = make([]protoimpl.MessageInfo, 5)
 var file_xo_game_v1_xo_proto_goTypes = []any{
 	(*Move)(nil),          // 0: xo_game.v1.Move
 	(*Play)(nil),          // 1: xo_game.v1.Play
 	(*PlayResponse)(nil),  // 2: xo_game.v1.PlayResponse
-	(*XoGameMessage)(nil), // 3: xo_game.v1.XoGameMessage
+	(*Time)(nil),          // 3: xo_game.v1.Time
+	(*XoGameMessage)(nil), // 4: xo_game.v1.XoGameMessage
 }
 var file_xo_game_v1_xo_proto_depIdxs = []int32{
 	0, // 0: xo_game.v1.PlayResponse.move:type_name -> xo_game.v1.Move
 	0, // 1: xo_game.v1.XoGameMessage.move:type_name -> xo_game.v1.Move
 	1, // 2: xo_game.v1.XoGameMessage.play:type_name -> xo_game.v1.Play
 	2, // 3: xo_game.v1.XoGameMessage.play_response:type_name -> xo_game.v1.PlayResponse
-	4, // [4:4] is the sub-list for method output_type
-	4, // [4:4] is the sub-list for method input_type
-	4, // [4:4] is the sub-list for extension type_name
-	4, // [4:4] is the sub-list for extension extendee
-	0, // [0:4] is the sub-list for field type_name
+	3, // 4: xo_game.v1.XoGameMessage.sync_time:type_name -> xo_game.v1.Time
+	5, // [5:5] is the sub-list for method output_type
+	5, // [5:5] is the sub-list for method input_type
+	5, // [5:5] is the sub-list for extension type_name
+	5, // [5:5] is the sub-list for extension extendee
+	0, // [0:5] is the sub-list for field type_name
 }
 
 func init() { file_xo_game_v1_xo_proto_init() }
@@ -337,10 +413,11 @@ func file_xo_game_v1_xo_proto_init() {
 	if File_xo_game_v1_xo_proto != nil {
 		return
 	}
-	file_xo_game_v1_xo_proto_msgTypes[3].OneofWrappers = []any{
+	file_xo_game_v1_xo_proto_msgTypes[4].OneofWrappers = []any{
 		(*XoGameMessage_Move)(nil),
 		(*XoGameMessage_Play)(nil),
 		(*XoGameMessage_PlayResponse)(nil),
+		(*XoGameMessage_SyncTime)(nil),
 	}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
@@ -348,7 +425,7 @@ func file_xo_game_v1_xo_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_xo_game_v1_xo_proto_rawDesc), len(file_xo_game_v1_xo_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   4,
+			NumMessages:   5,
 			NumExtensions: 0,
 			NumServices:   0,
 		},
