@@ -16,10 +16,11 @@ export function useXoGameOnline(
 
 	useEffect(() => {
 		socketRef.current.HandleGameMessage = (gameMessage) => {
-			console.log(gameMessage)
 			if (gameMessage.game.case != "xo") {
 				throw Error("non xo message ended up in xo")
 			}
+
+			console.log(gameMessage.game.value.payload.value?.$typeName, gameMessage)
 			const payload = gameMessage.game.value.payload
 			switch (payload.case) {
 				case "move":

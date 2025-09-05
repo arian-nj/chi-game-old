@@ -4,6 +4,12 @@ package xo_game.v1;
 
 option go_package = "backend/gen/xo_game/v1;xogamev1";
 
+message GameState {
+  repeated int32 cells = 1;
+  int64 turn_player_id = 2;
+  int32 board_size = 3;
+}
+
 message Move {
   int32 cell_value = 1;
   int32 cell_index = 2;
@@ -20,8 +26,9 @@ message PlayResponse {
 }
 
 message Time {
-  int32 spent_time = 1;
-  int32 total_time = 2;
+  int64 player_id = 1;
+  int32 spent_time = 2;
+  int32 total_time = 3;
 }
 
 message XoGameMessage {
@@ -30,6 +37,7 @@ message XoGameMessage {
     Play play = 2;
     PlayResponse play_response = 3;
     Time sync_time= 4;
+    GameState game_state = 5;
   }
 }
 

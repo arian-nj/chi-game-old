@@ -10,7 +10,34 @@ import type { Message } from "@bufbuild/protobuf";
  * Describes the file xo_game/v1/xo.proto.
  */
 export const file_xo_game_v1_xo: GenFile = /*@__PURE__*/
-  fileDesc("ChN4b19nYW1lL3YxL3hvLnByb3RvEgp4b19nYW1lLnYxIi4KBE1vdmUSEgoKY2VsbF92YWx1ZRgBIAEoBRISCgpjZWxsX2luZGV4GAIgASgFIhoKBFBsYXkSEgoKY2VsbF9pbmRleBgBIAEoBSJQCgxQbGF5UmVzcG9uc2USEAoIaXNfdmFsaWQYASABKAgSHgoEbW92ZRgCIAEoCzIQLnhvX2dhbWUudjEuTW92ZRIOCgZyZWFzb24YAyABKAkiLgoEVGltZRISCgpzcGVudF90aW1lGAEgASgFEhIKCnRvdGFsX3RpbWUYAiABKAUiuAEKDVhvR2FtZU1lc3NhZ2USIAoEbW92ZRgBIAEoCzIQLnhvX2dhbWUudjEuTW92ZUgAEiAKBHBsYXkYAiABKAsyEC54b19nYW1lLnYxLlBsYXlIABIxCg1wbGF5X3Jlc3BvbnNlGAMgASgLMhgueG9fZ2FtZS52MS5QbGF5UmVzcG9uc2VIABIlCglzeW5jX3RpbWUYBCABKAsyEC54b19nYW1lLnYxLlRpbWVIAEIJCgdwYXlsb2FkQpwBCg5jb20ueG9fZ2FtZS52MUIHWG9Qcm90b1ABWjxnaXRodWIuY29tL2FyaWFuLW5qL2NoaWJhemkvYmFja2VuZC9nZW4veG9fZ2FtZS92MTt4b19nYW1ldjGiAgNYWFiqAglYb0dhbWUuVjHKAglYb0dhbWVcVjHiAhVYb0dhbWVcVjFcR1BCTWV0YWRhdGHqAgpYb0dhbWU6OlYxYgZwcm90bzM");
+  fileDesc("ChN4b19nYW1lL3YxL3hvLnByb3RvEgp4b19nYW1lLnYxIkYKCUdhbWVTdGF0ZRINCgVjZWxscxgBIAMoBRIWCg50dXJuX3BsYXllcl9pZBgCIAEoAxISCgpib2FyZF9zaXplGAMgASgFIi4KBE1vdmUSEgoKY2VsbF92YWx1ZRgBIAEoBRISCgpjZWxsX2luZGV4GAIgASgFIhoKBFBsYXkSEgoKY2VsbF9pbmRleBgBIAEoBSJQCgxQbGF5UmVzcG9uc2USEAoIaXNfdmFsaWQYASABKAgSHgoEbW92ZRgCIAEoCzIQLnhvX2dhbWUudjEuTW92ZRIOCgZyZWFzb24YAyABKAkiQQoEVGltZRIRCglwbGF5ZXJfaWQYASABKAMSEgoKc3BlbnRfdGltZRgCIAEoBRISCgp0b3RhbF90aW1lGAMgASgFIuUBCg1Yb0dhbWVNZXNzYWdlEiAKBG1vdmUYASABKAsyEC54b19nYW1lLnYxLk1vdmVIABIgCgRwbGF5GAIgASgLMhAueG9fZ2FtZS52MS5QbGF5SAASMQoNcGxheV9yZXNwb25zZRgDIAEoCzIYLnhvX2dhbWUudjEuUGxheVJlc3BvbnNlSAASJQoJc3luY190aW1lGAQgASgLMhAueG9fZ2FtZS52MS5UaW1lSAASKwoKZ2FtZV9zdGF0ZRgFIAEoCzIVLnhvX2dhbWUudjEuR2FtZVN0YXRlSABCCQoHcGF5bG9hZEKcAQoOY29tLnhvX2dhbWUudjFCB1hvUHJvdG9QAVo8Z2l0aHViLmNvbS9hcmlhbi1uai9jaGliYXppL2JhY2tlbmQvZ2VuL3hvX2dhbWUvdjE7eG9fZ2FtZXYxogIDWFhYqgIJWG9HYW1lLlYxygIJWG9HYW1lXFYx4gIVWG9HYW1lXFYxXEdQQk1ldGFkYXRh6gIKWG9HYW1lOjpWMWIGcHJvdG8z");
+
+/**
+ * @generated from message xo_game.v1.GameState
+ */
+export type GameState = Message<"xo_game.v1.GameState"> & {
+  /**
+   * @generated from field: repeated int32 cells = 1;
+   */
+  cells: number[];
+
+  /**
+   * @generated from field: int64 turn_player_id = 2;
+   */
+  turnPlayerId: bigint;
+
+  /**
+   * @generated from field: int32 board_size = 3;
+   */
+  boardSize: number;
+};
+
+/**
+ * Describes the message xo_game.v1.GameState.
+ * Use `create(GameStateSchema)` to create a new message.
+ */
+export const GameStateSchema: GenMessage<GameState> = /*@__PURE__*/
+  messageDesc(file_xo_game_v1_xo, 0);
 
 /**
  * @generated from message xo_game.v1.Move
@@ -32,7 +59,7 @@ export type Move = Message<"xo_game.v1.Move"> & {
  * Use `create(MoveSchema)` to create a new message.
  */
 export const MoveSchema: GenMessage<Move> = /*@__PURE__*/
-  messageDesc(file_xo_game_v1_xo, 0);
+  messageDesc(file_xo_game_v1_xo, 1);
 
 /**
  * @generated from message xo_game.v1.Play
@@ -49,7 +76,7 @@ export type Play = Message<"xo_game.v1.Play"> & {
  * Use `create(PlaySchema)` to create a new message.
  */
 export const PlaySchema: GenMessage<Play> = /*@__PURE__*/
-  messageDesc(file_xo_game_v1_xo, 1);
+  messageDesc(file_xo_game_v1_xo, 2);
 
 /**
  * @generated from message xo_game.v1.PlayResponse
@@ -76,19 +103,24 @@ export type PlayResponse = Message<"xo_game.v1.PlayResponse"> & {
  * Use `create(PlayResponseSchema)` to create a new message.
  */
 export const PlayResponseSchema: GenMessage<PlayResponse> = /*@__PURE__*/
-  messageDesc(file_xo_game_v1_xo, 2);
+  messageDesc(file_xo_game_v1_xo, 3);
 
 /**
  * @generated from message xo_game.v1.Time
  */
 export type Time = Message<"xo_game.v1.Time"> & {
   /**
-   * @generated from field: int32 spent_time = 1;
+   * @generated from field: int64 player_id = 1;
+   */
+  playerId: bigint;
+
+  /**
+   * @generated from field: int32 spent_time = 2;
    */
   spentTime: number;
 
   /**
-   * @generated from field: int32 total_time = 2;
+   * @generated from field: int32 total_time = 3;
    */
   totalTime: number;
 };
@@ -98,7 +130,7 @@ export type Time = Message<"xo_game.v1.Time"> & {
  * Use `create(TimeSchema)` to create a new message.
  */
 export const TimeSchema: GenMessage<Time> = /*@__PURE__*/
-  messageDesc(file_xo_game_v1_xo, 3);
+  messageDesc(file_xo_game_v1_xo, 4);
 
 /**
  * @generated from message xo_game.v1.XoGameMessage
@@ -131,6 +163,12 @@ export type XoGameMessage = Message<"xo_game.v1.XoGameMessage"> & {
      */
     value: Time;
     case: "syncTime";
+  } | {
+    /**
+     * @generated from field: xo_game.v1.GameState game_state = 5;
+     */
+    value: GameState;
+    case: "gameState";
   } | { case: undefined; value?: undefined };
 };
 
@@ -139,5 +177,5 @@ export type XoGameMessage = Message<"xo_game.v1.XoGameMessage"> & {
  * Use `create(XoGameMessageSchema)` to create a new message.
  */
 export const XoGameMessageSchema: GenMessage<XoGameMessage> = /*@__PURE__*/
-  messageDesc(file_xo_game_v1_xo, 4);
+  messageDesc(file_xo_game_v1_xo, 5);
 

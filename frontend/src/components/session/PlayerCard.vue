@@ -1,24 +1,15 @@
 <script setup lang="ts">
 import type { Account } from "@/gen/account/v1/account_pb";
-import gsap from "gsap";
-import { ref } from "vue";
+// import gsap from "gsap";
+import { ref, watch } from "vue";
 
 const props = defineProps<{
   isActive: Boolean,
   account: Account,
 }>();
 
-defineExpose({
-  AnimateTimer,
-  ContinueTimer,
-  PauseTimer,
-})
-
 const totalTime = ref(10)
-const remaingTime = ref(8)
-
-const startColor = "#02c432"
-const endColor = "#e30232"
+const spentTime = ref(8)
 
 let name = props.account.name;
 if (name.length > 10) {
@@ -27,35 +18,37 @@ if (name.length > 10) {
 
 const timerDiv = ref<HTMLDivElement | null>(null);
 
-let timerTween: GSAPTween
+// let timerTween: GSAPTween
 
+watch(spentTime, () => {
+  AnimateTimer()
+})
+
+watch(totalTime, () => {
+  AnimateTimer()
+})
 function AnimateTimer() {
   if (timerDiv.value == null) return;
-  if (timerTween) {
-    timerTween.kill()
-  }
 
-  timerTween = gsap.fromTo(timerDiv.value,
-    {
-      height: `${(remaingTime.value / totalTime.value) * 100}%`,
-      backgroundColor: startColor
-    },
-    {
-      height: "0%",
-      duration: remaingTime.value,
-      ease: "linear",
-      backgroundColor: endColor
-    }
-  );
+  const remainingTime = totalTime.value - spentTime.value
+  const progress = (remainingTime / totalTime.value) * 100
+
+  // calculate color from green -> red
+  // progress = 100 → green (#22c55e), progress = 0 → red (#dc2626)
+  const r = Math.min(255, Math.floor(255 - (progress * 2.55))); // red increases as time decreases
+  const g = Math.min(255, Math.floor(progress * 2.55));         // green decreases as time decreases
+  const b = 0;
+
+  timerDiv.value.style.height = `${progress}%`
+  timerDiv.value.style.backgroundColor = `rgb(${r}, ${g}, ${b})`
 }
 
-function PauseTimer() {
-  timerTween?.pause()
-}
-
-function ContinueTimer() {
-  timerTween?.play()
-}
+defineExpose({
+  // ContinueTimer,
+  // PauseTimer,
+  spentTime,
+  totalTime
+})
 
 </script>
 
@@ -71,3 +64,38 @@ function ContinueTimer() {
   </div>
 
 </template>
+
+// function AnimateTimer() {
+// if (timerDiv.value == null) return;
+//
+// const remainingTime = totalTime.value - spentTime.value
+// const progress = (remainingTime / totalTime.value) * 100
+//
+// let wasPaused = true
+// if (timerTween) {
+// wasPaused = timerTween?.paused()
+// }
+// timerTween = gsap.fromTo(timerDiv.value,
+// {
+// height: `${progress}%`,
+// backgroundColor: startColor
+// },
+// {
+// height: "0%",
+// duration: remainingTime,
+// ease: "linear",
+// backgroundColor: endColor
+// }
+// );
+// if (wasPaused) {
+// timerTween.pause()
+// }
+// }
+//
+// function PauseTimer() {
+// timerTween?.pause()
+// }
+//
+// function ContinueTimer() {
+// timerTween?.play()
+// }

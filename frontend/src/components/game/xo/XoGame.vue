@@ -1,16 +1,12 @@
 <script setup lang="ts">
-import Session2PlayerCards from '@/components/session/Session2PlayerCards.vue';
 import XoSquare from './XoSquare.vue'
 import { ref } from 'vue';
 
 // let nextCell = 1
 // const lastCellMoved = -1
-const props = defineProps({
-  boardSize: {
-    type: Object as () => number,
-    required: true
-  },
-})
+const props = defineProps<{
+  boardSize: number
+}>()
 
 const emit = defineEmits<{
   cellSelected: [cellIndex: number]
@@ -34,8 +30,16 @@ const DoMove = (index: number, value: number) => {
   cells.value[index] = value
 }
 
+const SetCells = (newCells: number[]) => {
+
+  console.log(newCells)
+  for (let i = 0; i < newCells.length; i++)
+    cells.value[i] = newCells[i]
+}
+
 defineExpose({
   DoMove,
+  SetCells,
 })
 
 </script>
@@ -43,7 +47,7 @@ defineExpose({
 <template>
 
   <div :class="[`grid gap-1.5 w-4/5 lg:w-3/4  bg-gray-500`, boardSizeClass]">
-    <XoSquare v-for="cell, cellIndex in cells" :value="cell" :animate="animateIndex == cellIndex"
+    <XoSquare v-for="cellValue, cellIndex in cells" :value="cellValue" :animate="animateIndex == cellIndex"
       @cell_clicked="onCellSelected(cellIndex)" />
   </div>
 </template>

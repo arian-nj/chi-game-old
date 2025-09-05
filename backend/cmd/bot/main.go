@@ -176,8 +176,8 @@ func (gv *GlobalVars) createRandomGame(gameType gametype.GameType, ticketOne *ma
 	playerOne := gamesessions.NewSessionPlayer(ticketOne.UserID, ticketOne.TgID, ticketOne.Name)
 	playerTwo := gamesessions.NewSessionPlayer(ticketTwo.UserID, ticketTwo.TgID, ticketTwo.Name)
 
-	newGameSession.AddPlayer(playerOne)
-	newGameSession.AddPlayer(playerTwo)
+	newGameSession.AddSessionPlayer(playerOne)
+	newGameSession.AddSessionPlayer(playerTwo)
 
 	gv.AllSessions.Add(strconv.Itoa(playerOne.TgID), newGameSession)
 	gv.AllSessions.Add(strconv.Itoa(playerTwo.TgID), newGameSession)
@@ -185,6 +185,7 @@ func (gv *GlobalVars) createRandomGame(gameType gametype.GameType, ticketOne *ma
 	for _, ticket := range []*matchmaking.Ticket{ticketOne, ticketTwo} {
 		ticket.MatchFoundChan <- newGameSession
 	}
+
 	utils.RunBackgroundTask(func() {
 		err = newGameSession.StartGame()
 		if err != nil {

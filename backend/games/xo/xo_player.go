@@ -3,8 +3,8 @@ package xo
 import (
 	"fmt"
 	"strconv"
-	"time"
 
+	"github.com/arian-nj/chibazi/backend/internals/chronos"
 	"github.com/arian-nj/chibazi/backend/internals/socket"
 )
 
@@ -17,10 +17,11 @@ type XoPlayer struct {
 
 	Socket *socket.Socket
 
-	SpentTime         time.Duration
-	LastTurnStartedAt time.Time
+	// SpentTime         time.Duration
+	// LastTurnStartedAt time.Time
 
-	Move Cell
+	Timer *chronos.Timer
+	Move  Cell
 }
 
 func NewXoPlayer(id int, name string, tgID int, socket *socket.Socket) *XoPlayer {
@@ -33,6 +34,7 @@ func NewXoPlayer(id int, name string, tgID int, socket *socket.Socket) *XoPlayer
 		ID:         id,
 		Name:       fmt.Sprintf("`%s`", name),
 		TelegramID: tgID,
+		Timer:      chronos.NewTimer(MaxAllowedTime),
 	}
 }
 

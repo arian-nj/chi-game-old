@@ -4,12 +4,42 @@ import { authTransport } from '@/lib/transport';
 import { useQuery } from '@tanstack/vue-query';
 import { createClient } from '@connectrpc/connect'
 import { SessionService } from '@/gen/session/v1/session_pb';
-import PlayerCard from './PlayerCard.vue';
 import gsap from 'gsap'
-import { onMounted, useTemplateRef, watch } from 'vue';
+import { onMounted, useTemplateRef } from 'vue';
 
+import * as XoBuff from "@/gen/xo_game/v1/xo_pb";
+import PlayerCard from '@/components/session/PlayerCard.vue';
+
+// const props = defineProps<{
+//   isMyTurn: boolean
+// }>()
+//
 const mePlayerCardRef = useTemplateRef('me-card-ref')
 const oppPlayerCardRef = useTemplateRef('opp-card-ref')
+// watch(() => props.isMyTurn, (newIsMyTurn) => {
+//   if (newIsMyTurn) {
+//     mePlayerCardRef.value?.ContinueTimer()
+//     oppPlayerCardRef.value?.PauseTimer()
+//   } else {
+//     mePlayerCardRef.value?.PauseTimer()
+//     oppPlayerCardRef.value?.ContinueTimer()
+//   }
+// },
+//   { immediate: true }
+// )
+
+const handleTimeSync = (timeSync: XoBuff.Time) => {
+  if (timeSync.playerId == meData.value?.account?.id && mePlayerCardRef.value) {
+    mePlayerCardRef.value.totalTime = timeSync.totalTime
+    mePlayerCardRef.value.spentTime = timeSync.spentTime
+  }
+  if (timeSync.playerId == oppData.value?.opponent?.id && oppPlayerCardRef.value) {
+    oppPlayerCardRef.value.totalTime = timeSync.totalTime
+    oppPlayerCardRef.value.spentTime = timeSync.spentTime
+  }
+}
+
+
 
 const { isPending: meIsPending, error: meErr, data: meData } = useQuery({
   queryKey: ['me'],
@@ -42,18 +72,9 @@ onMounted(() => {
   }
 })
 
-watch(meData, (val) => {
-  if (val!.account) {
-    mePlayerCardRef!.value!.AnimateTimer()
-  }
+defineExpose({
+  handleTimeSync: handleTimeSync
 })
-watch(oppData, (val) => {
-  if (val!.opponent) {
-
-    oppPlayerCardRef!.value!.AnimateTimer()
-  }
-})
-
 </script>
 
 <template>

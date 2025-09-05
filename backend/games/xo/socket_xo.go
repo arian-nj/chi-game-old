@@ -19,17 +19,17 @@ func (game *XOState) SocketRouter(newGameMsg *sessionv1.GameMessage, playerId in
 
 type SocketListener struct{}
 
-func (sl *SocketListener) Update(game *XOState, command Command) {
+func (sl *SocketListener) Update(gameState *XOState, command Command) {
 	switch a := command.(type) {
 	case *MoveCommand:
-		sl.SocketBrodcastNewMove(game, a.Pos, a.MoveType, a.PlayerID)
+		sl.SocketBrodcastNewMove(gameState, a.Pos, a.MoveType, a.PlayerID)
 	case *StartCommand:
 	case *EndGameCommand:
 		if a.Winner == nil {
 		} else {
 		}
 	case *SyncTimeCommand:
-		sl.SocketBrodcastSyncTime(game)
+		sl.SocketBrodcastSyncTime(gameState)
 	}
 }
 
@@ -141,6 +141,7 @@ func (sl *SocketListener) SocketBrodcastNewMove(game *XOState, moveIndex int, ce
 	}
 }
 func (sl *SocketListener) SocketBrodcastSyncTime(gameState *XOState) {
+	allTimeMessages := []*sessionv1.SessionMessage{}
 	for _, player := range gameState.Players {
 		newSessionMessage := sessionv1.SessionMessage{
 			Content: &sessionv1.SessionMessage_Game{
@@ -149,8 +150,9 @@ func (sl *SocketListener) SocketBrodcastSyncTime(gameState *XOState) {
 						Xo: &xo_gamev1.XoGameMessage{
 							Payload: &xo_gamev1.XoGameMessage_SyncTime{
 								SyncTime: &xo_gamev1.Time{
-									SpentTime: int32(player.SpentTime),
-									TotalTime: int32(MaxAllowedTimeSecond),
+									PlayerId:  int64(player.ID),
+									SpentTime: int32(player.Timer.SpentInt()),
+									TotalTime: int32(MaxAllowedTimeInt),
 								},
 							},
 						},
@@ -158,9 +160,44 @@ func (sl *SocketListener) SocketBrodcastSyncTime(gameState *XOState) {
 				},
 			},
 		}
-		err := player.Socket.SendMessage(&newSessionMessage)
-		if err != nil {
-			slog.Error("can't send new move", "err", err)
+		allTimeMessages = append(allTimeMessages, &newSessionMessage)
+	}
+
+	for _, player := range gameState.Players {
+		for _, timeEvent := range allTimeMessages {
+			err := player.Socket.SendMessage(timeEvent)
+			if err != nil {
+				slog.Error("can't send new move", "err", err)
+			}
 		}
+	}
+}
+
+func SocketSendGameState(gameState *XOState, player *XoPlayer) {
+	cells := []int32{}
+	for _, cell := range gameState.Board.Board {
+		cells = append(cells, int32(cell))
+	}
+	newSessionMessage := sessionv1.SessionMessage{
+		Content: &sessionv1.SessionMessage_Game{
+			Game: &sessionv1.GameMessage{
+				Game: &sessionv1.GameMessage_Xo{
+					Xo: &xo_gamev1.XoGameMessage{
+						Payload: &xo_gamev1.XoGameMessage_GameState{
+							GameState: &xo_gamev1.GameState{
+								Cells:        cells,
+								TurnPlayerId: int64(gameState.CurrentPlayer().ID),
+								BoardSize:    int32(gameState.Board.MaxCellSize),
+							},
+						},
+					},
+				},
+			},
+		},
+	}
+
+	err := player.Socket.SendMessage(&newSessionMessage)
+	if err != nil {
+		slog.Error("error sending game state")
 	}
 }

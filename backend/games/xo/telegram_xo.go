@@ -250,7 +250,7 @@ func (game *XOState) CreatePlayersInlineButton(humanPlayers []*XoPlayer, Current
 			name = name[:20] + "..."
 		}
 
-		remainedTime := (MaxAllowedTimeSecond * time.Second) - hplayer.SpentTime
+		remainedTime := MaxAllowedTime - hplayer.Timer.Spent()
 		timeText := fmt.Sprintf("%d:%d", int(remainedTime.Minutes()), int(remainedTime.Seconds())%60)
 
 		row := make([]telebot.InlineButton, 2)

@@ -99,7 +99,7 @@ func (gs *GameSession) StartGame() error {
 	return gs.GameState.StartGame()
 }
 
-func (gs *GameSession) AddPlayer(player *SessionPlayer) {
+func (gs *GameSession) AddSessionPlayer(player *SessionPlayer) {
 	gs.Players = append(gs.Players, player)
 	utils.RunBackgroundTask(func() {
 		_, err := gs.Queries.CreateSessionPlayer(context.Background(), database.CreateSessionPlayerParams{

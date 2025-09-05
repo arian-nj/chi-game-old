@@ -124,15 +124,17 @@
 [X] move every rest api to rpc
 [X] move to vue
 [X] show game players in front
-[ ] vue chat
-[ ] rejoin game web
 
-[ ] declare turns
-[ ] timer module
+[X] declare turns
+[X] timer 
+
+[ ] vue chat
+[ ] new message bubble
+
+[X] rejoin game web
+
 [ ] 5x5 game
 [ ] Send Join Panel
-
-[ ] new message bubble
 
 # bot look
 [ ] better welcome message

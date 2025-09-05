@@ -1,6 +1,8 @@
 package xo
 
-import "log/slog"
+import (
+	"log/slog"
+)
 
 type XoSubscriber interface {
 	Update(state *XOState, command Command)
@@ -55,7 +57,6 @@ func NewStartCommand() *StartCommand {
 }
 
 func (start *StartCommand) Execute(game *XOState) {
-
 }
 
 type EndGameCommand struct {
