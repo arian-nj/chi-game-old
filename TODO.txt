@@ -141,7 +141,7 @@
 [ ] add /help
 [ ] add command list
 
-[ ] Go Code Maxes cpu usage after a While !!!
+[X] Go Code Maxes cpu usage after a While !!!
 [X] command monitor sleep fix this
 ## WARNINGS
 [X] Clean and Disconnect Session

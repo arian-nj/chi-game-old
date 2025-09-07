@@ -26,6 +26,21 @@ build_frontend() {
 	cd ..
 }
 
+run_frontend() {
+	echo "Running frontend dev server"
+	cd ./frontend/
+	npm run dev
+	cd ..
+}
+
+test_build_frontend() {
+	echo "Running frontend dev build server"
+	cd ./frontend/
+	npm run build
+	serve -s dist -l 3000 
+	cd ..
+}
+
 COMMAND=$1
 
 if [ -z "COMMAND" ]; then
@@ -48,10 +63,14 @@ case $COMMAND in
 	gensqlc)
 		generate_sqlc
 	;;
-	dev)
-		echo "serving dev frontend"
-		cd ./frontend/
-		npm run dev
+	fdev)
+		run_frontend
+	;;
+	fbuild)
+		build_frontend
+	;;
+	fserve)
+		test_build_frontend
 	;;
 
 	treafik)
