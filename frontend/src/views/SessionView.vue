@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import XoOnline from '@/components/game/xo/XoOnline.vue';
+import Chat from '@/components/chat/Chat.vue';
 import { useToast } from '@/components/Toast.vue';
 import { SessionErrorType } from '@/gen/session/v1/session_pb';
 
@@ -7,7 +8,7 @@ import { GetJwtToken } from "@/lib/auth";
 import { GetBaseUrl } from "@/lib/baseURL";
 import { SessionSocket } from "@/lib/SessionWs";
 import router from '@/router/router';
-import { ref } from 'vue';
+import { ref, useTemplateRef, watch } from 'vue';
 
 const { toast } = useToast()
 const isConnected = ref(false)
@@ -15,17 +16,12 @@ const isConnected = ref(false)
 const sessionAPIUrl = GetBaseUrl() + "/api/session/" + "?auth_token=" + GetJwtToken()
 const sessionSocket = new SessionSocket(sessionAPIUrl)
 
+const ChatRef = useTemplateRef('chat-ref')
+
 sessionSocket.onopen = () => {
   isConnected.value = true
   console.log("game session WebSocket connection established");
 }
-sessionSocket.onclose = (event) => {
-  console.warn("WebSocket closed:", {
-    code: event.code,
-    reason: event.reason,
-    wasClean: event.wasClean,
-  });
-};
 
 sessionSocket.onerror = (event) => {
   console.error("WebSocket error:", event);
@@ -42,6 +38,11 @@ function HandleError(errType: SessionErrorType) {
   }
 }
 sessionSocket.HandleSessionErrorMessage = HandleError
+watch(ChatRef, () => {
+  if (ChatRef.value) {
+    sessionSocket.HandleChatMessage = ChatRef.value.HandleIncomingChat
+  }
+})
 
 </script>
 
@@ -57,5 +58,7 @@ sessionSocket.HandleSessionErrorMessage = HandleError
     <div v-else class="text-4xl">
       Connecting...
     </div>
+
+    <Chat :session-socket="sessionSocket" ref='chat-ref' />
   </div>
 </template>

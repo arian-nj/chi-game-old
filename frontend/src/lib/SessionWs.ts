@@ -2,7 +2,7 @@ import { create, fromBinary, toBinary } from "@bufbuild/protobuf";
 import { ChatMessageRequestSchema, SessionMessageSchema, type ChatMessage, type GameMessage, type SessionErrorType } from "../gen/session/v1/session_pb";
 
 export class SessionSocket extends WebSocket {
-  HandleChatMessage: ((msg: ChatMessage) => void) | null = null
+  HandleChatMessage: ((chatMsg: ChatMessage) => void) | null = null
 
   HandleGameMessage: ((msg: GameMessage) => void) | null = null
 
@@ -11,6 +11,15 @@ export class SessionSocket extends WebSocket {
   constructor(url: string) {
     super(url, [])
     this.binaryType = "arraybuffer"
+    this.onclose = (event) => {
+      console.warn("WebSocket closed:", {
+        code: event.code,
+        reason: event.reason,
+        wasClean: event.wasClean,
+      });
+    };
+
+
 
     this.onmessage = async (event) => {
       const bytes = new Uint8Array(event.data)
@@ -39,7 +48,7 @@ export class SessionSocket extends WebSocket {
 
   };
 
-  SendChatMessage(text: string) {
+  SendChatReqMessage(text: string) {
     const chatReq = create(ChatMessageRequestSchema, { text });
 
     const sessionMsg = create(SessionMessageSchema, {

@@ -65,7 +65,6 @@ export function Chat({ socketRef, meAccount }: ChatProps) {
 		socketRef.current.SendChatMessage(message);
 	};
 
-
 	return (
 		<div className="absolute bottom-0" >
 			{showMessages &&

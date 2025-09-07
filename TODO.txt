@@ -128,7 +128,8 @@
 [X] declare turns
 [X] timer 
 
-[ ] vue chat
+[X] chat to vue
+[ ] chat backend action
 [ ] new message bubble
 
 [X] rejoin game web
