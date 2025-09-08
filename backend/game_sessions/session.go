@@ -10,6 +10,7 @@ import (
 
 	"github.com/arian-nj/chibazi/backend/database"
 	sessionv1 "github.com/arian-nj/chibazi/backend/gen/session/v1"
+	"github.com/arian-nj/chibazi/backend/internals/commander"
 	"github.com/arian-nj/chibazi/backend/internals/keybul"
 	"github.com/arian-nj/chibazi/backend/internals/socket"
 	"github.com/arian-nj/chibazi/backend/internals/utils"
@@ -57,6 +58,8 @@ type GameSession struct {
 
 	CreatedAt       time.Time
 	ExpireDuaration time.Duration
+
+	*commander.Commander
 }
 
 func NewGameSession(bot *telebot.Bot, Queries *database.Queries, sessionId int) *GameSession {
@@ -77,33 +80,35 @@ func NewGameSession(bot *telebot.Bot, Queries *database.Queries, sessionId int) 
 
 		CancelSession: cancel,
 		SessionCtx:    ctx,
+
+		Commander: commander.NewCommander(),
 	}
 	return gs
 }
 
-func (gs *GameSession) RunBgTask(allSession *AllSession) {
+func (session *GameSession) RunBgTask(allSession *AllSession) {
 	utils.RunBackgroundTask(func() {
-		gs.MonitorGameSession(allSession)
+		session.MonitorGameSession(allSession)
 	})
 }
 
-func (gs *GameSession) StartGame() error {
-	if gs.GameState == nil {
+func (session *GameSession) StartGame() error {
+	if session.GameState == nil {
 		return errors.New("failed to start game field GameState is nil")
 	}
 
-	for _, player := range gs.Players {
-		gs.GameState.AddPlayer(player.ID, player.Name, player.TgID, player.Socket)
+	for _, player := range session.Players {
+		session.GameState.AddPlayer(player.ID, player.Name, player.TgID, player.Socket)
 	}
 
-	return gs.GameState.StartGame()
+	return session.GameState.StartGame()
 }
 
-func (gs *GameSession) AddSessionPlayer(player *SessionPlayer) {
-	gs.Players = append(gs.Players, player)
+func (session *GameSession) AddSessionPlayer(player *SessionPlayer) {
+	session.Players = append(session.Players, player)
 	utils.RunBackgroundTask(func() {
-		_, err := gs.Queries.CreateSessionPlayer(context.Background(), database.CreateSessionPlayerParams{
-			SessionID: gs.ID,
+		_, err := session.Queries.CreateSessionPlayer(context.Background(), database.CreateSessionPlayerParams{
+			SessionID: session.ID,
 			PersonID:  player.ID,
 		})
 		if err != nil {
@@ -112,25 +117,25 @@ func (gs *GameSession) AddSessionPlayer(player *SessionPlayer) {
 	})
 }
 
-func (gs *GameSession) MonitorGameSession(allSession *AllSession) {
+func (session *GameSession) MonitorGameSession(allSession *AllSession) {
 	for {
 		select {
-		case newSessionEvent := <-gs.MsgChnl:
+		case newSessionEvent := <-session.MsgChnl:
 			switch newSessionEvent.Event.Content.(type) {
 			case *sessionv1.SessionMessage_ChatReq:
-				gs.HandleWebChatMessage(newSessionEvent.Player, newSessionEvent.Event.GetChatReq())
+				session.SocketRequestSendMsg(newSessionEvent.Player, newSessionEvent.Event.GetChatReq())
 			case *sessionv1.SessionMessage_Game:
-				gs.GameState.SocketRouter(newSessionEvent.Event.GetGame(), newSessionEvent.Player.ID)
+				session.GameState.SocketRouter(newSessionEvent.Event.GetGame(), newSessionEvent.Player.ID)
 			}
 
-		case <-gs.GameState.GetContext().Done():
-			gs.IsGameEnded = true
-			if gs.Chat.IsOn {
+		case <-session.GameState.GetContext().Done():
+			session.IsGameEnded = true
+			if session.Chat.IsOn {
 				expDur := 30 * time.Second
-				if gs.Bot != nil {
+				if session.Bot != nil {
 					text := fmt.Sprintf("چت تا %d ثانیه دیگه بسته میشه", int(expDur.Seconds()))
-					for _, player := range gs.Players {
-						_, err := gs.Bot.Send(&telebot.User{ID: int64(player.TgID)}, text)
+					for _, player := range session.Players {
+						_, err := session.Bot.Send(&telebot.User{ID: int64(player.TgID)}, text)
 						if err != nil {
 							slog.Error("can't send end game chat message", "err", err)
 						}
@@ -138,17 +143,23 @@ func (gs *GameSession) MonitorGameSession(allSession *AllSession) {
 				}
 				time.Sleep(expDur)
 			}
-			gs.CleanAndDisconnect(allSession)
+			session.CleanAndDisconnect(allSession)
 			return
+
+		case <-session.CommandNotifire:
+			if len(session.Commands) > 0 {
+				com := session.PopCommand()
+				session.ApplyCommand(com)
+			}
 		}
 	}
 }
 
-func (gs *GameSession) CleanAndDisconnect(allSession *AllSession) {
-	if gs.Chat.IsOn {
+func (session *GameSession) CleanAndDisconnect(allSession *AllSession) {
+	if session.Chat.IsOn {
 		text := "چت قطع شد"
-		for _, player := range gs.Players {
-			_, err := gs.Bot.Send(&telebot.User{ID: int64(player.TgID)}, text, keybul.WelcomeReplyKeyboard)
+		for _, player := range session.Players {
+			_, err := session.Bot.Send(&telebot.User{ID: int64(player.TgID)}, text, keybul.WelcomeReplyKeyboard)
 			if err != nil {
 				slog.Error("can't send chat ended message", "err", err)
 			}
@@ -158,7 +169,7 @@ func (gs *GameSession) CleanAndDisconnect(allSession *AllSession) {
 	allSession.Mutex.Lock()
 	defer allSession.Mutex.Unlock()
 
-	for _, player := range gs.Players {
+	for _, player := range session.Players {
 		delete(allSession.Sessions, strconv.Itoa(player.TgID))
 	}
 }

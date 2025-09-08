@@ -30,13 +30,13 @@ func (app *BotApplication) inlineResultFeedbackHandler(c telebot.Context) error 
 	switch gameType {
 	case gametype.XOGameType3X3:
 		newXOGame := xo.NewXOGame(newGameSession.SessionCtx, gametype.XOGameType3X3, app.Bot, app.Queries)
-		newXOGame.Register(tgListen)
-		newXOGame.Register(&xo.SocketListener{})
+		newXOGame.Subscribe(tgListen)
+		newXOGame.Subscribe(&xo.SocketListener{})
 		newGame = newXOGame
 	case gametype.XOGameType5X5:
 		newXOGame := xo.NewXOGame(newGameSession.SessionCtx, gametype.XOGameType5X5, app.Bot, app.Queries)
-		newXOGame.Register(tgListen)
-		newXOGame.Register(&xo.SocketListener{})
+		newXOGame.Subscribe(tgListen)
+		newXOGame.Subscribe(&xo.SocketListener{})
 		newGame = newXOGame
 	default:
 		return c.RespondAlert("این بازیرو ندارم!")

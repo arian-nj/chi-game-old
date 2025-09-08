@@ -7,6 +7,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/arian-nj/chibazi/backend/internals/commander"
 	"github.com/arian-nj/chibazi/backend/internals/keybul"
 	"gopkg.in/telebot.v4"
 )
@@ -26,34 +27,33 @@ func NewXOTelegramListener(bot *telebot.Bot, viaMessageID string) *XoTelegramLis
 	}
 }
 
-func (tg *XoTelegramListener) Update(gameState *XOState, command Command) {
-	return
+func (tg *XoTelegramListener) Update(command commander.Command) {
 	switch c := command.(type) {
 	case *MoveCommand:
-		err := tg.EditDuringGameBoard(gameState)
+		err := tg.EditDuringGameBoard(c.Game)
 		if err != nil {
 			slog.Error("can't edit durning move command", "err", err)
 		}
 	case *StartCommand:
-		err := tg.EditDuringGameBoard(gameState)
+		err := tg.EditDuringGameBoard(c.Game)
 		if err != nil {
 			slog.Error("can't edit during start command", "err", err)
 		}
 	case *EndGameCommand:
 		if c.Winner == nil {
-			err := tg.TieGame(gameState)
+			err := tg.TieGame(c.Game)
 			if err != nil {
 				slog.Error("tie failed", "error", err)
 			}
 		} else {
-			err := tg.TheEnd(gameState, c.Winner, c.Text)
+			err := tg.TheEnd(c.Game, c.Winner, c.Text)
 			if err != nil {
 				slog.Error("the end failed", "error", err)
 			}
 		}
 	case *SyncTimeCommand:
 		if time.Since(tg.LastEdit) > 10*time.Second {
-			err := tg.EditDuringGameBoard(gameState)
+			err := tg.EditDuringGameBoard(c.Game)
 			if err != nil {
 				slog.Error("can't edit sync Time", "err", err)
 			}
@@ -151,8 +151,8 @@ func (game *XOState) XOPlayHandler(c telebot.Context, callbackData string) error
 		return c.RespondText("can't find player")
 	}
 
-	playCommand := NewPlayCommand(cellIndex, moveType, player.ID)
-	game.pushCommand(playCommand)
+	playCommand := NewPlayCommand(game, cellIndex, moveType, player.ID)
+	game.PushCommand(playCommand)
 	return nil
 }
 

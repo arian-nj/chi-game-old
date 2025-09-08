@@ -5,10 +5,12 @@ import (
 
 	sessionv1 "github.com/arian-nj/chibazi/backend/gen/session/v1"
 	xo_gamev1 "github.com/arian-nj/chibazi/backend/gen/xo_game/v1"
+	"github.com/arian-nj/chibazi/backend/internals/commander"
 )
 
 // FIXME: make it map handler with auto Converting inputs
 func (game *XOState) SocketRouter(newGameMsg *sessionv1.GameMessage, playerId int) {
+
 	newXoMessage := newGameMsg.GetXo()
 	switch newXoMessage.Payload.(type) {
 	case *xo_gamev1.XoGameMessage_Play:
@@ -19,17 +21,17 @@ func (game *XOState) SocketRouter(newGameMsg *sessionv1.GameMessage, playerId in
 
 type SocketListener struct{}
 
-func (sl *SocketListener) Update(gameState *XOState, command Command) {
+func (sl *SocketListener) Update(command commander.Command) {
 	switch a := command.(type) {
 	case *MoveCommand:
-		sl.SocketBrodcastNewMove(gameState, a.Pos, a.MoveType, a.PlayerID)
+		sl.SocketBrodcastNewMove(a.Game, a.Pos, a.MoveType, a.PlayerID)
 	case *StartCommand:
 	case *EndGameCommand:
 		if a.Winner == nil {
 		} else {
 		}
 	case *SyncTimeCommand:
-		sl.SocketBrodcastSyncTime(gameState)
+		sl.SocketBrodcastSyncTime(a.Game)
 	}
 }
 
@@ -60,6 +62,7 @@ func sendInvalidResponse(player *XoPlayer, errMsg string, cellIndex int32, cellT
 
 func (game *XOState) PlayHandlerSocket(playInput *xo_gamev1.Play, playerID int) {
 	player := game.findByID(playerID)
+
 	if player == nil {
 		slog.Error("can't find player in socjet play handler")
 		return
@@ -73,6 +76,7 @@ func (game *XOState) PlayHandlerSocket(playInput *xo_gamev1.Play, playerID int) 
 	moveType := game.CurrentPlayer().Move
 
 	isValid, errMsg := game.Board.IsMoveValid(int(playInput.CellIndex), moveType)
+
 	if !isValid {
 		err := sendInvalidResponse(player, errMsg, playInput.CellIndex, 0)
 		if err != nil {
@@ -81,8 +85,8 @@ func (game *XOState) PlayHandlerSocket(playInput *xo_gamev1.Play, playerID int) 
 		return
 	}
 
-	playCommand := NewPlayCommand(int(playInput.CellIndex), moveType, player.ID)
-	game.pushCommand(playCommand)
+	playCommand := NewPlayCommand(game, int(playInput.CellIndex), moveType, player.ID)
+	game.PushCommand(playCommand)
 }
 
 func (sl *SocketListener) SocketBrodcastNewMove(game *XOState, moveIndex int, cellType Cell, playerID int) {

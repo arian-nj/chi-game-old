@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/arian-nj/chibazi/backend/database"
+	"github.com/arian-nj/chibazi/backend/internals/commander"
 	gametype "github.com/arian-nj/chibazi/backend/internals/game_type"
 	"github.com/arian-nj/chibazi/backend/internals/random"
 	"github.com/arian-nj/chibazi/backend/internals/socket"
@@ -29,11 +30,7 @@ type XOState struct { // of GameInterface type
 	CancelGame context.CancelFunc
 	Ctx        context.Context
 
-	Commands        []Command
-	DoneCommands    []Command
-	CommandNotifire chan any
-
-	Subscribers []XoSubscriber
+	*commander.Commander
 
 	mu sync.Mutex
 }
@@ -53,7 +50,6 @@ func NewXOGame(
 	ctx, cancel := context.WithCancel(sessionCtx)
 
 	return &XOState{
-
 		CurrentPlayerIndex: randIndex,
 		Players:            []*XoPlayer{},
 		CancelGame:         cancel,
@@ -62,13 +58,8 @@ func NewXOGame(
 		GameType: gameType,
 		Board:    NewTicBoard(maxBoardSize, winSize),
 
-		Queries: queries,
-
-		Commands:        []Command{},
-		DoneCommands:    []Command{},
-		CommandNotifire: make(chan any, 6),
-
-		Subscribers: []XoSubscriber{},
+		Queries:   queries,
+		Commander: commander.NewCommander(),
 	}
 }
 
@@ -84,21 +75,21 @@ func (gameState *XOState) monitorXoGame() {
 			currentPlayer := gameState.CurrentPlayer()
 
 			if currentPlayer.Timer.Spent() >= MaxAllowedTime {
-				newEndCommand := NewEndGameCommand(gameState.OpponentPlayer(), "\n برنده زمانی")
-				gameState.injectCommand(newEndCommand)
+				newEndCommand := NewEndGameCommand(gameState, gameState.OpponentPlayer(), "\n برنده زمانی")
+				gameState.InjectCommand(newEndCommand)
 				return
 			}
 			if now.Sub(lastSyncTime) > time.Second*1 {
-				newSyncCommand := NewSyncTimeCommand()
-				gameState.pushCommand(newSyncCommand)
+				newSyncCommand := NewSyncTimeCommand(gameState)
+				gameState.PushCommand(newSyncCommand)
 				lastSyncTime = now
 			}
 		case <-gameState.Ctx.Done():
 			return
 		case <-gameState.CommandNotifire:
 			if len(gameState.Commands) > 0 {
-				action := gameState.popCommand()
-				gameState.applyCommand(action)
+				com := gameState.PopCommand()
+				gameState.ApplyCommand(com)
 			}
 		}
 	}
@@ -145,42 +136,6 @@ func (g *XOState) nextPlayer() {
 	g.CurrentPlayer().Timer.Start()
 }
 
-// Commands
-func (game *XOState) pushCommand(newCommand Command) {
-	game.Commands = append(game.Commands, newCommand)
-	game.CommandNotifire <- nil
-}
-
-func (game *XOState) injectCommand(newAction Command) {
-	game.Commands = append([]Command{newAction}, game.Commands...)
-	game.CommandNotifire <- nil
-}
-func (game *XOState) popCommand() Command {
-	firstAction := game.Commands[0]
-	game.Commands = game.Commands[1:]
-	return firstAction
-}
-
-func (gs *XOState) applyCommand(newCommand Command) {
-	gs.mu.Lock()
-	defer gs.mu.Unlock()
-
-	newCommand.Execute(gs)
-	gs.Notify(newCommand)
-	gs.DoneCommands = append(gs.DoneCommands, newCommand)
-}
-
-// Subscription
-func (gs *XOState) Notify(command Command) {
-	for _, sub := range gs.Subscribers {
-		sub.Update(gs, command) // pass both state + action
-	}
-}
-
-func (game *XOState) Register(subscriber XoSubscriber) {
-	game.Subscribers = append(game.Subscribers, subscriber)
-}
-
 // game interface
 func (g *XOState) AddPlayer(id int, name string, tgId int, socket *socket.Socket) {
 	player := NewXoPlayer(id, name, tgId, socket)
@@ -208,7 +163,7 @@ func (game *XOState) StartGame() error {
 	game.Players[1].Move = O
 
 	game.CurrentPlayer().Timer.Start()
-	startAction := NewStartCommand()
-	game.pushCommand(startAction)
+	startAction := NewStartCommand(game)
+	game.PushCommand(startAction)
 	return nil
 }

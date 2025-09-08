@@ -34,7 +34,6 @@ func sendSessionSocketError(socketClient *socket.Socket, errType sessionv1.Sessi
 }
 
 func (app *ApiApplication) gameSessionWS(w http.ResponseWriter, r *http.Request) {
-
 	conn, err := websocket.Accept(w, r, &websocket.AcceptOptions{
 		OriginPatterns: CORS_PATTERNS,
 	})
@@ -69,6 +68,11 @@ func (app *ApiApplication) gameSessionWS(w http.ResponseWriter, r *http.Request)
 		}
 	}
 	sessionPlayer.Socket = socketClient
+
+	socketSubber := gamesessions.NewSessionSocketListener(personRow.ID)
+	gameSession.Subscribe(socketSubber)
+	defer gameSession.Unsubscribe(socketSubber)
+
 	if gameSession.GameState != nil {
 		gameSession.GameState.SetPlayerSocket(personRow.ID, socketClient)
 	}

@@ -129,7 +129,8 @@
 [X] timer 
 
 [X] chat to vue
-[ ] chat backend action
+[X] session command
+[ ] get chats on rejoin
 [ ] new message bubble
 
 [X] rejoin game web

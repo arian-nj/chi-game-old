@@ -80,7 +80,7 @@ func (app *BotApplication) textHandler(c telebot.Context) error {
 	// ensure game is in not Via Message
 	gameSession, ok := app.AllSessions.Get(strconv.Itoa(senderID))
 	if ok {
-		return gameSession.HandleBotChatMessage(c.Bot(), senderID, text)
+		return gameSession.BotRequestSendMsg(c.Bot(), senderID, text)
 	}
 
 	return c.Send(
