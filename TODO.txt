@@ -130,7 +130,7 @@
 
 [X] chat to vue
 [X] session command
-[ ] get chats on rejoin
+[X] get chats on rejoin
 [ ] new message bubble
 
 [X] rejoin game web

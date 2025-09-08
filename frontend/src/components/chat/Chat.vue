@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import ChatInput from '@/components/chat/ChatInput.vue';
-import type { ChatMessage } from '@/gen/session/v1/session_pb';
+import { SessionService, type ChatMessage } from '@/gen/session/v1/session_pb';
 import type { SessionSocket } from '@/lib/SessionWs';
 import { Message } from '@/types/Message';
 import { watch } from 'vue';
@@ -22,7 +22,24 @@ const { isPending: meIsPending, error: meErr, data: meData } = useQuery({
   }
 })
 
+const { isPending: chatHistoryIsPending, error: chatHistoryErr, data: chatHistoryData } = useQuery({
+  queryKey: ['chat-history'],
+  queryFn: async () => {
+    const client = createClient(SessionService, authTransport)
+    const data = await client.getChatHistory({})
+    return data
+  },
+  staleTime: 0
+})
 
+watch(chatHistoryData, () => {
+  if (chatHistoryData && chatHistoryData.value) {
+    const oldMessages = chatHistoryData.value.messages.map(
+      (m) => new Message(m.text, m.playerId)
+    )
+    allChatMessages.value = oldMessages
+  }
+})
 
 const allChatMessages = ref(Array<Message>())
 const showChat = ref(false)
