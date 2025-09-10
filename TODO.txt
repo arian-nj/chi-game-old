@@ -130,6 +130,9 @@
 [X] rejoin game web
 [X] very basic win panel
 
+[X] Setup vps
+[ ] CD Pipline
+
 [ ] 5x5 game
 [ ] Send Join Panel
 [ ] new message bubble

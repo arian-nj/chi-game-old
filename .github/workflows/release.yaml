@@ -14,7 +14,7 @@ permissions:
   contents: read
 
 jobs:
-  build_and_push_bot_image:
+  build_and_push_back_image:
     runs-on: ubuntu-latest
 
     steps:
@@ -35,10 +35,38 @@ jobs:
         with:
           context: .
           push: true
-          file: bot.Dockerfile
+          file: back.Dockerfile
           tags: |
-            ghcr.io/arian-nj/tix-bot:latest
-            ghcr.io/arian-nj/tix-bot:${{ github.sha }}
+            ghcr.io/arian-nj/core-api:latest
+            ghcr.io/arian-nj/core-api:${{ github.sha }}
+
+  build_and_push_front_image:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          token:  ${{ secrets.read_token }}
+
+      - name: Log in to the Container registry
+        uses: docker/login-action@v3
+        with:
+          registry: https://ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GHCR_TOKEN }}
+
+      - name: Bot Build and push Docker image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: true
+          file: front.Dockerfile
+          tags: |
+            ghcr.io/arian-nj/front:latest
+            ghcr.io/arian-nj/front:${{ github.sha }}
+
+
 
   deploy:
     runs-on: ubuntu-latest
@@ -59,9 +87,9 @@ jobs:
       - name: Docker Stack Deploy
         uses: cssnr/stack-deploy-action@v1
         with:
-          name: tix-game
+          name: chi-game
           file: docker-stack.yaml
-          host: 144.172.101.88
+          host:  144.172.91.193
           user: deploy
           ssh_key: ${{ secrets.DEPLOY_SSH_PRIVATE_KEY }}
           env_file: ./envfile
