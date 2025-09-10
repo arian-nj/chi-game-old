@@ -2,7 +2,7 @@ FROM golang:1.24-bookworm AS deps
 
 WORKDIR /app
 
-COPY ./go.mod ./go.sum ./
+COPY ./backend/go.mod ./backend/go.sum ./
 
 RUN go mod download
 
@@ -11,7 +11,7 @@ FROM golang:1.24-bookworm AS builder
 WORKDIR /app
 COPY --from=deps /go/pkg /go/pkg
 
-COPY . .
+COPY ./backend/. .
 
 RUN CGO_ENABLED=0 GOOS=linux go build -ldflags="-w -s" -o ./build/bot_server ./cmd/bot/.
 
