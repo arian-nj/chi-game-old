@@ -1,12 +1,12 @@
 import { createConnectTransport } from "@connectrpc/connect-web";
-import { GetBaseUrl } from "./baseURL";
+import { GetApiUrl } from "./baseURL";
 import { GetJwtToken } from "./auth";
 
 export const rawTransport = createConnectTransport({
-  baseUrl: GetBaseUrl(),
+  baseUrl: GetApiUrl(),
 })
 export const authTransport = createConnectTransport({
-  baseUrl: GetBaseUrl(),
+  baseUrl: GetApiUrl(),
   interceptors: [
     (next) => (request) => {
       const token = GetJwtToken();

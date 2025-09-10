@@ -5,7 +5,7 @@ import { useToast } from '@/components/Toast.vue';
 import { SessionErrorType } from '@/gen/session/v1/session_pb';
 
 import { GetJwtToken } from "@/lib/auth";
-import { GetBaseUrl } from "@/lib/baseURL";
+import { GetApiUrl } from "@/lib/baseURL";
 import { SessionSocket } from "@/lib/SessionWs";
 import router from '@/router/router';
 import { ref, useTemplateRef, watch } from 'vue';
@@ -13,7 +13,7 @@ import { ref, useTemplateRef, watch } from 'vue';
 const { toast } = useToast()
 const isConnected = ref(false)
 
-const sessionAPIUrl = GetBaseUrl() + "/api/session/" + "?auth_token=" + GetJwtToken()
+const sessionAPIUrl = GetApiUrl() + "/api/session/" + "?auth_token=" + GetJwtToken()
 const sessionSocket = new SessionSocket(sessionAPIUrl)
 
 const ChatRef = useTemplateRef('chat-ref')

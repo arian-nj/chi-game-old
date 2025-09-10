@@ -2,7 +2,7 @@
 import { useToast } from '@/components/Toast.vue'
 import { FinderErrorType, FinderEventSchema, FinderType } from '@/gen/finder/v1/finder_pb'
 import { GetJwtToken } from '@/lib/auth'
-import { GetBaseUrl } from '@/lib/baseURL'
+import { GetApiUrl } from '@/lib/baseURL'
 import { create, fromBinary, toBinary } from '@bufbuild/protobuf'
 import { useRouter } from 'vue-router'
 
@@ -15,7 +15,7 @@ import wasmUrl from "@lottiefiles/dotlottie-web/dist/dotlottie-player.wasm?url";
 DotLottieWeb.setWasmUrl(wasmUrl)
 const router = useRouter()
 
-const url = GetBaseUrl() + "/api/match_making/ticket/?auth_token=" + GetJwtToken()
+const url = GetApiUrl() + "/api/match_making/ticket/?auth_token=" + GetJwtToken()
 
 const { toast } = useToast()
 
