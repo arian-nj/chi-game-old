@@ -38,8 +38,8 @@ services:
       context: .
       dockerfile: front.Dockerfile
 
-    args:
-      VITE_API_URL: "https://api.chigame.site"
+    environment:
+      - RELEASE_MODE=release
 
     labels:
       - "traefik.enable=true"
