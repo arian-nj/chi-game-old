@@ -23,7 +23,7 @@ if (token == null || token == "") {
 }
 
 const selectedGame = ref("")
-const games = ["3X3", "5X5"];
+const games = ["3X3"];
 
 const playBtnRef = ref<HTMLButtonElement | null>(null)
 
@@ -47,7 +47,7 @@ onMounted(() => {
 
 <template>
   <main>
-    <div class="relative h-screen w-screen bg-neutral-800 text-pearl overflow-hidden">
+    <div class="relative h-screen w-screen bg-background text-pearl overflow-hidden">
 
       <div class="flex justify-center ">
         <MeComponent />
@@ -59,14 +59,15 @@ onMounted(() => {
       </div>
 
 
-      <button ref="playBtnRef" type="button" @click="handlePlayClick" :class="[
+      <button ref="playBtnRef" type="button" :disabled="selectedGame == ''" @click="handlePlayClick" :class="[
         `play-btn absolute bottom-0 left-0 w-full
             py-6 text-4xl font-bold rounded-none
-            focus:outline-none focus:ring-4 focus:ring-pink-300`
+            focus:outline-none focus:ring-4 focus:ring-pink-300
+            transition-colors duration-400`
         ,
         selectedGame
-          ? 'bg-gradient-to-r from-pink-500 to-orange-400 text-white hover:opacity-90 shadow-md'
-          : 'bg-gray-300 text-gray-400 cursor-not-allowed'
+          ? 'bg-secondary text-white hover:opacity-90 shadow-md'
+          : 'bg-gray-300 text-gray-400 cursor-not-allowed '
       ]">
         Play
       </button>
