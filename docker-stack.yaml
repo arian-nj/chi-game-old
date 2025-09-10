@@ -55,7 +55,7 @@ services:
       dockerfile: back.Dockerfile
 
     environment:
-      - RELEASE_BOT_TOKEN=8236580151:AAGhdmel90Y2eZxzEEMTThCfNvzADxXZtz0
+      - RELEASE_BOT_TOKEN=8452814311:AAGPKXzHy3Fs2anmoG5abDNmPIBDYedHSVY
       - RELEASE_DATABASE_URL=postgres://pgadmin:p239ijfw921ioad@db:5432/game?sslmode=disable
       - RELEASE_MODE=release
 
