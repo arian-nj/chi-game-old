@@ -88,4 +88,4 @@ services:
 
 volumes:
   postgres_data:
-
+  letsencrypt:
