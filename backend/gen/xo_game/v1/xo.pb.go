@@ -7,6 +7,7 @@
 package xo_gamev1
 
 import (
+	v1 "github.com/arian-nj/chibazi/backend/gen/account/v1"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	reflect "reflect"
@@ -20,6 +21,58 @@ const (
 	// Verify that runtime/protoimpl is sufficiently up-to-date.
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
+
+type EndReason int32
+
+const (
+	EndReason_END_REASON_UNSPECIFIED EndReason = 0
+	EndReason_END_REASON_TIMOUT      EndReason = 1
+	EndReason_END_REASON_TIE         EndReason = 2
+	EndReason_END_REASON_FULL        EndReason = 3
+)
+
+// Enum value maps for EndReason.
+var (
+	EndReason_name = map[int32]string{
+		0: "END_REASON_UNSPECIFIED",
+		1: "END_REASON_TIMOUT",
+		2: "END_REASON_TIE",
+		3: "END_REASON_FULL",
+	}
+	EndReason_value = map[string]int32{
+		"END_REASON_UNSPECIFIED": 0,
+		"END_REASON_TIMOUT":      1,
+		"END_REASON_TIE":         2,
+		"END_REASON_FULL":        3,
+	}
+)
+
+func (x EndReason) Enum() *EndReason {
+	p := new(EndReason)
+	*p = x
+	return p
+}
+
+func (x EndReason) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (EndReason) Descriptor() protoreflect.EnumDescriptor {
+	return file_xo_game_v1_xo_proto_enumTypes[0].Descriptor()
+}
+
+func (EndReason) Type() protoreflect.EnumType {
+	return &file_xo_game_v1_xo_proto_enumTypes[0]
+}
+
+func (x EndReason) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use EndReason.Descriptor instead.
+func (EndReason) EnumDescriptor() ([]byte, []int) {
+	return file_xo_game_v1_xo_proto_rawDescGZIP(), []int{0}
+}
 
 type GameState struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
@@ -297,6 +350,66 @@ func (x *Time) GetTotalTime() int32 {
 	return 0
 }
 
+type EndGame struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Reason        EndReason              `protobuf:"varint,1,opt,name=reason,proto3,enum=xo_game.v1.EndReason" json:"reason,omitempty"`
+	Winner        *v1.Account            `protobuf:"bytes,2,opt,name=winner,proto3" json:"winner,omitempty"`
+	Loser         *v1.Account            `protobuf:"bytes,3,opt,name=loser,proto3" json:"loser,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *EndGame) Reset() {
+	*x = EndGame{}
+	mi := &file_xo_game_v1_xo_proto_msgTypes[5]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *EndGame) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*EndGame) ProtoMessage() {}
+
+func (x *EndGame) ProtoReflect() protoreflect.Message {
+	mi := &file_xo_game_v1_xo_proto_msgTypes[5]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use EndGame.ProtoReflect.Descriptor instead.
+func (*EndGame) Descriptor() ([]byte, []int) {
+	return file_xo_game_v1_xo_proto_rawDescGZIP(), []int{5}
+}
+
+func (x *EndGame) GetReason() EndReason {
+	if x != nil {
+		return x.Reason
+	}
+	return EndReason_END_REASON_UNSPECIFIED
+}
+
+func (x *EndGame) GetWinner() *v1.Account {
+	if x != nil {
+		return x.Winner
+	}
+	return nil
+}
+
+func (x *EndGame) GetLoser() *v1.Account {
+	if x != nil {
+		return x.Loser
+	}
+	return nil
+}
+
 type XoGameMessage struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// Types that are valid to be assigned to Payload:
@@ -306,6 +419,7 @@ type XoGameMessage struct {
 	//	*XoGameMessage_PlayResponse
 	//	*XoGameMessage_SyncTime
 	//	*XoGameMessage_GameState
+	//	*XoGameMessage_EndGame
 	Payload       isXoGameMessage_Payload `protobuf_oneof:"payload"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -313,7 +427,7 @@ type XoGameMessage struct {
 
 func (x *XoGameMessage) Reset() {
 	*x = XoGameMessage{}
-	mi := &file_xo_game_v1_xo_proto_msgTypes[5]
+	mi := &file_xo_game_v1_xo_proto_msgTypes[6]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -325,7 +439,7 @@ func (x *XoGameMessage) String() string {
 func (*XoGameMessage) ProtoMessage() {}
 
 func (x *XoGameMessage) ProtoReflect() protoreflect.Message {
-	mi := &file_xo_game_v1_xo_proto_msgTypes[5]
+	mi := &file_xo_game_v1_xo_proto_msgTypes[6]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -338,7 +452,7 @@ func (x *XoGameMessage) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use XoGameMessage.ProtoReflect.Descriptor instead.
 func (*XoGameMessage) Descriptor() ([]byte, []int) {
-	return file_xo_game_v1_xo_proto_rawDescGZIP(), []int{5}
+	return file_xo_game_v1_xo_proto_rawDescGZIP(), []int{6}
 }
 
 func (x *XoGameMessage) GetPayload() isXoGameMessage_Payload {
@@ -393,6 +507,15 @@ func (x *XoGameMessage) GetGameState() *GameState {
 	return nil
 }
 
+func (x *XoGameMessage) GetEndGame() *EndGame {
+	if x != nil {
+		if x, ok := x.Payload.(*XoGameMessage_EndGame); ok {
+			return x.EndGame
+		}
+	}
+	return nil
+}
+
 type isXoGameMessage_Payload interface {
 	isXoGameMessage_Payload()
 }
@@ -417,6 +540,10 @@ type XoGameMessage_GameState struct {
 	GameState *GameState `protobuf:"bytes,5,opt,name=game_state,json=gameState,proto3,oneof"`
 }
 
+type XoGameMessage_EndGame struct {
+	EndGame *EndGame `protobuf:"bytes,6,opt,name=end_game,json=endGame,proto3,oneof"`
+}
+
 func (*XoGameMessage_Move) isXoGameMessage_Payload() {}
 
 func (*XoGameMessage_Play) isXoGameMessage_Payload() {}
@@ -427,12 +554,14 @@ func (*XoGameMessage_SyncTime) isXoGameMessage_Payload() {}
 
 func (*XoGameMessage_GameState) isXoGameMessage_Payload() {}
 
+func (*XoGameMessage_EndGame) isXoGameMessage_Payload() {}
+
 var File_xo_game_v1_xo_proto protoreflect.FileDescriptor
 
 const file_xo_game_v1_xo_proto_rawDesc = "" +
 	"\n" +
 	"\x13xo_game/v1/xo.proto\x12\n" +
-	"xo_game.v1\"f\n" +
+	"xo_game.v1\x1a\x18account/v1/account.proto\"f\n" +
 	"\tGameState\x12\x14\n" +
 	"\x05cells\x18\x01 \x03(\x05R\x05cells\x12$\n" +
 	"\x0eturn_player_id\x18\x02 \x01(\x03R\fturnPlayerId\x12\x1d\n" +
@@ -455,15 +584,25 @@ const file_xo_game_v1_xo_proto_rawDesc = "" +
 	"\n" +
 	"spent_time\x18\x02 \x01(\x05R\tspentTime\x12\x1d\n" +
 	"\n" +
-	"total_time\x18\x03 \x01(\x05R\ttotalTime\"\x94\x02\n" +
+	"total_time\x18\x03 \x01(\x05R\ttotalTime\"\x90\x01\n" +
+	"\aEndGame\x12-\n" +
+	"\x06reason\x18\x01 \x01(\x0e2\x15.xo_game.v1.EndReasonR\x06reason\x12+\n" +
+	"\x06winner\x18\x02 \x01(\v2\x13.account.v1.AccountR\x06winner\x12)\n" +
+	"\x05loser\x18\x03 \x01(\v2\x13.account.v1.AccountR\x05loser\"\xc6\x02\n" +
 	"\rXoGameMessage\x12&\n" +
 	"\x04move\x18\x01 \x01(\v2\x10.xo_game.v1.MoveH\x00R\x04move\x12&\n" +
 	"\x04play\x18\x02 \x01(\v2\x10.xo_game.v1.PlayH\x00R\x04play\x12?\n" +
 	"\rplay_response\x18\x03 \x01(\v2\x18.xo_game.v1.PlayResponseH\x00R\fplayResponse\x12/\n" +
 	"\tsync_time\x18\x04 \x01(\v2\x10.xo_game.v1.TimeH\x00R\bsyncTime\x126\n" +
 	"\n" +
-	"game_state\x18\x05 \x01(\v2\x15.xo_game.v1.GameStateH\x00R\tgameStateB\t\n" +
-	"\apayloadB\x9c\x01\n" +
+	"game_state\x18\x05 \x01(\v2\x15.xo_game.v1.GameStateH\x00R\tgameState\x120\n" +
+	"\bend_game\x18\x06 \x01(\v2\x13.xo_game.v1.EndGameH\x00R\aendGameB\t\n" +
+	"\apayload*g\n" +
+	"\tEndReason\x12\x1a\n" +
+	"\x16END_REASON_UNSPECIFIED\x10\x00\x12\x15\n" +
+	"\x11END_REASON_TIMOUT\x10\x01\x12\x12\n" +
+	"\x0eEND_REASON_TIE\x10\x02\x12\x13\n" +
+	"\x0fEND_REASON_FULL\x10\x03B\x9c\x01\n" +
 	"\x0ecom.xo_game.v1B\aXoProtoP\x01Z<github.com/arian-nj/chibazi/backend/gen/xo_game/v1;xo_gamev1\xa2\x02\x03XXX\xaa\x02\tXoGame.V1\xca\x02\tXoGame\\V1\xe2\x02\x15XoGame\\V1\\GPBMetadata\xea\x02\n" +
 	"XoGame::V1b\x06proto3"
 
@@ -479,27 +618,35 @@ func file_xo_game_v1_xo_proto_rawDescGZIP() []byte {
 	return file_xo_game_v1_xo_proto_rawDescData
 }
 
-var file_xo_game_v1_xo_proto_msgTypes = make([]protoimpl.MessageInfo, 6)
+var file_xo_game_v1_xo_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
+var file_xo_game_v1_xo_proto_msgTypes = make([]protoimpl.MessageInfo, 7)
 var file_xo_game_v1_xo_proto_goTypes = []any{
-	(*GameState)(nil),     // 0: xo_game.v1.GameState
-	(*Move)(nil),          // 1: xo_game.v1.Move
-	(*Play)(nil),          // 2: xo_game.v1.Play
-	(*PlayResponse)(nil),  // 3: xo_game.v1.PlayResponse
-	(*Time)(nil),          // 4: xo_game.v1.Time
-	(*XoGameMessage)(nil), // 5: xo_game.v1.XoGameMessage
+	(EndReason)(0),        // 0: xo_game.v1.EndReason
+	(*GameState)(nil),     // 1: xo_game.v1.GameState
+	(*Move)(nil),          // 2: xo_game.v1.Move
+	(*Play)(nil),          // 3: xo_game.v1.Play
+	(*PlayResponse)(nil),  // 4: xo_game.v1.PlayResponse
+	(*Time)(nil),          // 5: xo_game.v1.Time
+	(*EndGame)(nil),       // 6: xo_game.v1.EndGame
+	(*XoGameMessage)(nil), // 7: xo_game.v1.XoGameMessage
+	(*v1.Account)(nil),    // 8: account.v1.Account
 }
 var file_xo_game_v1_xo_proto_depIdxs = []int32{
-	1, // 0: xo_game.v1.PlayResponse.move:type_name -> xo_game.v1.Move
-	1, // 1: xo_game.v1.XoGameMessage.move:type_name -> xo_game.v1.Move
-	2, // 2: xo_game.v1.XoGameMessage.play:type_name -> xo_game.v1.Play
-	3, // 3: xo_game.v1.XoGameMessage.play_response:type_name -> xo_game.v1.PlayResponse
-	4, // 4: xo_game.v1.XoGameMessage.sync_time:type_name -> xo_game.v1.Time
-	0, // 5: xo_game.v1.XoGameMessage.game_state:type_name -> xo_game.v1.GameState
-	6, // [6:6] is the sub-list for method output_type
-	6, // [6:6] is the sub-list for method input_type
-	6, // [6:6] is the sub-list for extension type_name
-	6, // [6:6] is the sub-list for extension extendee
-	0, // [0:6] is the sub-list for field type_name
+	2,  // 0: xo_game.v1.PlayResponse.move:type_name -> xo_game.v1.Move
+	0,  // 1: xo_game.v1.EndGame.reason:type_name -> xo_game.v1.EndReason
+	8,  // 2: xo_game.v1.EndGame.winner:type_name -> account.v1.Account
+	8,  // 3: xo_game.v1.EndGame.loser:type_name -> account.v1.Account
+	2,  // 4: xo_game.v1.XoGameMessage.move:type_name -> xo_game.v1.Move
+	3,  // 5: xo_game.v1.XoGameMessage.play:type_name -> xo_game.v1.Play
+	4,  // 6: xo_game.v1.XoGameMessage.play_response:type_name -> xo_game.v1.PlayResponse
+	5,  // 7: xo_game.v1.XoGameMessage.sync_time:type_name -> xo_game.v1.Time
+	1,  // 8: xo_game.v1.XoGameMessage.game_state:type_name -> xo_game.v1.GameState
+	6,  // 9: xo_game.v1.XoGameMessage.end_game:type_name -> xo_game.v1.EndGame
+	10, // [10:10] is the sub-list for method output_type
+	10, // [10:10] is the sub-list for method input_type
+	10, // [10:10] is the sub-list for extension type_name
+	10, // [10:10] is the sub-list for extension extendee
+	0,  // [0:10] is the sub-list for field type_name
 }
 
 func init() { file_xo_game_v1_xo_proto_init() }
@@ -507,25 +654,27 @@ func file_xo_game_v1_xo_proto_init() {
 	if File_xo_game_v1_xo_proto != nil {
 		return
 	}
-	file_xo_game_v1_xo_proto_msgTypes[5].OneofWrappers = []any{
+	file_xo_game_v1_xo_proto_msgTypes[6].OneofWrappers = []any{
 		(*XoGameMessage_Move)(nil),
 		(*XoGameMessage_Play)(nil),
 		(*XoGameMessage_PlayResponse)(nil),
 		(*XoGameMessage_SyncTime)(nil),
 		(*XoGameMessage_GameState)(nil),
+		(*XoGameMessage_EndGame)(nil),
 	}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_xo_game_v1_xo_proto_rawDesc), len(file_xo_game_v1_xo_proto_rawDesc)),
-			NumEnums:      0,
-			NumMessages:   6,
+			NumEnums:      1,
+			NumMessages:   7,
 			NumExtensions: 0,
 			NumServices:   0,
 		},
 		GoTypes:           file_xo_game_v1_xo_proto_goTypes,
 		DependencyIndexes: file_xo_game_v1_xo_proto_depIdxs,
+		EnumInfos:         file_xo_game_v1_xo_proto_enumTypes,
 		MessageInfos:      file_xo_game_v1_xo_proto_msgTypes,
 	}.Build()
 	File_xo_game_v1_xo_proto = out.File

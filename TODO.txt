@@ -66,10 +66,6 @@
 
 [X] make it panic safe
 
-[ ] add don't care random game
-
-[ ] start advertisement
-
 # 0.6.0 Session Chat
 [X] make api base
 [X] make front base embed in go
@@ -131,17 +127,19 @@
 [X] chat to vue
 [X] session command
 [X] get chats on rejoin
-[ ] new message bubble
-
 [X] rejoin game web
+[X] very basic win panel
 
 [ ] 5x5 game
 [ ] Send Join Panel
+[ ] new message bubble
 
 # bot look
 [ ] better welcome message
 [ ] add /help
 [ ] add command list
+
+[ ] start advertisement
 
 [X] Go Code Maxes cpu usage after a While !!!
 [X] command monitor sleep fix this
@@ -160,6 +158,7 @@ maybe add scroing to make it harder to use other bots
 [ ] renew jwt token automaticly
 
 
+[ ] add don't care random game
 
 
 [-] implementing

@@ -1,14 +1,22 @@
 services:
-
-  telegram:
-    image: ghcr.io/arian-nj/tix-bot:${GIT_COMMIT_HASH}
+  frontend:
+    image: ghcr.io/arian-nj/chi-game:${GIT_COMMIT_HASH}
     build:
       context: .
-      dockerfile: bot.Dockerfile
+      dockerfile: front.Dockerfile
 
     environment:
-      - RELEASE_BOT_TOKEN=8122683105:AAHIVYGHFjgb0DCv1SHQYjv30Wg3olsnnxI
-      - RELEASE_DATABASE_URL=postgres://pgadmin:mq90rcqnuc38crn@db:5432/game?sslmode=disable
+      - RELEASE_MODE=release
+
+  backend:
+    image: ghcr.io/arian-nj/chi-game:${GIT_COMMIT_HASH}
+    build:
+      context: .
+      dockerfile: back.Dockerfile
+
+    environment:
+      - RELEASE_BOT_TOKEN=8236580151:AAGhdmel90Y2eZxzEEMTThCfNvzADxXZtz0
+      - RELEASE_DATABASE_URL=postgres://pgadmin:p239ijfw921ioad@db:5432/game?sslmode=disable
       - RELEASE_MODE=release
 
     deploy:
@@ -19,7 +27,7 @@ services:
     image: postgres:latest
     environment:
       POSTGRES_USER: pgadmin
-      POSTGRES_PASSWORD: mq90rcqnuc38crn
+      POSTGRES_PASSWORD: p239ijfw921ioad
       POSTGRES_DB: game
     volumes:
       - postgres_data:/var/lib/postgresql/data  # Keeps data persistent

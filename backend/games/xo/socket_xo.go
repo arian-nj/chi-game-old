@@ -3,6 +3,7 @@ package xo
 import (
 	"log/slog"
 
+	accountv1 "github.com/arian-nj/chibazi/backend/gen/account/v1"
 	sessionv1 "github.com/arian-nj/chibazi/backend/gen/session/v1"
 	xo_gamev1 "github.com/arian-nj/chibazi/backend/gen/xo_game/v1"
 	"github.com/arian-nj/chibazi/backend/internals/commander"
@@ -22,16 +23,14 @@ func (game *XOState) SocketRouter(newGameMsg *sessionv1.GameMessage, playerId in
 type SocketListener struct{}
 
 func (sl *SocketListener) Update(command commander.Command) {
-	switch a := command.(type) {
+	switch c := command.(type) {
 	case *MoveCommand:
-		sl.SocketBrodcastNewMove(a.Game, a.Pos, a.MoveType, a.PlayerID)
+		sl.SocketBrodcastNewMove(c.Game, c.Pos, c.MoveType, c.PlayerID)
 	case *StartCommand:
 	case *EndGameCommand:
-		if a.Winner == nil {
-		} else {
-		}
+		sl.SendEndGameSocket(c)
 	case *SyncTimeCommand:
-		sl.SocketBrodcastSyncTime(a.Game)
+		sl.SocketBrodcastSyncTime(c.Game)
 	}
 }
 
@@ -177,6 +176,45 @@ func (sl *SocketListener) SocketBrodcastSyncTime(gameState *XOState) {
 	}
 }
 
+func (sl *SocketListener) SendEndGameSocket(endGameCommand *EndGameCommand) {
+	reason := xo_gamev1.EndReason_END_REASON_UNSPECIFIED
+	switch endGameCommand.reason {
+	case END_GAME_TIE:
+		reason = xo_gamev1.EndReason_END_REASON_TIE
+	case END_GAME_FULL:
+		reason = xo_gamev1.EndReason_END_REASON_FULL
+	case END_GAME_TIMEOUT:
+		reason = xo_gamev1.EndReason_END_REASON_TIMOUT
+
+	}
+
+	newSessionMessage := sessionv1.SessionMessage{
+		Content: &sessionv1.SessionMessage_Game{
+			Game: &sessionv1.GameMessage{Game: &sessionv1.GameMessage_Xo{Xo: &xo_gamev1.XoGameMessage{
+				Payload: &xo_gamev1.XoGameMessage_EndGame{
+					EndGame: &xo_gamev1.EndGame{
+						Reason: reason,
+						Winner: &accountv1.Account{
+							Id:   int64(endGameCommand.Winner.ID),
+							Name: endGameCommand.Winner.Name,
+						},
+						Loser: &accountv1.Account{
+							Id:   int64(endGameCommand.Loser.ID),
+							Name: endGameCommand.Loser.Name,
+						},
+					},
+				},
+			}}},
+		},
+	}
+	for _, player := range endGameCommand.Game.Players {
+		err := player.Socket.SendMessage(&newSessionMessage)
+		if err != nil {
+			slog.Error("error sending game state")
+		}
+	}
+
+}
 func SocketSendGameState(gameState *XOState, player *XoPlayer) {
 	cells := []int32{}
 	for _, cell := range gameState.Board.Board {

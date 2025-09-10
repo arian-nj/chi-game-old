@@ -3,6 +3,7 @@ syntax = "proto3";
 package xo_game.v1;
 
 option go_package = "backend/gen/xo_game/v1;xogamev1";
+import "account/v1/account.proto";
 
 message GameState {
   repeated int32 cells = 1;
@@ -31,6 +32,19 @@ message Time {
   int32 total_time = 3;
 }
 
+enum EndReason {
+  END_REASON_UNSPECIFIED= 0;
+  END_REASON_TIMOUT = 1;
+  END_REASON_TIE = 2;
+  END_REASON_FULL = 3;
+}
+
+message EndGame {
+  EndReason reason = 1;
+  account.v1.Account winner = 2;
+  account.v1.Account loser = 3;
+}
+
 message XoGameMessage {
   oneof payload {
     Move move = 1;
@@ -38,6 +52,7 @@ message XoGameMessage {
     PlayResponse play_response = 3;
     Time sync_time= 4;
     GameState game_state = 5;
+    EndGame end_game = 6;
   }
 }
 

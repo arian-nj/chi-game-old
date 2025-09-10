@@ -32,9 +32,9 @@ func (move *MoveCommand) Execute() {
 
 	var endGameCommand *EndGameCommand = nil
 	if hasWon {
-		endGameCommand = NewEndGameCommand(move.Game, move.Game.CurrentPlayer(), "")
+		endGameCommand = NewEndGameCommand(move.Game, move.Game.CurrentPlayer(), game.OpponentPlayer(), END_GAME_FULL)
 	} else if !game.Board.IsAnyCellEmpty() {
-		endGameCommand = NewEndGameCommand(move.Game, nil, "")
+		endGameCommand = NewEndGameCommand(move.Game, nil, nil, END_GAME_TIE)
 	}
 
 	if endGameCommand != nil {
@@ -58,16 +58,27 @@ func NewStartCommand(game *XOState) *StartCommand {
 func (start *StartCommand) Execute() {
 }
 
+type EndGameReason int
+
+const (
+	END_GAME_TIE EndGameReason = iota
+	END_GAME_TIMEOUT
+	END_GAME_FULL
+)
+
 type EndGameCommand struct {
+	reason EndGameReason
 	Winner *XoPlayer
-	Text   string
+	Loser  *XoPlayer
 	Game   *XOState
 }
 
-func NewEndGameCommand(game *XOState, winner *XoPlayer, text string) *EndGameCommand {
+func NewEndGameCommand(game *XOState, winner *XoPlayer, loser *XoPlayer, endGameReason EndGameReason) *EndGameCommand {
 	return &EndGameCommand{
+		reason: endGameReason,
 		Winner: winner,
-		Text:   text,
+		Loser:  loser,
+		Game:   game,
 	}
 }
 

@@ -46,7 +46,7 @@ func (tg *XoTelegramListener) Update(command commander.Command) {
 				slog.Error("tie failed", "error", err)
 			}
 		} else {
-			err := tg.TheEnd(c.Game, c.Winner, c.Text)
+			err := tg.TheEnd(c)
 			if err != nil {
 				slog.Error("the end failed", "error", err)
 			}
@@ -85,8 +85,14 @@ func (tg *XoTelegramListener) EditDuringGameBoard(game *XOState) error {
 	return err
 }
 
-func (tg *XoTelegramListener) TheEnd(game *XOState, winner *XoPlayer, additionalText string) error {
-	text := game.EndGameText() + game.WinGameText(winner) + additionalText
+func (tg *XoTelegramListener) TheEnd(endCommand *EndGameCommand) error {
+	game := endCommand.Game
+	additionalText := ""
+	if endCommand.reason == END_GAME_TIMEOUT {
+		additionalText = "\n برنده زمانی"
+	}
+
+	text := game.EndGameText() + game.WinGameText(endCommand.Winner) + additionalText
 	err := tg.Edit(tg, text,
 		keybul.CreateInlineKeyboard(
 			keybul.CreateBotNameInlineButton(),

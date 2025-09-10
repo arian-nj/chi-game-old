@@ -75,7 +75,7 @@ func (gameState *XOState) monitorXoGame() {
 			currentPlayer := gameState.CurrentPlayer()
 
 			if currentPlayer.Timer.Spent() >= MaxAllowedTime {
-				newEndCommand := NewEndGameCommand(gameState, gameState.OpponentPlayer(), "\n برنده زمانی")
+				newEndCommand := NewEndGameCommand(gameState, gameState.OpponentPlayer(), gameState.CurrentPlayer(), END_GAME_TIE)
 				gameState.InjectCommand(newEndCommand)
 				return
 			}

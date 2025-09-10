@@ -7,6 +7,7 @@ import { create, toBinary } from "@bufbuild/protobuf";
 import { SessionMessageSchema } from "@/gen/session/v1/session_pb";
 import { useToast } from "@/components/Toast.vue";
 import PlayersBoard from "./PlayersBoard.vue";
+import XoEndGame from "./XoEndGame.vue";
 
 import { AccountService } from '@/gen/account/v1/account_pb';
 import { authTransport } from '@/lib/transport';
@@ -28,6 +29,8 @@ const props = defineProps({
     required: true
   }
 })
+
+const EndGameData = ref<XoBuff.EndGame>()
 
 const isMyTurn = ref(false)
 
@@ -60,6 +63,8 @@ props.sessionSocket.HandleGameMessage = (gameMessage) => {
     case "syncTime":
       PlayersBoardRef.value?.handleTimeSync(payload.value)
       break
+    case "endGame":
+      EndGameData.value = payload.value
   }
 }
 const handleMoveAction = (moveData: XoBuff.Move) => {
@@ -106,5 +111,7 @@ function sendClick(i: number) {
     <span v-if="meErr">Error {{ meErr?.message }}</span>
     <PlayersBoard v-else ref="players-board" :is-my-turn="isMyTurn" />
     <XoGame @cell-selected="sendClick" :board-size="boardSize" ref="xo-board-ref" />
+
+    <XoEndGame v-if="EndGameData" :loser="EndGameData.loser" :winner="EndGameData.winner" />
   </div>
 </template>

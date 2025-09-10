@@ -48,14 +48,15 @@ onMounted(() => {
   <main>
     <div class="relative h-screen w-screen bg-neutral-800 text-pearl overflow-hidden">
 
+      <div class="flex justify-center ">
+        <MeComponent />
+      </div>
+
       <div class="flex justify-center gap-4 pt-16">
         <GameSelectorBtn v-for="game in games" :game-name="game" :selected="game == selectedGame"
           @choosed="selectedGame = game" />
       </div>
 
-      <div class="flex justify-center ">
-        <MeComponent />
-      </div>
 
       <button ref="playBtnRef" type="button" @click="handlePlayClick" :class="[
         `play-btn absolute bottom-0 left-0 w-full
