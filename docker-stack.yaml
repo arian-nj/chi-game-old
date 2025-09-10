@@ -43,10 +43,10 @@ services:
 
     labels:
       - "traefik.enable=true"
-      - "traefik.http.services.core_api.loadbalancer.server.port=3000"
-      - "traefik.http.routers.core_api.rule=Host(`chigame.site`)"
-      - "traefik.http.routers.core_api.entrypoints=websecure"
-      - "traefik.http.routers.core_api.tls.certresolver=myresolver"
+      - "traefik.http.services.frontend.loadbalancer.server.port=3000"
+      - "traefik.http.routers.frontend.rule=Host(`chigame.site`)"
+      - "traefik.http.routers.frontend.entrypoints=websecure"
+      - "traefik.http.routers.frontend.tls.certresolver=myresolver"
 
   backend:
     image: ghcr.io/arian-nj/chi-front:${GIT_COMMIT_HASH}
