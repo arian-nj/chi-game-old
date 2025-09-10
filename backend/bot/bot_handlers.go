@@ -79,6 +79,7 @@ func (app *BotApplication) meHandler(c telebot.Context) error {
 	text := fmt.Sprintf("id %d \ntg %d", personRow.ID, personRow.TgID)
 	return c.Send(text, keybul.WelcomeReplyKeyboard)
 }
+
 func (app *BotApplication) textHandler(c telebot.Context) error {
 	if !c.Message().Private() {
 		return nil
