@@ -33,7 +33,7 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
   
   frontend:
-    image: ghcr.io/arian-nj/chi-core-api:${GIT_COMMIT_HASH}
+    image: ghcr.io/arian-nj/chi-front:${GIT_COMMIT_HASH}
     build:
       context: .
       dockerfile: front.Dockerfile
@@ -49,7 +49,7 @@ services:
       - "traefik.http.routers.frontend.tls.certresolver=myresolver"
 
   backend:
-    image: ghcr.io/arian-nj/chi-front:${GIT_COMMIT_HASH}
+    image: ghcr.io/arian-nj/chi-core-api:${GIT_COMMIT_HASH}
     build:
       context: .
       dockerfile: back.Dockerfile
