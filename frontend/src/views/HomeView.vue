@@ -14,6 +14,7 @@ onMounted(() => {
   import('../views/FinderView.vue')
   import(/* @vite-ignore */  wasmUrl)
 })
+
 const router = useRouter()
 const token = GetJwtToken()
 

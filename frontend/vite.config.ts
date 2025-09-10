@@ -15,7 +15,7 @@ export default defineConfig({
     visualizer({
       open: true, // This will automatically open the visualization in your browser
       gzipSize: true, // Shows the gzipped size, which is what you care about most
-      brotliSize: true, // Shows brotli size as well (another compression algorithm)
+      // brotliSize: true, // Shows brotli size as well (another compression algorithm)
     }),
 
   ],

@@ -11,8 +11,14 @@ import { DotLottieVue } from '@lottiefiles/dotlottie-vue'
 import { DotLottie as DotLottieWeb } from '@lottiefiles/dotlottie-web'
 
 import wasmUrl from "@lottiefiles/dotlottie-web/dist/dotlottie-player.wasm?url";
+import { onMounted } from 'vue'
 
 DotLottieWeb.setWasmUrl(wasmUrl)
+
+onMounted(() => {
+  // Prefetch Session page component
+  import('../views/SessionView.vue')
+})
 const router = useRouter()
 
 const url = GetApiUrl() + "/api/match_making/ticket/?auth_token=" + GetJwtToken()

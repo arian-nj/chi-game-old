@@ -13,5 +13,9 @@
 // console.log("base url is ", apiUrl)
 //
 export const GetApiUrl = () => {
-  return import.meta.env.VITE_API_URL || "http://localhost:8383";
+  const mode = import.meta.env.MODE
+  if (mode == "production") {
+    return "https://api.chigame.site"
+  }
+  return "http://localhost:8383";
 }
