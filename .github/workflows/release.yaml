@@ -37,8 +37,8 @@ jobs:
           push: true
           file: back.Dockerfile
           tags: |
-            ghcr.io/arian-nj/core-api:latest
-            ghcr.io/arian-nj/core-api:${{ github.sha }}
+            ghcr.io/arian-nj/chi-core-api:latest
+            ghcr.io/arian-nj/chi-core-api:${{ github.sha }}
 
   build_and_push_front_image:
     runs-on: ubuntu-latest
@@ -63,8 +63,8 @@ jobs:
           push: true
           file: front.Dockerfile
           tags: |
-            ghcr.io/arian-nj/front:latest
-            ghcr.io/arian-nj/front:${{ github.sha }}
+            ghcr.io/arian-nj/chi-front:latest
+            ghcr.io/arian-nj/chi-front:${{ github.sha }}
 
 
 
