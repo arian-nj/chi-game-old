@@ -71,6 +71,7 @@ func (app *BotApplication) MakeBot() (*telebot.Bot, error) {
 
 	b.Handle("/start", app.welcomeHandler)
 	b.Handle("/panel", app.statHandler)
+	b.Handle("/me", app.meHandler)
 
 	b.Handle(keybul.PlayWithFriendsButtonText, app.PlayWithFriendsHandler)
 	b.Handle(keybul.PlayWithRandomPlayerText, app.PlayWithRandomPlayerHandler)
