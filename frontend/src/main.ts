@@ -15,3 +15,4 @@ app.use(router)
 app.use(VueQueryPlugin)
 
 app.mount('#app')
+

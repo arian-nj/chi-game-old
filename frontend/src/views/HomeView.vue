@@ -2,24 +2,49 @@
 import { onMounted, ref } from 'vue';
 import MeComponent from '../components/MeComponent.vue'
 import { useRouter } from 'vue-router';
-import { GetJwtToken } from '@/lib/auth';
+import { GetJwtToken, SetJwtToken } from '@/lib/auth';
 import GameSelectorBtn from '@/components/Home/GameSelectorBtn.vue';
 import gsap from 'gsap'
-
+import WebApp from "@twa-dev/sdk";
+import { createClient } from "@connectrpc/connect"
 
 import wasmUrl from "@lottiefiles/dotlottie-web/dist/dotlottie-player.wasm?url";
+import { useQuery } from '@tanstack/vue-query';
+import { AuthService } from '@/gen/auth/v1/auth_pb';
+import { rawTransport } from '@/lib/transport';
+import { IsReleaseMode } from '@/lib/ReleaseMode';
+
 
 onMounted(() => {
-  // Prefetch About page component
+  // prefetch
   import('../views/FinderView.vue')
   import(/* @vite-ignore */  wasmUrl)
 })
 
-const router = useRouter()
-const token = GetJwtToken()
 
-if (token == null || token == "") {
-  router.push("login")
+const router = useRouter()
+if (IsReleaseMode == false) {
+  const token = GetJwtToken()
+
+  if (token == null || token == "") {
+    router.push("login")
+  }
+
+} else {
+  const { isPending, error, data } = useQuery({
+    queryKey: ["telegram_token"],
+    queryFn: async () => {
+      const client = createClient(AuthService, rawTransport)
+      const data = await client.validateTelegramInitData({ initData: WebApp.initData })
+      console.log(data.token)
+      SetJwtToken(data.token)
+      return data
+    }
+  })
+
+  onMounted(() => {
+    WebApp.ready()
+  })
 }
 
 const selectedGame = ref("")
@@ -29,7 +54,7 @@ const playBtnRef = ref<HTMLButtonElement | null>(null)
 
 
 function handlePlayClick() {
-  router.push("/finder")
+  router.push(`/finder?game=${selectedGame.value}`)
 }
 
 onMounted(() => {

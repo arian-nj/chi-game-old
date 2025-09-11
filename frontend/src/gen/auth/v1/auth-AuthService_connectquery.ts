@@ -8,8 +8,3 @@ import { AuthService } from "./auth_pb";
  * @generated from rpc auth.v1.AuthService.ValidateTelegramInitData
  */
 export const validateTelegramInitData = AuthService.method.validateTelegramInitData;
-
-/**
- * @generated from rpc auth.v1.AuthService.DummyValidate
- */
-export const dummyValidate = AuthService.method.dummyValidate;

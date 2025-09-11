@@ -1,16 +1,16 @@
 <script setup>
-import { AuthService } from '@/gen/auth/v1/auth_pb';
 import { useMutation } from '@tanstack/vue-query';
 import { createClient } from "@connectrpc/connect";
 import { ref } from 'vue';
 import { SetJwtToken } from '@/lib/auth';
 import { useRouter } from 'vue-router';
 import { rawTransport } from '@/lib/transport';
+import { DummyAuthService } from '@/gen/dummy_auth/v1/dummy_auth_pb';
 
 const userID = ref(0)
 
 
-const client = createClient(AuthService, rawTransport);
+const client = createClient(DummyAuthService, rawTransport);
 const router = useRouter()
 const { isPending, isError, error, isSuccess, mutate: loginMutate } = useMutation({
   mutationFn: async () => {

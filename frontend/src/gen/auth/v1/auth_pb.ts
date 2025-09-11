@@ -10,7 +10,7 @@ import type { Message } from "@bufbuild/protobuf";
  * Describes the file auth/v1/auth.proto.
  */
 export const file_auth_v1_auth: GenFile = /*@__PURE__*/
-  fileDesc("ChJhdXRoL3YxL2F1dGgucHJvdG8SB2F1dGgudjEiNAofVmFsaWRhdGVUZWxlZ3JhbUluaXREYXRhUmVxdWVzdBIRCglpbml0X2RhdGEYASABKAkiMQogVmFsaWRhdGVUZWxlZ3JhbUluaXREYXRhUmVzcG9uc2USDQoFdG9rZW4YASABKAkiIgoURHVtbXlWYWxpZGF0ZVJlcXVlc3QSCgoCaWQYASABKAMiJgoVRHVtbXlWYWxpZGF0ZVJlc3BvbnNlEg0KBXRva2VuGAEgASgJMtIBCgtBdXRoU2VydmljZRJxChhWYWxpZGF0ZVRlbGVncmFtSW5pdERhdGESKC5hdXRoLnYxLlZhbGlkYXRlVGVsZWdyYW1Jbml0RGF0YVJlcXVlc3QaKS5hdXRoLnYxLlZhbGlkYXRlVGVsZWdyYW1Jbml0RGF0YVJlc3BvbnNlIgASUAoNRHVtbXlWYWxpZGF0ZRIdLmF1dGgudjEuRHVtbXlWYWxpZGF0ZVJlcXVlc3QaHi5hdXRoLnYxLkR1bW15VmFsaWRhdGVSZXNwb25zZSIAQo0BCgtjb20uYXV0aC52MUIJQXV0aFByb3RvUAFaNmdpdGh1Yi5jb20vYXJpYW4tbmovY2hpYmF6aS9iYWNrZW5kL2dlbi9hdXRoL3YxO2F1dGh2MaICA0FYWKoCB0F1dGguVjHKAgdBdXRoXFYx4gITQXV0aFxWMVxHUEJNZXRhZGF0YeoCCEF1dGg6OlYxYgZwcm90bzM");
+  fileDesc("ChJhdXRoL3YxL2F1dGgucHJvdG8SB2F1dGgudjEiNAofVmFsaWRhdGVUZWxlZ3JhbUluaXREYXRhUmVxdWVzdBIRCglpbml0X2RhdGEYASABKAkiMQogVmFsaWRhdGVUZWxlZ3JhbUluaXREYXRhUmVzcG9uc2USDQoFdG9rZW4YASABKAkygAEKC0F1dGhTZXJ2aWNlEnEKGFZhbGlkYXRlVGVsZWdyYW1Jbml0RGF0YRIoLmF1dGgudjEuVmFsaWRhdGVUZWxlZ3JhbUluaXREYXRhUmVxdWVzdBopLmF1dGgudjEuVmFsaWRhdGVUZWxlZ3JhbUluaXREYXRhUmVzcG9uc2UiAEKNAQoLY29tLmF1dGgudjFCCUF1dGhQcm90b1ABWjZnaXRodWIuY29tL2FyaWFuLW5qL2NoaWJhemkvYmFja2VuZC9nZW4vYXV0aC92MTthdXRodjGiAgNBWFiqAgdBdXRoLlYxygIHQXV0aFxWMeICE0F1dGhcVjFcR1BCTWV0YWRhdGHqAghBdXRoOjpWMWIGcHJvdG8z");
 
 /**
  * @generated from message auth.v1.ValidateTelegramInitDataRequest
@@ -47,40 +47,6 @@ export const ValidateTelegramInitDataResponseSchema: GenMessage<ValidateTelegram
   messageDesc(file_auth_v1_auth, 1);
 
 /**
- * @generated from message auth.v1.DummyValidateRequest
- */
-export type DummyValidateRequest = Message<"auth.v1.DummyValidateRequest"> & {
-  /**
-   * @generated from field: int64 id = 1;
-   */
-  id: bigint;
-};
-
-/**
- * Describes the message auth.v1.DummyValidateRequest.
- * Use `create(DummyValidateRequestSchema)` to create a new message.
- */
-export const DummyValidateRequestSchema: GenMessage<DummyValidateRequest> = /*@__PURE__*/
-  messageDesc(file_auth_v1_auth, 2);
-
-/**
- * @generated from message auth.v1.DummyValidateResponse
- */
-export type DummyValidateResponse = Message<"auth.v1.DummyValidateResponse"> & {
-  /**
-   * @generated from field: string token = 1;
-   */
-  token: string;
-};
-
-/**
- * Describes the message auth.v1.DummyValidateResponse.
- * Use `create(DummyValidateResponseSchema)` to create a new message.
- */
-export const DummyValidateResponseSchema: GenMessage<DummyValidateResponse> = /*@__PURE__*/
-  messageDesc(file_auth_v1_auth, 3);
-
-/**
  * @generated from service auth.v1.AuthService
  */
 export const AuthService: GenService<{
@@ -91,14 +57,6 @@ export const AuthService: GenService<{
     methodKind: "unary";
     input: typeof ValidateTelegramInitDataRequestSchema;
     output: typeof ValidateTelegramInitDataResponseSchema;
-  },
-  /**
-   * @generated from rpc auth.v1.AuthService.DummyValidate
-   */
-  dummyValidate: {
-    methodKind: "unary";
-    input: typeof DummyValidateRequestSchema;
-    output: typeof DummyValidateResponseSchema;
   },
 }> = /*@__PURE__*/
   serviceDesc(file_auth_v1_auth, 0);
