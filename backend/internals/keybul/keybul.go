@@ -30,7 +30,7 @@ func EscapeReserved(text string) string {
 	return replacer.Replace(text)
 }
 
-func EditGameMessage(bot telebot.API, msg telebot.Editable, text string, keyboard *telebot.ReplyMarkup) error {
+func EditMessage(bot telebot.API, msg telebot.Editable, text string, keyboard *telebot.ReplyMarkup) error {
 	_, err := bot.Edit(msg, text, keyboard, telebot.ModeMarkdownV2)
 	if err != nil && !errors.Is(err, telebot.ErrTrueResult) {
 		return err

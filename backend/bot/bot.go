@@ -134,16 +134,11 @@ func (app *BotApplication) handleCallback(c telebot.Context) error {
 	}
 
 	app.AllSessions.Mutex.Lock()
-	gameSession, has_game := app.AllSessions.Sessions[messageId]
+	gameSession, hasSession := app.AllSessions.Sessions[messageId]
 	app.AllSessions.Mutex.Unlock()
 
-	if has_game {
-		err := gameSession.GameState.CallBackRouter(c)
-		if err != nil {
-			slog.Error("error in call back router", "error", err)
-			return c.RespondText("خطا")
-		}
-		return nil
+	if hasSession {
+		return gameSession.HandleCallback(c, app.Queries)
 	}
-	return c.RespondText("هیچی")
+	return c.RespondText("no active game")
 }

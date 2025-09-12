@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/arian-nj/chibazi/backend/database"
+	"github.com/arian-nj/chibazi/backend/games/game"
 	sessionv1 "github.com/arian-nj/chibazi/backend/gen/session/v1"
 	"github.com/arian-nj/chibazi/backend/internals/commander"
 	"github.com/arian-nj/chibazi/backend/internals/keybul"
@@ -39,6 +40,9 @@ func NewSessionPlayer(ID int, tgID int, name string) *SessionPlayer {
 	}
 }
 
+type Chat struct {
+	IsOn bool
+}
 type GameSession struct {
 	ID int
 
@@ -46,8 +50,8 @@ type GameSession struct {
 	Queries *database.Queries
 
 	IsGameEnded bool
-	Chat        *Chat
-	GameState   Game
+	Chat        Chat
+	GameState   game.Game
 
 	MsgChnl chan *SessionEvent
 
@@ -69,7 +73,7 @@ func NewGameSession(bot *telebot.Bot, Queries *database.Queries, sessionId int) 
 		ID:        sessionId,
 		Bot:       bot,
 		CreatedAt: time.Now(),
-		Chat: &Chat{
+		Chat: Chat{
 			IsOn: true,
 		},
 		Players:         []*SessionPlayer{},
@@ -100,6 +104,13 @@ func (session *GameSession) StartGame() error {
 	for _, player := range session.Players {
 		session.GameState.AddPlayer(player.ID, player.Name, player.TgID, player.Socket)
 	}
+
+	for _, suber := range session.Subscribers {
+		if listener, ok := suber.(*SessionTelegramListener); ok {
+			session.GameState.SubToTelegram(listener.Bot, listener.ViaMessageId)
+		}
+	}
+	session.GameState.SubToSocket()
 
 	return session.GameState.StartGame()
 }
@@ -172,4 +183,34 @@ func (session *GameSession) CleanAndDisconnect(allSession *AllSession) {
 	for _, player := range session.Players {
 		delete(allSession.Sessions, strconv.Itoa(player.TgID))
 	}
+}
+func (session *GameSession) HandleCallback(c telebot.Context, queries *database.Queries) error {
+	callbackData := c.Callback().Data
+	if callbackData == "join" {
+		personRow, err := queries.GetTgUserByTgID(context.Background(), int(c.Sender().ID))
+		if err != nil {
+			slog.Error("can not get user at session handle callback", "err", err)
+			return c.RespondText("خطا")
+		}
+		if c.Sender().ID == int64(session.Players[0].TgID) {
+			text := "خودت بازیو ساختی تو بازی هستی"
+			return c.RespondText(text)
+		}
+
+		newJoinCommand := NewJoinSessionCommand(session, NewSessionPlayer(personRow.ID, personRow.TgID, personRow.Name))
+		session.PushCommand(newJoinCommand)
+
+		text := "اضافه شدی بازی شروع شد"
+		err = c.RespondText(text)
+		if err != nil {
+			return err
+		}
+	}
+	err := session.GameState.CallBackRouter(c)
+	if err != nil {
+		slog.Error("error in call back router", "error", err)
+		return c.RespondText("خطا")
+	}
+
+	return c.RespondText("none")
 }

@@ -1,6 +1,7 @@
 package gamesessions
 
 import (
+	"fmt"
 	"log/slog"
 
 	sessionv1 "github.com/arian-nj/chibazi/backend/gen/session/v1"
@@ -53,4 +54,18 @@ func (session *GameSession) SocketRequestSendMsg(sessionPlayer *SessionPlayer, c
 	}
 
 	session.PushCommand(NewMessageCommand(session, messageText, senderPlayer, recieverPlayer))
+}
+func SendChatMessageInWeb(recieverPlayer *SessionPlayer, senderPlayer *SessionPlayer, messageText string) error {
+	if recieverPlayer.Socket != nil {
+		newChatMsg := &sessionv1.SessionMessage{
+			Content: &sessionv1.SessionMessage_Chat{
+				Chat: &sessionv1.ChatMessage{
+					PlayerId: int64(senderPlayer.ID),
+					Text:     messageText,
+				},
+			},
+		}
+		return recieverPlayer.Socket.SendMessage(newChatMsg)
+	}
+	return fmt.Errorf("no socket found")
 }

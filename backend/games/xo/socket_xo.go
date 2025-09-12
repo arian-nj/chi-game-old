@@ -22,6 +22,11 @@ func (game *XOState) SocketRouter(newGameMsg *sessionv1.GameMessage, playerId in
 
 type SocketListener struct{}
 
+func (gameState *XOState) SubToSocket() {
+	sListener := SocketListener{}
+	gameState.Subscribe(&sListener)
+}
+
 func (sl *SocketListener) Update(command commander.Command) {
 	switch c := command.(type) {
 	case *MoveCommand:

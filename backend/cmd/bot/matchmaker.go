@@ -8,7 +8,7 @@ import (
 	"time"
 
 	gamesessions "github.com/arian-nj/chibazi/backend/game_sessions"
-	"github.com/arian-nj/chibazi/backend/games/xo"
+	"github.com/arian-nj/chibazi/backend/games/game"
 	xoconsole "github.com/arian-nj/chibazi/backend/games/xo"
 	gametype "github.com/arian-nj/chibazi/backend/internals/game_type"
 	"github.com/arian-nj/chibazi/backend/internals/utils"
@@ -46,15 +46,11 @@ func (gv *GlobalVars) createRandomGame(gameType gametype.GameType, ticketOne *ma
 	newGameSession.Subscribe(gamesessions.NewSessionTelegramListener(ticketOne.UserID, ticketOne.TgID, gv.Bot, ""))
 	newGameSession.Subscribe(gamesessions.NewSessionTelegramListener(ticketTwo.UserID, ticketTwo.TgID, gv.Bot, ""))
 
-	var newGame gamesessions.Game
+	var newGame game.Game
 
 	switch gameType {
 	case gametype.XOGameType3X3, gametype.XOGameType5X5:
 		newXoGame := xoconsole.NewXOGame(newGameSession.SessionCtx, gametype.XOGameType3X3, gv.Bot, gv.Queries)
-
-		newXoGame.Subscribe(xo.NewXOTelegramListener(gv.Bot, ""))
-		newXoGame.Subscribe(&xo.SocketListener{})
-
 		newGame = newXoGame
 
 	default:

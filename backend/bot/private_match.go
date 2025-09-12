@@ -7,6 +7,7 @@ import (
 
 	"github.com/arian-nj/chibazi/backend/database"
 	gamesessions "github.com/arian-nj/chibazi/backend/game_sessions"
+	"github.com/arian-nj/chibazi/backend/games/game"
 	"github.com/arian-nj/chibazi/backend/games/xo"
 	gametype "github.com/arian-nj/chibazi/backend/internals/game_type"
 	"github.com/arian-nj/chibazi/backend/internals/keybul"
@@ -17,26 +18,24 @@ func (app *BotApplication) inlineResultFeedbackHandler(c telebot.Context) error 
 	resultId := c.InlineResult().ResultID
 	viaMessageID := c.InlineResult().MessageID
 
-	newSessionRow, err := app.Queries.CreateSession(context.Background(), string(gamesessions.RandomSession))
+	newSessionRow, err := app.Queries.CreateSession(context.Background(), string(gamesessions.PrivateSession))
 	if err != nil {
+		slog.Error("can't create session inline feedback")
 		return err
 	}
 
-	newGameSession := gamesessions.NewGameSession(app.Bot, app.Queries, newSessionRow.ID)
+	newSession := gamesessions.NewGameSession(app.Bot, app.Queries, newSessionRow.ID)
+	sessionTgListen := gamesessions.NewSessionTelegramListener(0, 0, app.Bot, viaMessageID)
+	newSession.Subscribe(sessionTgListen)
 
-	var newGame gamesessions.Game
+	var newGame game.Game
 	gameType := gametype.GameType(resultId)
-	tgListen := xo.NewXOTelegramListener(app.Bot, viaMessageID)
 	switch gameType {
 	case gametype.XOGameType3X3:
-		newXOGame := xo.NewXOGame(newGameSession.SessionCtx, gametype.XOGameType3X3, app.Bot, app.Queries)
-		newXOGame.Subscribe(tgListen)
-		newXOGame.Subscribe(&xo.SocketListener{})
+		newXOGame := xo.NewXOGame(newSession.SessionCtx, gametype.XOGameType3X3, app.Bot, app.Queries)
 		newGame = newXOGame
 	case gametype.XOGameType5X5:
-		newXOGame := xo.NewXOGame(newGameSession.SessionCtx, gametype.XOGameType5X5, app.Bot, app.Queries)
-		newXOGame.Subscribe(tgListen)
-		newXOGame.Subscribe(&xo.SocketListener{})
+		newXOGame := xo.NewXOGame(newSession.SessionCtx, gametype.XOGameType5X5, app.Bot, app.Queries)
 		newGame = newXOGame
 	default:
 		return c.RespondAlert("این بازیرو ندارم!")
@@ -48,16 +47,24 @@ func (app *BotApplication) inlineResultFeedbackHandler(c telebot.Context) error 
 		return err
 	}
 
-	newGameSession.GameState = newGame
-	newGameSession.RunBgTask(app.AllSessions)
+	newSession.GameState = newGame
 
-	app.AllSessions.Add(viaMessageID, newGameSession)
+	app.AllSessions.Add(viaMessageID, newSession)
 
-	err = newGame.SendJoinPanelAddSender(c)
+	personRow, err := app.Queries.GetTgUserByTgID(context.Background(), int(c.Sender().ID))
 	if err != nil {
-		slog.Error("can't send join panel", "error", err)
+		slog.Error("can not get creator user in feedback")
 		return err
 	}
+
+	creatorPlayer := gamesessions.NewSessionPlayer(personRow.ID, personRow.TgID, personRow.Name)
+	newSession.AddSessionPlayer(creatorPlayer)
+
+	newWaitCommand := gamesessions.NewWaitForPlayerCommand(newSession, creatorPlayer)
+	newSession.PushCommand(newWaitCommand)
+
+	newSession.RunBgTask(app.AllSessions)
+
 	_, err = app.Queries.CreateSessionGame(context.Background(), database.CreateSessionGameParams{
 		SessionID: newSessionRow.ID,
 		GameType:  string(gameType),

@@ -1,4 +1,4 @@
-package gamesessions
+package game
 
 import (
 	"context"
@@ -10,12 +10,32 @@ import (
 
 type Game interface {
 	AddPlayer(id int, name string, tgId int, socket *socket.Socket)
+
 	SetPlayerSocket(ID int, socket *socket.Socket)
+
 	SocketRouter(session *sessionv1.GameMessage, playerId int)
 
 	CallBackRouter(c telebot.Context) error
-	SendJoinPanelAddSender(telebot.Context) error
 
 	StartGame() error
 	GetContext() context.Context
+
+	GetGameData() *GameData
+
+	SubToTelegram(bot *telebot.Bot, ViaMessageId string)
+	SubToSocket()
+}
+
+type GameData struct {
+	StartText string
+	RulesText string
+	MaxPlayer int
+}
+
+func NewGameData(startText, rulesText string, maxPlayer int) *GameData {
+	return &GameData{
+		StartText: startText,
+		RulesText: rulesText,
+		MaxPlayer: maxPlayer,
+	}
 }

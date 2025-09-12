@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/arian-nj/chibazi/backend/database"
+	"github.com/arian-nj/chibazi/backend/games/game"
 	"github.com/arian-nj/chibazi/backend/internals/commander"
 	gametype "github.com/arian-nj/chibazi/backend/internals/game_type"
 	"github.com/arian-nj/chibazi/backend/internals/random"
@@ -19,6 +20,7 @@ const MaxAllowedTime = MaxAllowedTimeInt * time.Second
 
 type XOState struct { // of GameInterface type
 	GameType gametype.GameType
+	GameData *game.GameData
 
 	Board *XoBoard
 
@@ -49,7 +51,7 @@ func NewXOGame(
 
 	ctx, cancel := context.WithCancel(sessionCtx)
 
-	return &XOState{
+	state := &XOState{
 		CurrentPlayerIndex: randIndex,
 		Players:            []*XoPlayer{},
 		CancelGame:         cancel,
@@ -61,6 +63,12 @@ func NewXOGame(
 		Queries:   queries,
 		Commander: commander.NewCommander(),
 	}
+	state.GameData = game.NewGameData(XOStartText, state.RulesText(), 2)
+	return state
+}
+
+func (gameState *XOState) GetGameData() *game.GameData {
+	return gameState.GameData
 }
 
 func (gameState *XOState) monitorXoGame() {

@@ -19,12 +19,16 @@ type XoTelegramListener struct {
 	ViaMessageId string // Via Bots
 }
 
-func NewXOTelegramListener(bot *telebot.Bot, viaMessageID string) *XoTelegramListener {
+func newXOTelegramListener(bot *telebot.Bot, viaMessageID string) *XoTelegramListener {
 	return &XoTelegramListener{
 		Bot:          bot,
 		LastEdit:     time.Now(),
 		ViaMessageId: viaMessageID,
 	}
+}
+
+func (gameState *XOState) SubToTelegram(bot *telebot.Bot, ViaMessageId string) {
+	gameState.Subscribe(newXOTelegramListener(bot, ViaMessageId))
 }
 
 func (tg *XoTelegramListener) Update(command commander.Command) {
@@ -63,12 +67,10 @@ func (tg *XoTelegramListener) Update(command commander.Command) {
 
 func (g *XOState) CallBackRouter(c telebot.Context) error {
 	callbackData := c.Callback().Data
-	if callbackData == "join" {
-		// return g.XOJoinGameHandler(c)
-
-	} else if after, hasPrefix := strings.CutPrefix(callbackData, "play_"); hasPrefix {
+	if after, hasPrefix := strings.CutPrefix(callbackData, "play_"); hasPrefix {
 		return g.XOPlayHandler(c, after)
 	}
+	slog.Error("invalid callback in xo game callback router")
 	return c.RespondAlert("no a valid callback")
 }
 
@@ -118,21 +120,6 @@ func (tg *XoTelegramListener) TieGame(game *XOState) error {
 
 // Reciecves Actions
 
-// func (g *XOGame) XOJoinGameHandler(c telebot.Context) error {
-// 	sender := c.Callback().Sender
-// 	if sender.ID == int64(g.Players[0].TgID) {
-// 		text := "خودت بازیو ساختی تو بازی هستی"
-// 		return c.RespondText(text)
-// 	}
-// 	g.AddPlayer(sender.FirstName, int(sender.ID), nil)
-// 	text := "اضافه شدی بازی شروع شد"
-// 	err := c.RespondText(text)
-// 	if err != nil {
-// 		return err
-// 	}
-// 	return g.StartGame()
-// }
-
 func (game *XOState) XOPlayHandler(c telebot.Context, callbackData string) error {
 	sender := c.Sender()
 
@@ -166,17 +153,6 @@ func (game *XOState) XOPlayHandler(c telebot.Context, callbackData string) error
 
 func (tg *XoTelegramListener) MessageSig() (string, int64) {
 	return tg.ViaMessageId, 0
-}
-
-func (game *XOState) SendJoinPanelAddSender(c telebot.Context) error {
-	// sender := c.Sender()
-	// game.AddPlayer(sender.FirstName, int(sender.ID), nil)
-	// inlineKeyboard := keybul.CreateInlineKeyboard(
-	// 	keybul.JoinGameInlineButtons,
-	// )
-	// text := XOStartText + "\n\n" + game.RulesText() + "\n\n🕹 بازیکن " + fmt.Sprintf("%s", sender.FirstName) + " منتظر حریفه"
-	// return game.Edit(c.Bot(), game, text, inlineKeyboard)
-	return nil
 }
 
 const (
@@ -282,7 +258,7 @@ func (game *XOState) RulesText() string {
 func (tg *XoTelegramListener) Edit(msg telebot.Editable, text string, keyboard *telebot.ReplyMarkup, players []*XoPlayer) error {
 	tg.LastEdit = time.Now()
 	if tg.ViaMessageId != "" {
-		err := keybul.EditGameMessage(tg.Bot, tg, text, keyboard)
+		err := keybul.EditMessage(tg.Bot, tg, text, keyboard)
 		if err != nil {
 			return fmt.Errorf("can't edit via message %w", err)
 		}
@@ -296,7 +272,7 @@ func (tg *XoTelegramListener) Edit(msg telebot.Editable, text string, keyboard *
 				}
 				p.MessageID = msg.ID
 			}
-			err := keybul.EditGameMessage(tg.Bot, p, text, keyboard)
+			err := keybul.EditMessage(tg.Bot, p, text, keyboard)
 			if err != nil {
 				slog.Error("can't edit player message ", "error", err)
 			}

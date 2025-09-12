@@ -14,9 +14,7 @@ onMounted(() => {
   import(/* @vite-ignore */  wasmUrl)
 })
 
-
 const router = useRouter()
-
 
 const selectedGame = ref("")
 const games = ["3X3"];

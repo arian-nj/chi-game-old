@@ -38,3 +38,35 @@ func (message *MessageCommand) Execute() {
 		}
 	})
 }
+
+type WaitForPlayerCommand struct {
+	Session *GameSession
+	Creator *SessionPlayer
+}
+
+func NewWaitForPlayerCommand(session *GameSession, creatorUser *SessionPlayer) *WaitForPlayerCommand {
+	return &WaitForPlayerCommand{
+		Session: session,
+		Creator: creatorUser,
+	}
+}
+
+func (wait *WaitForPlayerCommand) Execute() {
+}
+
+type JoinSessionCommand struct {
+	Session      *GameSession
+	JoinedPlayer *SessionPlayer
+}
+
+func NewJoinSessionCommand(session *GameSession, JoinedUser *SessionPlayer) *JoinSessionCommand {
+	return &JoinSessionCommand{
+		Session:      session,
+		JoinedPlayer: JoinedUser,
+	}
+}
+
+func (join *JoinSessionCommand) Execute() {
+	join.Session.AddSessionPlayer(join.JoinedPlayer)
+	join.Session.StartGame()
+}
