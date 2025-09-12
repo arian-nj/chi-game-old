@@ -20,7 +20,8 @@ function onSquareClick() {
 			flex items-center justify-center
 			text-6xl lg:text-4xl sm:text-3xl font-extrabold
       bg-[#14bd96]
-      transition-all duration-200 ease-out`
+      transition-all duration-200 ease-out
+      `
   ]">
     <span :class="[
       props.animate ? 'animate-pop' : '',

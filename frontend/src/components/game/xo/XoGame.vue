@@ -28,10 +28,10 @@ function onCellSelected(index: number) {
 
 const DoMove = (index: number, value: number) => {
   cells.value[index] = value
+  animateIndex = index
 }
 
 const SetCells = (newCells: number[]) => {
-
   console.log(newCells)
   for (let i = 0; i < newCells.length; i++)
     cells.value[i] = newCells[i]
