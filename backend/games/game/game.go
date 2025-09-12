@@ -11,10 +11,7 @@ import (
 type Game interface {
 	AddPlayer(id int, name string, tgId int, socket *socket.Socket)
 
-	SetPlayerSocket(ID int, socket *socket.Socket)
-
 	SocketRouter(session *sessionv1.GameMessage, playerId int)
-
 	CallBackRouter(c telebot.Context) error
 
 	StartGame() error
@@ -22,8 +19,8 @@ type Game interface {
 
 	GetGameData() *GameData
 
-	SubToTelegram(bot *telebot.Bot, ViaMessageId string)
-	SubToSocket()
+	SubToTelegram(ID int, bot *telebot.Bot, ViaMessageId string)
+	SubToSocket(ID int, newSocket *socket.Socket) func()
 }
 
 type GameData struct {

@@ -1,0 +1,65 @@
+package gamesessions
+
+import (
+	"fmt"
+	"log/slog"
+
+	"github.com/arian-nj/chibazi/backend/internals/commander"
+	"gopkg.in/telebot.v4"
+)
+
+type SessionTelegramBotListener struct {
+	Bot    *telebot.Bot
+	UserID int
+	TgID   int
+}
+
+func NewSessionTelegramBotListener(playerID int, TgID int, bot *telebot.Bot, viaMessageID string) *SessionTelegramBotListener {
+	return &SessionTelegramBotListener{
+		Bot:    bot,
+		UserID: playerID,
+		TgID:   TgID,
+	}
+}
+
+func (tg *SessionTelegramBotListener) Update(command commander.Command) {
+	switch c := command.(type) {
+	case *MessageCommand:
+		if c.Reciever.ID == tg.UserID {
+			err := tg.SendChatMessageInBot(tg.TgID, c.Text, c.Sender.Name)
+			if err != nil {
+				slog.Error("Can not send chat message in session telegram", "error", err)
+			}
+		}
+	}
+}
+
+// Handler
+func (session *GameSession) BotRequestSendMsg(bot telebot.API, senderID int, messageText string) error {
+	if !session.Chat.IsOn {
+		return nil
+	}
+	if len(messageText) > 256 {
+		slog.Error("message is to long")
+		return nil
+	}
+
+	var senderPlayer *SessionPlayer
+	var recieverPlayer *SessionPlayer
+
+	for _, p := range session.Players {
+		if p.TgID == senderID {
+			senderPlayer = p
+		} else {
+			recieverPlayer = p
+		}
+	}
+	session.PushCommand(NewMessageCommand(session, messageText, senderPlayer, recieverPlayer))
+	return nil
+}
+
+func (tg *SessionTelegramBotListener) SendChatMessageInBot(toId int, text string, senderName string) error {
+	_, err := tg.Bot.Send(&telebot.User{ID: int64(toId)},
+		fmt.Sprintf("*_%s:_* %s", senderName, text), telebot.ModeMarkdownV2)
+	return err
+}

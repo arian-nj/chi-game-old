@@ -11,7 +11,8 @@ import (
 type XoPlayer struct {
 	ID         int
 	TelegramID int
-	Name       string
+
+	Name string
 
 	MessageID int
 

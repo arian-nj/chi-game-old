@@ -45,14 +45,14 @@ func (app *ApiApplication) makeMatchMakingTicketWS(w http.ResponseWriter, r *htt
 		return
 	}
 
-	hasTicket := app.MatchMaking.HasTicket(tgUser.TgID)
+	hasTicket := app.MatchMaking.HasTicket(tgUser.ID)
 	if hasTicket {
 		sendFinderSocketError(socketClient, finderv1.FinderErrorType_FINDER_ERROR_TYPE_HAS_TICKET)
 		slog.Error("user already have ticket can't make another one")
 		return
 	}
 
-	if app.AllSessions.IsSessionEmpty(tgUser.TgID) == false {
+	if app.AllSessions.IsSessionEmpty(tgUser.ID) == false {
 		sendFinderSocketError(socketClient, finderv1.FinderErrorType_FINDER_ERROR_TYPE_HAS_SESSION)
 		slog.Error("user already have ticket can't make another one")
 		return

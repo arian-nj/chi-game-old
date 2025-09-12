@@ -51,7 +51,7 @@ func (app *ApiApplication) gameSessionWS(w http.ResponseWriter, r *http.Request)
 		return
 	}
 
-	gameSession, found := app.AllSessions.Get(strconv.Itoa(personRow.TgID))
+	gameSession, found := app.AllSessions.Get(strconv.Itoa(personRow.ID))
 	if found == false {
 		sendSessionSocketError(socketClient, sessionv1.SessionErrorType_SESSION_ERROR_TYPE_NOSESSION)
 		return
@@ -62,19 +62,24 @@ func (app *ApiApplication) gameSessionWS(w http.ResponseWriter, r *http.Request)
 	var sessionPlayer *gamesessions.SessionPlayer
 
 	for _, SPlayer := range gameSession.Players {
-		if SPlayer.TgID == personRow.TgID {
+		if SPlayer.ID == personRow.ID {
 			sessionPlayer = SPlayer
 			break
 		}
 	}
 	sessionPlayer.Socket = socketClient
 
-	socketSubber := gamesessions.NewSessionSocketListener(personRow.ID)
+	socketSubber := gamesessions.NewSessionSocketListener(sessionPlayer)
 	gameSession.Subscribe(socketSubber)
 	defer gameSession.Unsubscribe(socketSubber)
 
 	if gameSession.GameState != nil {
-		gameSession.GameState.SetPlayerSocket(personRow.ID, socketClient)
+		cancel := gameSession.GameState.SubToSocket(personRow.ID, socketClient)
+		if cancel == nil {
+			sendSessionSocketError(socketClient, sessionv1.SessionErrorType_SESSION_ERROR_TYPE_UNSPECIFIED)
+			return
+		}
+		defer cancel()
 	}
 
 	for {

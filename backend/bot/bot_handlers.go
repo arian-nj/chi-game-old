@@ -148,11 +148,11 @@ func (app *BotApplication) PlayRandomGameHandler(c telebot.Context, gameType gam
 		return c.Send("پیدات نمیکنم")
 	}
 
-	if app.AllSessions.IsSessionEmpty(int(sender.ID)) == false {
+	if app.AllSessions.IsSessionEmpty(personRow.ID) == false {
 		return c.Send("بازی قبلیت باید تموم بشه")
 	}
 
-	if app.MatchMaking.RemovePlayerTicket(int(sender.ID)) {
+	if app.MatchMaking.RemovePlayerTicket(personRow.ID) {
 		text += "قبلیو لغو کردم\n"
 	}
 
@@ -162,7 +162,7 @@ func (app *BotApplication) PlayRandomGameHandler(c telebot.Context, gameType gam
 		return err
 	}
 
-	newTicket := matchmaking.NewTicket(sender.FirstName, personRow.ID, int(sender.ID), gameType)
+	newTicket := matchmaking.NewTicket(personRow.Name, personRow.ID, int(sender.ID), gameType)
 	app.MatchMaking.PushTicket(newTicket)
 
 	select {
@@ -213,7 +213,7 @@ func (app *BotApplication) StopChatHandler(c telebot.Context) error {
 	}
 
 	if gameSession.IsGameEnded {
-		gameSession.CleanAndDisconnect(app.AllSessions)
+		gameSession.CleanAndDisconnect()
 		return nil
 	}
 

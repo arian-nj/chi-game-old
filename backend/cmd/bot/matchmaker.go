@@ -42,9 +42,9 @@ func (gv *GlobalVars) createRandomGame(gameType gametype.GameType, ticketOne *ma
 	if err != nil {
 		slog.Error("can't create new random game", "error", err)
 	}
-	newGameSession := gamesessions.NewGameSession(gv.Bot, gv.Queries, newSessionRow.ID)
-	newGameSession.Subscribe(gamesessions.NewSessionTelegramListener(ticketOne.UserID, ticketOne.TgID, gv.Bot, ""))
-	newGameSession.Subscribe(gamesessions.NewSessionTelegramListener(ticketTwo.UserID, ticketTwo.TgID, gv.Bot, ""))
+	newGameSession := gamesessions.NewGameSession(gv.Bot, gv.Queries, newSessionRow.ID, gv.AllSessions)
+	newGameSession.Subscribe(gamesessions.NewSessionTelegramBotListener(ticketOne.UserID, ticketOne.TgID, gv.Bot, ""))
+	newGameSession.Subscribe(gamesessions.NewSessionTelegramBotListener(ticketTwo.UserID, ticketTwo.TgID, gv.Bot, ""))
 
 	var newGame game.Game
 
@@ -58,7 +58,7 @@ func (gv *GlobalVars) createRandomGame(gameType gametype.GameType, ticketOne *ma
 		return
 	}
 	newGameSession.GameState = newGame
-	newGameSession.RunBgTask(gv.AllSessions)
+	newGameSession.RunBgMonitor()
 
 	playerOne := gamesessions.NewSessionPlayer(ticketOne.UserID, ticketOne.TgID, ticketOne.Name)
 	playerTwo := gamesessions.NewSessionPlayer(ticketTwo.UserID, ticketTwo.TgID, ticketTwo.Name)
@@ -66,8 +66,8 @@ func (gv *GlobalVars) createRandomGame(gameType gametype.GameType, ticketOne *ma
 	newGameSession.AddSessionPlayer(playerOne)
 	newGameSession.AddSessionPlayer(playerTwo)
 
-	gv.AllSessions.Add(strconv.Itoa(playerOne.TgID), newGameSession)
-	gv.AllSessions.Add(strconv.Itoa(playerTwo.TgID), newGameSession)
+	gv.AllSessions.Add(strconv.Itoa(playerOne.ID), newGameSession)
+	gv.AllSessions.Add(strconv.Itoa(playerTwo.ID), newGameSession)
 
 	for _, ticket := range []*matchmaking.Ticket{ticketOne, ticketTwo} {
 		ticket.MatchFoundChan <- newGameSession

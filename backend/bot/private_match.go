@@ -24,19 +24,17 @@ func (app *BotApplication) inlineResultFeedbackHandler(c telebot.Context) error 
 		return err
 	}
 
-	newSession := gamesessions.NewGameSession(app.Bot, app.Queries, newSessionRow.ID)
-	sessionTgListen := gamesessions.NewSessionTelegramListener(0, 0, app.Bot, viaMessageID)
+	newSession := gamesessions.NewGameSession(app.Bot, app.Queries, newSessionRow.ID, app.AllSessions)
+	sessionTgListen := gamesessions.NewSessionTelegramViaListener(app.Bot, viaMessageID)
 	newSession.Subscribe(sessionTgListen)
 
 	var newGame game.Game
 	gameType := gametype.GameType(resultId)
 	switch gameType {
 	case gametype.XOGameType3X3:
-		newXOGame := xo.NewXOGame(newSession.SessionCtx, gametype.XOGameType3X3, app.Bot, app.Queries)
-		newGame = newXOGame
+		newGame = xo.NewXOGame(newSession.SessionCtx, gametype.XOGameType3X3, app.Bot, app.Queries)
 	case gametype.XOGameType5X5:
-		newXOGame := xo.NewXOGame(newSession.SessionCtx, gametype.XOGameType5X5, app.Bot, app.Queries)
-		newGame = newXOGame
+		newGame = xo.NewXOGame(newSession.SessionCtx, gametype.XOGameType5X5, app.Bot, app.Queries)
 	default:
 		return c.RespondAlert("این بازیرو ندارم!")
 	}
@@ -48,7 +46,6 @@ func (app *BotApplication) inlineResultFeedbackHandler(c telebot.Context) error 
 	}
 
 	newSession.GameState = newGame
-
 	app.AllSessions.Add(viaMessageID, newSession)
 
 	personRow, err := app.Queries.GetTgUserByTgID(context.Background(), int(c.Sender().ID))
@@ -60,10 +57,11 @@ func (app *BotApplication) inlineResultFeedbackHandler(c telebot.Context) error 
 	creatorPlayer := gamesessions.NewSessionPlayer(personRow.ID, personRow.TgID, personRow.Name)
 	newSession.AddSessionPlayer(creatorPlayer)
 
-	newWaitCommand := gamesessions.NewWaitForPlayerCommand(newSession, creatorPlayer)
-	newSession.PushCommand(newWaitCommand)
+	newSession.RunBgMonitor()
 
-	newSession.RunBgTask(app.AllSessions)
+	newSession.PushCommand(
+		gamesessions.NewWaitForPlayerCommand(newSession, creatorPlayer),
+	)
 
 	_, err = app.Queries.CreateSessionGame(context.Background(), database.CreateSessionGameParams{
 		SessionID: newSessionRow.ID,

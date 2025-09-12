@@ -63,11 +63,12 @@ type GameSession struct {
 	CreatedAt       time.Time
 	ExpireDuaration time.Duration
 
+	allSession *AllSession
+
 	*commander.Commander
 }
 
-func NewGameSession(bot *telebot.Bot, Queries *database.Queries, sessionId int) *GameSession {
-
+func NewGameSession(bot *telebot.Bot, Queries *database.Queries, sessionId int, allSession *AllSession) *GameSession {
 	ctx, cancel := context.WithCancel(context.Background())
 	gs := &GameSession{
 		ID:        sessionId,
@@ -85,14 +86,15 @@ func NewGameSession(bot *telebot.Bot, Queries *database.Queries, sessionId int) 
 		CancelSession: cancel,
 		SessionCtx:    ctx,
 
-		Commander: commander.NewCommander(),
+		Commander:  commander.NewCommander(),
+		allSession: allSession,
 	}
 	return gs
 }
 
-func (session *GameSession) RunBgTask(allSession *AllSession) {
+func (session *GameSession) RunBgMonitor() {
 	utils.RunBackgroundTask(func() {
-		session.MonitorGameSession(allSession)
+		session.MonitorGameSession()
 	})
 }
 
@@ -102,15 +104,18 @@ func (session *GameSession) StartGame() error {
 	}
 
 	for _, player := range session.Players {
+		session.allSession.Add(strconv.Itoa(player.ID), session)
 		session.GameState.AddPlayer(player.ID, player.Name, player.TgID, player.Socket)
 	}
 
 	for _, suber := range session.Subscribers {
-		if listener, ok := suber.(*SessionTelegramListener); ok {
-			session.GameState.SubToTelegram(listener.Bot, listener.ViaMessageId)
+		if listener, ok := suber.(*SessionTelegramBotListener); ok {
+			session.GameState.SubToTelegram(listener.UserID, listener.Bot, "")
+		}
+		if listener, ok := suber.(*SessionTelegramViaListener); ok {
+			session.GameState.SubToTelegram(0, listener.Bot, listener.ViaMessageId)
 		}
 	}
-	session.GameState.SubToSocket()
 
 	return session.GameState.StartGame()
 }
@@ -128,7 +133,7 @@ func (session *GameSession) AddSessionPlayer(player *SessionPlayer) {
 	})
 }
 
-func (session *GameSession) MonitorGameSession(allSession *AllSession) {
+func (session *GameSession) MonitorGameSession() {
 	for {
 		select {
 		case newSessionEvent := <-session.MsgChnl:
@@ -154,7 +159,7 @@ func (session *GameSession) MonitorGameSession(allSession *AllSession) {
 				}
 				time.Sleep(expDur)
 			}
-			session.CleanAndDisconnect(allSession)
+			session.CleanAndDisconnect()
 			return
 
 		case <-session.CommandNotifire:
@@ -166,7 +171,7 @@ func (session *GameSession) MonitorGameSession(allSession *AllSession) {
 	}
 }
 
-func (session *GameSession) CleanAndDisconnect(allSession *AllSession) {
+func (session *GameSession) CleanAndDisconnect() {
 	if session.Chat.IsOn {
 		text := "چت قطع شد"
 		for _, player := range session.Players {
@@ -177,13 +182,14 @@ func (session *GameSession) CleanAndDisconnect(allSession *AllSession) {
 		}
 	}
 
-	allSession.Mutex.Lock()
-	defer allSession.Mutex.Unlock()
+	session.allSession.Mutex.Lock()
+	defer session.allSession.Mutex.Unlock()
 
 	for _, player := range session.Players {
-		delete(allSession.Sessions, strconv.Itoa(player.TgID))
+		delete(session.allSession.Sessions, strconv.Itoa(player.TgID))
 	}
 }
+
 func (session *GameSession) HandleCallback(c telebot.Context, queries *database.Queries) error {
 	callbackData := c.Callback().Data
 	if callbackData == "join" {
@@ -205,12 +211,13 @@ func (session *GameSession) HandleCallback(c telebot.Context, queries *database.
 		if err != nil {
 			return err
 		}
+		return nil
 	}
+
 	err := session.GameState.CallBackRouter(c)
 	if err != nil {
 		slog.Error("error in call back router", "error", err)
 		return c.RespondText("خطا")
 	}
-
-	return c.RespondText("none")
+	return nil
 }

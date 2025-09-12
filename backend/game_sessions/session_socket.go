@@ -9,18 +9,18 @@ import (
 )
 
 type SessionSocketListener struct {
-	UserID int
+	Player *SessionPlayer
 }
 
-func NewSessionSocketListener(userID int) *SessionSocketListener {
+func NewSessionSocketListener(player *SessionPlayer) *SessionSocketListener {
 	return &SessionSocketListener{
-		UserID: userID,
+		Player: player,
 	}
 }
 func (sl *SessionSocketListener) Update(command commander.Command) {
 	switch c := command.(type) {
 	case *MessageCommand:
-		if c.Reciever.ID == sl.UserID {
+		if c.Reciever.ID == sl.Player.ID {
 			err := SendChatMessageInWeb(c.Reciever, c.Sender, c.Text)
 			if err != nil {
 				slog.Error("Can not send chat message in session socket", "error", err)

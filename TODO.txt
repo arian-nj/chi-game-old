@@ -138,20 +138,16 @@
 [X] Xo Animation
 [X] Continue in Web
 
-[ ] test private games
+[X] fix private games
 [X] Game Data Struct
 [X] Wait for other player in private games
-[ ] Disable telegram chat in via games
+[X] Disable telegram chat in via games
+
+[-] Handle Clicks to Continue Web if there is no Game
+[ ] create user if came stright to web
+
+[ ] continue open game in web
 [ ] new message bubble
-
-[ ] continue open game
-
-[ ] Handle Clicks to Continue Web if there is no Game
-
-# bot look
-[ ] better welcome message
-[ ] add /help
-[ ] add command list
 
 [ ] Play test
 
@@ -162,11 +158,11 @@
 [ ] Limit Chat Message burst for telegram bot 1per 1s ?
 [X] duplicate ticket sending
 maybe add scroing to make it harder to use other bots
-[ ] create user if came stright to web
 
 # 0.7.0 connect 4
 
-# 1.0.0
+
+# 1.0.0 ()
 [ ] log tickets in database for miss rate
 [ ] log who built game session (random from keyboard,random from web, via web ,via + creator)
 
@@ -174,6 +170,11 @@ maybe add scroing to make it harder to use other bots
 [ ] renew jwt token automaticly
 
 [ ] add don't care random game
+
+# prepare for ads
+[ ] better welcome message
+[ ] add /help
+[ ] add command list
 
 --- Personal Statistics
 

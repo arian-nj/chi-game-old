@@ -2,6 +2,7 @@ package xo
 
 import (
 	"context"
+	"log/slog"
 	"sync"
 	"time"
 
@@ -154,12 +155,33 @@ func (cg *XOState) GetContext() context.Context {
 	return cg.Ctx
 }
 
-func (gameState *XOState) SetPlayerSocket(ID int, newSocket *socket.Socket) {
-	foundPlayer := gameState.findByID(ID)
-	if foundPlayer != nil {
-		foundPlayer.Socket = newSocket
-		SocketSendGameState(gameState, foundPlayer)
+func (gameState *XOState) SubToTelegram(userID int, bot *telebot.Bot, ViaMessageId string) {
+	foundPlayer := gameState.findByID(userID)
+	if foundPlayer == nil && ViaMessageId == "" {
+		slog.Error("no user found")
+		return
 	}
+	gameState.Subscribe(newXOTelegramListener(foundPlayer, bot, ViaMessageId))
+}
+
+func (gameState *XOState) SubToSocket(ID int, newSocket *socket.Socket) func() {
+	foundPlayer := gameState.findByID(ID)
+	if foundPlayer == nil {
+		return nil
+	}
+
+	foundPlayer.Socket = newSocket
+	SocketSendGameState(gameState, foundPlayer)
+	sListener := &SocketListener{
+		Player: foundPlayer,
+	}
+	gameState.Subscribe(sListener)
+	unregister := func() {
+		if gameState != nil {
+			gameState.Unsubscribe(sListener)
+		}
+	}
+	return unregister
 }
 
 func (game *XOState) StartGame() error {

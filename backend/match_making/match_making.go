@@ -54,13 +54,13 @@ func NewTicket(name string, userID int, tgID int, gameType gametype.GameType) *T
 	}
 }
 
-func (mm *MatchMaking) HasTicket(tgUserID int) bool {
+func (mm *MatchMaking) HasTicket(UserID int) bool {
 	mm.Mutex.Lock()
 	defer mm.Mutex.Unlock()
 
 	for _, tickets := range mm.WaitingPlayers {
 		for _, ticket := range tickets {
-			if ticket.TgID == tgUserID {
+			if ticket.UserID == UserID {
 				return true
 			}
 		}
@@ -76,13 +76,13 @@ func (mm *MatchMaking) PushTicket(newTicket *Ticket) {
 	queue := mm.WaitingPlayers[newTicket.GameType]
 	mm.WaitingPlayers[newTicket.GameType] = append(queue, newTicket)
 }
-func (mm *MatchMaking) RemovePlayerTicket(tgUserID int) bool {
+func (mm *MatchMaking) RemovePlayerTicket(UserID int) bool {
 	mm.Mutex.Lock()
 	defer mm.Mutex.Unlock()
 
 	for gameType, tickets := range mm.WaitingPlayers {
 		for index, ticket := range tickets {
-			if ticket.TgID == tgUserID {
+			if ticket.UserID == UserID {
 				li := mm.WaitingPlayers[gameType]
 				mm.WaitingPlayers[gameType] = append(li[:index], li[index+1:]...)
 				return true

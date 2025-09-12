@@ -16,19 +16,17 @@ type XoTelegramListener struct {
 	Bot *telebot.Bot
 
 	LastEdit     time.Time
+	Player       *XoPlayer
 	ViaMessageId string // Via Bots
 }
 
-func newXOTelegramListener(bot *telebot.Bot, viaMessageID string) *XoTelegramListener {
+func newXOTelegramListener(player *XoPlayer, bot *telebot.Bot, viaMessageID string) *XoTelegramListener {
 	return &XoTelegramListener{
 		Bot:          bot,
+		Player:       player,
 		LastEdit:     time.Now(),
 		ViaMessageId: viaMessageID,
 	}
-}
-
-func (gameState *XOState) SubToTelegram(bot *telebot.Bot, ViaMessageId string) {
-	gameState.Subscribe(newXOTelegramListener(bot, ViaMessageId))
 }
 
 func (tg *XoTelegramListener) Update(command commander.Command) {
@@ -82,7 +80,7 @@ func (tg *XoTelegramListener) EditDuringGameBoard(game *XOState) error {
 			CreateTicBoardInlineButton(game.Board),
 			game.CreatePlayersInlineButton(game.Players, game.CurrentPlayerIndex),
 		),
-		game.Players,
+		tg.Player,
 	)
 	return err
 }
@@ -100,7 +98,7 @@ func (tg *XoTelegramListener) TheEnd(endCommand *EndGameCommand) error {
 			keybul.CreateBotNameInlineButton(),
 			keybul.EndGameInlineKeyboard(tg.ViaMessageId != ""),
 		),
-		game.Players,
+		tg.Player,
 	)
 	return err
 }
@@ -113,7 +111,7 @@ func (tg *XoTelegramListener) TieGame(game *XOState) error {
 			keybul.CreateBotNameInlineButton(),
 			keybul.EndGameInlineKeyboard(tg.ViaMessageId != ""),
 		),
-		game.Players,
+		tg.Player,
 	)
 	return err
 }
@@ -255,7 +253,7 @@ func (game *XOState) RulesText() string {
 	return text
 }
 
-func (tg *XoTelegramListener) Edit(msg telebot.Editable, text string, keyboard *telebot.ReplyMarkup, players []*XoPlayer) error {
+func (tg *XoTelegramListener) Edit(msg telebot.Editable, text string, keyboard *telebot.ReplyMarkup, player *XoPlayer) error {
 	tg.LastEdit = time.Now()
 	if tg.ViaMessageId != "" {
 		err := keybul.EditMessage(tg.Bot, tg, text, keyboard)
@@ -264,18 +262,16 @@ func (tg *XoTelegramListener) Edit(msg telebot.Editable, text string, keyboard *
 		}
 		return nil
 	} else {
-		for _, p := range players {
-			if p.MessageID == 0 {
-				msg, err := tg.Bot.Send(p, "game")
-				if err != nil {
-					slog.Error("can't send player message ", "error", err)
-				}
-				p.MessageID = msg.ID
-			}
-			err := keybul.EditMessage(tg.Bot, p, text, keyboard)
+		if player.MessageID == 0 {
+			msg, err := tg.Bot.Send(player, "game")
 			if err != nil {
-				slog.Error("can't edit player message ", "error", err)
+				slog.Error("can't send player message ", "error", err)
 			}
+			player.MessageID = msg.ID
+		}
+		err := keybul.EditMessage(tg.Bot, player, text, keyboard)
+		if err != nil {
+			slog.Error("can't edit player message ", "error", err)
 		}
 
 	}
