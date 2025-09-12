@@ -57,6 +57,7 @@ finderSocket.onmessage = async (msg) => {
     } else if (newFinderEvent.errType == FinderErrorType.UNSPECIFIED) {
       toast.error("an error happend try again")
     }
+    router.push("/")
   }
 }
 

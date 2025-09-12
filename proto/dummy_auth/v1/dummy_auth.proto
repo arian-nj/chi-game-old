@@ -1,0 +1,15 @@
+syntax = "proto3";
+
+package dummy_auth.v1;
+
+service DummyAuthService {
+  rpc DummyValidate(DummyValidateRequest) returns (DummyValidateResponse) {}
+}
+
+message DummyValidateRequest {
+  int64 id = 1;
+}
+
+message DummyValidateResponse {
+  string token = 1;
+}

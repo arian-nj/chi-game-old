@@ -36,15 +36,11 @@ const (
 	// AuthServiceValidateTelegramInitDataProcedure is the fully-qualified name of the AuthService's
 	// ValidateTelegramInitData RPC.
 	AuthServiceValidateTelegramInitDataProcedure = "/auth.v1.AuthService/ValidateTelegramInitData"
-	// AuthServiceDummyValidateProcedure is the fully-qualified name of the AuthService's DummyValidate
-	// RPC.
-	AuthServiceDummyValidateProcedure = "/auth.v1.AuthService/DummyValidate"
 )
 
 // AuthServiceClient is a client for the auth.v1.AuthService service.
 type AuthServiceClient interface {
 	ValidateTelegramInitData(context.Context, *connect.Request[v1.ValidateTelegramInitDataRequest]) (*connect.Response[v1.ValidateTelegramInitDataResponse], error)
-	DummyValidate(context.Context, *connect.Request[v1.DummyValidateRequest]) (*connect.Response[v1.DummyValidateResponse], error)
 }
 
 // NewAuthServiceClient constructs a client for the auth.v1.AuthService service. By default, it uses
@@ -64,19 +60,12 @@ func NewAuthServiceClient(httpClient connect.HTTPClient, baseURL string, opts ..
 			connect.WithSchema(authServiceMethods.ByName("ValidateTelegramInitData")),
 			connect.WithClientOptions(opts...),
 		),
-		dummyValidate: connect.NewClient[v1.DummyValidateRequest, v1.DummyValidateResponse](
-			httpClient,
-			baseURL+AuthServiceDummyValidateProcedure,
-			connect.WithSchema(authServiceMethods.ByName("DummyValidate")),
-			connect.WithClientOptions(opts...),
-		),
 	}
 }
 
 // authServiceClient implements AuthServiceClient.
 type authServiceClient struct {
 	validateTelegramInitData *connect.Client[v1.ValidateTelegramInitDataRequest, v1.ValidateTelegramInitDataResponse]
-	dummyValidate            *connect.Client[v1.DummyValidateRequest, v1.DummyValidateResponse]
 }
 
 // ValidateTelegramInitData calls auth.v1.AuthService.ValidateTelegramInitData.
@@ -84,15 +73,9 @@ func (c *authServiceClient) ValidateTelegramInitData(ctx context.Context, req *c
 	return c.validateTelegramInitData.CallUnary(ctx, req)
 }
 
-// DummyValidate calls auth.v1.AuthService.DummyValidate.
-func (c *authServiceClient) DummyValidate(ctx context.Context, req *connect.Request[v1.DummyValidateRequest]) (*connect.Response[v1.DummyValidateResponse], error) {
-	return c.dummyValidate.CallUnary(ctx, req)
-}
-
 // AuthServiceHandler is an implementation of the auth.v1.AuthService service.
 type AuthServiceHandler interface {
 	ValidateTelegramInitData(context.Context, *connect.Request[v1.ValidateTelegramInitDataRequest]) (*connect.Response[v1.ValidateTelegramInitDataResponse], error)
-	DummyValidate(context.Context, *connect.Request[v1.DummyValidateRequest]) (*connect.Response[v1.DummyValidateResponse], error)
 }
 
 // NewAuthServiceHandler builds an HTTP handler from the service implementation. It returns the path
@@ -108,18 +91,10 @@ func NewAuthServiceHandler(svc AuthServiceHandler, opts ...connect.HandlerOption
 		connect.WithSchema(authServiceMethods.ByName("ValidateTelegramInitData")),
 		connect.WithHandlerOptions(opts...),
 	)
-	authServiceDummyValidateHandler := connect.NewUnaryHandler(
-		AuthServiceDummyValidateProcedure,
-		svc.DummyValidate,
-		connect.WithSchema(authServiceMethods.ByName("DummyValidate")),
-		connect.WithHandlerOptions(opts...),
-	)
 	return "/auth.v1.AuthService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
 		case AuthServiceValidateTelegramInitDataProcedure:
 			authServiceValidateTelegramInitDataHandler.ServeHTTP(w, r)
-		case AuthServiceDummyValidateProcedure:
-			authServiceDummyValidateHandler.ServeHTTP(w, r)
 		default:
 			http.NotFound(w, r)
 		}
@@ -131,8 +106,4 @@ type UnimplementedAuthServiceHandler struct{}
 
 func (UnimplementedAuthServiceHandler) ValidateTelegramInitData(context.Context, *connect.Request[v1.ValidateTelegramInitDataRequest]) (*connect.Response[v1.ValidateTelegramInitDataResponse], error) {
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("auth.v1.AuthService.ValidateTelegramInitData is not implemented"))
-}
-
-func (UnimplementedAuthServiceHandler) DummyValidate(context.Context, *connect.Request[v1.DummyValidateRequest]) (*connect.Response[v1.DummyValidateResponse], error) {
-	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("auth.v1.AuthService.DummyValidate is not implemented"))
 }

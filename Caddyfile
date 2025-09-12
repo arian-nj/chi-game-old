@@ -1,7 +1,7 @@
-192.168.91.112:443 {
+192.168.0.106:443 {
 	encode gzip
 
-	reverse_proxy localhost:8383
+	reverse_proxy localhost:5173
 
 	tls internal
 }

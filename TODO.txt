@@ -132,11 +132,14 @@
 
 [X] Setup vps
 [X] CD Pipline
-[ ] Connect to Web App
-[ ] return from finder on error
+[X] Connect to Web App
+[X] return from finder on error
 
+[ ] Xo Animation
 [ ] Send Join Panel
 [ ] new message bubble
+
+[ ] continue open game
 
 # bot look
 [ ] better welcome message

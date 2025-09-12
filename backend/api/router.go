@@ -1,18 +1,20 @@
 package api
 
 import (
-	"fmt"
 	"log"
 	"net/http"
 
 	connectcors "connectrpc.com/cors"
 	"github.com/arian-nj/chibazi/backend/gen/account/v1/accountv1connect"
 	"github.com/arian-nj/chibazi/backend/gen/auth/v1/authv1connect"
+	"github.com/arian-nj/chibazi/backend/gen/dummy_auth/v1/dummy_authv1connect"
 	"github.com/arian-nj/chibazi/backend/gen/session/v1/sessionv1connect"
+	"github.com/arian-nj/chibazi/backend/internals/config"
 	"github.com/rs/cors"
 )
 
 var CORS_PATTERNS = []string{
+	"*",
 	"http://localhost:5173", "https://localhost:5173", "localhost:5173",
 	"http://localhost:3000", "https://localhost:3000", "localhost:3000",
 	"https://chigame.site", "chigame.site",
@@ -35,7 +37,11 @@ func (app *ApiApplication) createRouter() *http.ServeMux {
 
 	authPath, authHandler := authv1connect.NewAuthServiceHandler(app)
 	mux.Handle(authPath, withCORS(authHandler))
-	fmt.Println("Auth path:", authPath)
+
+	if app.Config.ReleaseMode == config.Develop {
+		dummyAuthPath, dummyAuthHandler := dummy_authv1connect.NewDummyAuthServiceHandler(app)
+		mux.Handle(dummyAuthPath, withCORS(dummyAuthHandler))
+	}
 
 	accountPath, accountHandler := accountv1connect.NewAccountServiceHandler(app)
 	mux.Handle(accountPath, withCORS(accountHandler))

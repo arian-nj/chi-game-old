@@ -17,6 +17,7 @@ import (
 	"connectrpc.com/connect"
 	"github.com/arian-nj/chibazi/backend/database"
 	authv1 "github.com/arian-nj/chibazi/backend/gen/auth/v1"
+	dummy_authv1 "github.com/arian-nj/chibazi/backend/gen/dummy_auth/v1"
 	"github.com/arian-nj/chibazi/backend/internals/utils"
 	"github.com/golang-jwt/jwt/v5"
 )
@@ -111,8 +112,8 @@ func (app *ApiApplication) ValidateToken(tokenString string) (int, error) {
 
 func (app *ApiApplication) DummyValidate(
 	ctx context.Context,
-	req *connect.Request[authv1.DummyValidateRequest],
-) (*connect.Response[authv1.DummyValidateResponse], error) {
+	req *connect.Request[dummy_authv1.DummyValidateRequest],
+) (*connect.Response[dummy_authv1.DummyValidateResponse], error) {
 	_, err := app.Queries.GetTgUserByID(ctx, int(req.Msg.Id))
 	if err != nil {
 		slog.Error("can't get user", "err", err)
@@ -124,7 +125,7 @@ func (app *ApiApplication) DummyValidate(
 	if err != nil {
 		return nil, connect.NewError(connect.CodeUnknown, errors.New("internal"))
 	}
-	return connect.NewResponse(&authv1.DummyValidateResponse{
+	return connect.NewResponse(&dummy_authv1.DummyValidateResponse{
 		Token: tokenString,
 	}), nil
 }
