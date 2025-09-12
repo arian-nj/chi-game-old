@@ -135,7 +135,8 @@
 [X] Connect to Web App
 [X] return from finder on error
 
-[ ] Xo Animation
+[X] Xo Animation
+[ ] Comntinue in Web
 [ ] Send Join Panel
 [ ] new message bubble
 
