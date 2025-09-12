@@ -1,5 +1,46 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import HomeView from '../views/HomeView.vue'
+import { GetJwtToken, SetJwtToken } from '@/lib/auth'
+import { rawTransport } from '@/lib/transport'
+import { AuthService } from '@/gen/auth/v1/auth_pb'
+import WebApp from '@twa-dev/sdk'
+import { createClient } from "@connectrpc/connect"
+
+import type { Router } from "vue-router"
+
+export function setupRouterGuards(router: Router, IsReleaseMode: boolean) {
+  router.beforeEach(async (to, _, next) => {
+    // Routes that don't need authentication
+    if (to.name === "login") {
+      return next()
+    }
+
+    if (!IsReleaseMode) {
+      // Dev mode: just check for JWT
+      const token = GetJwtToken()
+      if (!token) {
+        return next({ name: "login" })
+      }
+      return next()
+    }
+
+    // Release mode: validate Telegram
+    const token = GetJwtToken()
+    if (token) {
+      return next() // already validated
+    }
+
+    try {
+      const client = createClient(AuthService, rawTransport)
+      const data = await client.validateTelegramInitData({ initData: WebApp.initData })
+      SetJwtToken(data.token)
+      return next()
+    } catch (err) {
+      console.error("Telegram auth failed:", err)
+      return next({ name: "login-fail" })
+    }
+  })
+}
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
