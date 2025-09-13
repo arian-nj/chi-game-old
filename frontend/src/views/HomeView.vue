@@ -19,8 +19,8 @@ onMounted(() => {
 
 const router = useRouter()
 
-const selectedGame = ref("")
-const games = ["3X3", "5X5"];
+const games = ["3X3"];
+const selectedGame = ref(games[0])
 
 const playBtnRef = ref<HTMLButtonElement | null>(null)
 

@@ -158,7 +158,6 @@
 [X] Clean and Disconnect Session
 [ ] Limit Chat Message burst for telegram bot 1per 1s ?
 [X] duplicate ticket sending
-maybe add scroing to make it harder to use other bots
 
 [] add 5x5? 
 
@@ -166,6 +165,7 @@ maybe add scroing to make it harder to use other bots
 
 
 # 1.0.0 ()
+maybe add scroing to make it harder to use other bots
 [ ] log tickets in database for miss rate
 [ ] log who built game session (random from keyboard,random from web, via web ,via + creator)
 
