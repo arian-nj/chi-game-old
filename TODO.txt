@@ -145,8 +145,8 @@
 
 [X] change webapp lib
 [X] Handle Clicks to Continue Web if there is no Game
-[ ] how handle user db came stright to web
-[ ] fix can't get opponnent
+[X] how handle user db came stright to web
+[X] fix can't get opponnent & chat
 
 [ ] continue open game in web
 [ ] new message bubble

@@ -15,11 +15,11 @@ import (
 	"time"
 
 	"connectrpc.com/connect"
-	"github.com/arian-nj/chibazi/backend/database"
 	authv1 "github.com/arian-nj/chibazi/backend/gen/auth/v1"
 	dummy_authv1 "github.com/arian-nj/chibazi/backend/gen/dummy_auth/v1"
 	"github.com/arian-nj/chibazi/backend/internals/utils"
 	"github.com/golang-jwt/jwt/v5"
+	"github.com/jackc/pgx/v5"
 )
 
 const JWTExpiryDuration = 1 * time.Hour
@@ -134,31 +134,27 @@ func (app *ApiApplication) ValidateTelegramInitData(
 	ctx context.Context,
 	req *connect.Request[authv1.ValidateTelegramInitDataRequest],
 ) (*connect.Response[authv1.ValidateTelegramInitDataResponse], error) {
+
 	parsedQuery, _ := url.ParseQuery(req.Msg.InitData)
 	user, ok := ValidateWebappRequest(parsedQuery, app.Config.BotToken)
 	if !ok {
 		return nil, connect.NewError(connect.CodeUnauthenticated, fmt.Errorf("can't validate init data"))
 	}
 
-	botUserRow, err := app.Queries.GetTgUserByTgID(ctx, int(user.ID))
+	userRow, err := app.Queries.GetTgUserByTgID(ctx, int(user.TgID))
 	if err != nil {
-		return nil, connect.NewError(connect.CodeUnknown, errors.New("internal"))
-	}
-
-	var tgUserRow database.Person
-	if botUserRow.ID == 0 {
-		tgUserRow, err = utils.CreateBrandNewPerson(app.Queries, int(user.ID), user.FirstName)
-		if err != nil {
-			return nil, connect.NewError(connect.CodeUnknown, errors.New("internal"))
-		}
-	} else {
-		tgUserRow, err = app.Queries.GetTgUserByID(ctx, int(botUserRow.ID))
-		if err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			userRow, err = utils.CreateBrandNewPerson(app.Queries, int(user.TgID), user.FirstName)
+			if err != nil {
+				slog.Error("can't create user is ValidateTelegramInitData", "error", err)
+				return nil, connect.NewError(connect.CodeUnknown, errors.New("internal"))
+			}
+		} else {
 			return nil, connect.NewError(connect.CodeUnknown, errors.New("internal"))
 		}
 	}
 
-	token := createToken(tgUserRow.ID)
+	token := createToken(userRow.ID)
 	tokenString, err := token.SignedString(app.Config.Jwt.SecretKey)
 	if err != nil {
 		return nil, connect.NewError(connect.CodeUnknown, errors.New("internal"))
@@ -170,7 +166,7 @@ func (app *ApiApplication) ValidateTelegramInitData(
 }
 
 type WebAppUser struct {
-	ID                    int64  `json:"id"`
+	TgID                  int64  `json:"id"`
 	IsBot                 bool   `json:"is_bot"`
 	FirstName             string `json:"first_name"`
 	LastName              string `json:"last_name"`
