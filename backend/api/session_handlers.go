@@ -107,7 +107,7 @@ func (app *ApiApplication) GetChatHistory(
 	if person == nil {
 		return nil, ErrorUnauthenticated
 	}
-	gameSession, ok := app.AllSessions.Get(strconv.Itoa(person.TgID))
+	gameSession, ok := app.AllSessions.Get(strconv.Itoa(person.ID))
 	if !ok {
 		return nil, connect.NewError(connect.CodeNotFound, errors.New("no game found"))
 	}
@@ -148,7 +148,7 @@ func (app *ApiApplication) GetSessionOpponent(
 		return nil, ErrorUnauthenticated
 	}
 
-	gs, gsExist := app.AllSessions.Get(strconv.Itoa(person.TgID))
+	gs, gsExist := app.AllSessions.Get(strconv.Itoa(person.ID))
 	if !gsExist {
 		return nil, connect.NewError(connect.CodeNotFound, errors.New("session not found"))
 	}
