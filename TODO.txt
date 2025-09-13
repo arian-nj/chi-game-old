@@ -159,7 +159,7 @@
 [ ] Limit Chat Message burst for telegram bot 1per 1s ?
 [X] duplicate ticket sending
 
-[] add 5x5? 
+[] add 5x5?
 
 # 0.7.0 connect 4 (not yet)
 

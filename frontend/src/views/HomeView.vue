@@ -8,7 +8,7 @@ import gsap from 'gsap'
 import wasmUrl from "@lottiefiles/dotlottie-web/dist/dotlottie-player.wasm?url";
 
 
-import { openTelegramLink } from '@telegram-apps/sdk';
+import { switchInlineQuery } from '@telegram-apps/sdk';
 
 
 onMounted(() => {
@@ -39,6 +39,11 @@ onMounted(() => {
   }
 })
 
+function onPlayFriendsClick() {
+
+  switchInlineQuery("", ["users", "groups"])
+}
+
 </script>
 
 <template>
@@ -63,8 +68,7 @@ onMounted(() => {
                  text-2xl font-extrabold text-white tracking-wide
                  shadow-lg hover:shadow-cyan-400/30
                  hover:scale-105 active:scale-95
-                 transition-all duration-300 ease-in-out"
-          @click="openTelegramLink('https://t.me/UltrunBot?start=friends')">
+                 transition-all duration-300 ease-in-out" @click="onPlayFriendsClick()">
           🎮 بازی با دوستان
         </button>
 
