@@ -144,7 +144,7 @@
 [X] Disable telegram chat in via games
 
 [X] change webapp lib
-[-] Handle Clicks to Continue Web if there is no Game
+[X] Handle Clicks to Continue Web if there is no Game
 [ ] how handle user db came stright to web
 
 [ ] continue open game in web

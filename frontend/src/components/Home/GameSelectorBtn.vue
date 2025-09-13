@@ -24,10 +24,12 @@ onMounted(() => {
 </script>
 <template>
   <button ref="btnRef" type="button" @click="emit('choosed')" :class="[
-    ` px-12 py-8 mx-3 rounded-xl text-3xl font-bold text-text backdrop-blur-md
-         border-2`
-    ,
-    props.selected ? ' border-text bg-teal-100/30 shadow-xl text-orange-800' : 'bg-teal-50/10 border-accent text-gray-800'
+    `px-10 py-6 mx-3 rounded-2xl text-2xl font-extrabold tracking-wide
+         transition-colors duration-300 ease-in-out
+         border-2 backdrop-blur-md`,
+    props.selected
+      ? 'border-pink-500 bg-gradient-to-br from-pink-500/30 to-purple-500/30 text-white shadow-lg ring-2 ring-pink-500'
+      : 'bg-gray-800/40 border-gray-600 text-gray-300 '
   ]">
     {{ props.gameName }}
   </button>

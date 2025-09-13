@@ -64,8 +64,17 @@ func (app *BotApplication) statHandler(c telebot.Context) error {
 
 	return c.Send(text, telebot.ModeMarkdownV2)
 }
-
 func (app *BotApplication) welcomeHandler(c telebot.Context) error {
+	args := c.Args()
+	if len(args) > 0 {
+		if args[0] == "friends" {
+			return app.PlayWithFriendsHandler(c)
+		}
+	}
+	return app.welcomePanel(c)
+}
+
+func (app *BotApplication) welcomePanel(c telebot.Context) error {
 	return c.Send(
 		`خوش اومدید 👋`, keybul.WelcomeReplyKeyboard)
 }

@@ -33,7 +33,7 @@ function HandleError(errType: SessionErrorType) {
     toast.error("auth error")
     router.push('/');
   } else if (errType == SessionErrorType.NOSESSION) {
-    toast.error("no game")
+    toast.error("تو هیچ بازی ای ن نیستی")
     router.push('/');
   }
 }

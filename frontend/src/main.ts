@@ -9,7 +9,7 @@ import { GetApiUrl } from './lib/baseURL'
 import { IsReleaseMode } from './lib/ReleaseMode'
 import { init } from '@telegram-apps/sdk';
 
-if (!IsReleaseMode) {
+if (IsReleaseMode) {
   init()
 }
 GetApiUrl()
