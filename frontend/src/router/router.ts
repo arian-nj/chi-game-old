@@ -3,10 +3,12 @@ import HomeView from '../views/HomeView.vue'
 import { GetJwtToken, SetJwtToken } from '@/lib/auth'
 import { rawTransport } from '@/lib/transport'
 import { AuthService } from '@/gen/auth/v1/auth_pb'
-import WebApp from '@twa-dev/sdk'
 import { createClient } from "@connectrpc/connect"
 
 import type { Router } from "vue-router"
+
+import { initDataRaw, restoreInitData } from '@telegram-apps/sdk';
+
 
 export function setupRouterGuards(router: Router, IsReleaseMode: boolean) {
   router.beforeEach(async (to, _, next) => {
@@ -32,7 +34,9 @@ export function setupRouterGuards(router: Router, IsReleaseMode: boolean) {
 
     try {
       const client = createClient(AuthService, rawTransport)
-      const data = await client.validateTelegramInitData({ initData: WebApp.initData })
+      restoreInitData()
+      const raw = initDataRaw()
+      const data = await client.validateTelegramInitData({ initData: raw })
       SetJwtToken(data.token)
       return next()
     } catch (err) {
@@ -72,3 +76,4 @@ const router = createRouter({
 })
 
 export default router
+

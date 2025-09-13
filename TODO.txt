@@ -143,8 +143,9 @@
 [X] Wait for other player in private games
 [X] Disable telegram chat in via games
 
+[X] change webapp lib
 [-] Handle Clicks to Continue Web if there is no Game
-[ ] create user if came stright to web
+[ ] how handle user db came stright to web
 
 [ ] continue open game in web
 [ ] new message bubble
@@ -159,7 +160,9 @@
 [X] duplicate ticket sending
 maybe add scroing to make it harder to use other bots
 
-# 0.7.0 connect 4
+[] add 5x5? 
+
+# 0.7.0 connect 4 (not yet)
 
 
 # 1.0.0 ()
