@@ -147,6 +147,10 @@
 [X] Handle Clicks to Continue Web if there is no Game
 [X] how handle user db came stright to web
 [X] fix can't get opponnent & chat
+[X] better timer
+[X] better win panel
+
+[ ] fix show chat
 
 [ ] continue open game in web
 [ ] new message bubble

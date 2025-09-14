@@ -3,7 +3,7 @@ import ChatInput from '@/components/chat/ChatInput.vue';
 import { SessionService, type ChatMessage } from '@/gen/session/v1/session_pb';
 import type { SessionSocket } from '@/lib/SessionWs';
 import { Message } from '@/types/Message';
-import { watch } from 'vue';
+import { useTemplateRef, watch } from 'vue';
 import { onMounted, onUnmounted, ref } from 'vue';
 import ChatBubble from './ChatBubble.vue';
 
@@ -44,6 +44,8 @@ watch(chatHistoryData, () => {
 const allChatMessages = ref(Array<Message>())
 const showChat = ref(false)
 
+const chatInput = useTemplateRef('chat-input')
+
 watch(showChat, () => {
   console.log("show " + showChat)
 })
@@ -56,6 +58,9 @@ const props = defineProps({
 })
 
 function sendMessage(msgText: string) {
+  if (msgText == "") {
+    return
+  }
   props.sessionSocket.SendChatReqMessage(msgText)
   if (meData) {
     allChatMessages.value.push(new Message(msgText, meData.value!.account!.id))
@@ -66,9 +71,12 @@ function HandleIncomingChat(chatMsg: ChatMessage) {
   allChatMessages.value.push(new Message(chatMsg.text, chatMsg.playerId))
 }
 
-function handleOutClick() {
-  showChat.value = false
+function handleOutClick(event: MouseEvent) {
+  if (chatInput.value && !chatInput.value.contains(event.target as Node)) {
+    showChat.value = false
+  }
 }
+
 onMounted(() => {
   document.addEventListener("mousedown", handleOutClick);
 })
@@ -93,6 +101,8 @@ defineExpose({
         </div>
       </div>
     </div>
-    <ChatInput @input-click="showChat = true" @submit="sendMessage" />
+    <div ref="chat-input">
+      <ChatInput @input-click="showChat = true" @submit="sendMessage" />
+    </div>
   </div>
 </template>
