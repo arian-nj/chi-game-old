@@ -78,23 +78,25 @@ defineExpose({
 </script>
 
 <template>
-  <div ref="player-board-ref" class="absolute top-0 left-1/2 -translate-x-1/2
-    flex px-1 py-2
-    w-[85%] min-h-[10%] z-50
-    border-b-4 border-x-4 border-[#2E3228]
-    bg-gray-700 rounded-b-2xl shadow-md shadow-gray-700/30
+  <div ref="player-board-ref" class="
+    absolute top-4 left-1/2 -translate-x-1/2
+    flex items-center justify-between gap-4 p-2
+    w-[90%] max-w-2xl z-50
+    rounded-xl border border-slate-700
+    bg-slate-900/50 shadow-2xl shadow-black/50 backdrop-blur-md
     ">
 
-    <span v-if="meIsPending">Loading ...</span>
-    <span v-if="meErr">Error {{ meErr?.message }}</span>
-    <PlayerCard v-else-if="meData?.account" :account="meData?.account" :isActive="true" ref="me-card-ref" />
+    <span v-if="meIsPending" class="flex-1 text-center text-gray-400 italic">Loading Player...</span>
+    <span v-if="meErr" class="flex-1 text-center text-red-400">{{ meErr?.message }}</span>
+    <PlayerCard v-else-if="meData?.account" :account="meData?.account" :isActive="true" ref="me-card-ref"
+      :is-me="true" />
 
-    <div class="flex justify-center items-center bg-amber-200 p-2 mx-2 text-sm opacity-0">
-      <p>new chat message</p>
+    <div class="flex-shrink-0 w-1.5 h-10 bg-slate-700/50 rounded-full">
     </div>
 
-    <span v-if="oppIsPending">Loading ...</span>
-    <span v-if="oppErr">Error {{ oppErr?.message }}</span>
-    <PlayerCard v-else-if="oppData?.opponent" :account="oppData?.opponent" :isActive="false" ref="opp-card-ref" />
+    <span v-if="oppIsPending" class="flex-1 text-center text-gray-400 italic">Finding Opponent...</span>
+    <span v-if="oppErr" class="flex-1 text-center text-red-400">{{ oppErr?.message }}</span>
+    <PlayerCard v-else-if="oppData?.opponent" :account="oppData?.opponent" :isActive="false" ref="opp-card-ref"
+      :is-me="false" />
   </div>
 </template>

@@ -1,6 +1,8 @@
 
 // const apiUrl = import.meta.env.VITE_API_URL
 
+import { IsReleaseMode } from "./ReleaseMode";
+
 // let url;
 // switch (apiUrl) {
 // 	case 'production':
@@ -13,8 +15,7 @@
 // console.log("base url is ", apiUrl)
 //
 export const GetApiUrl = () => {
-  const mode = import.meta.env.MODE
-  if (mode == "production") {
+  if (IsReleaseMode) {
     return "https://api.chigame.site"
   }
   return "http://localhost:8383";

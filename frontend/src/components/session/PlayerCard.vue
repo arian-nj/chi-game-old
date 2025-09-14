@@ -1,15 +1,20 @@
 <script setup lang="ts">
 import type { Account } from "@/gen/account/v1/account_pb";
 // import gsap from "gsap";
-import { ref, watch } from "vue";
+import { computed, ref, watch } from "vue";
 
 const props = defineProps<{
   isActive: Boolean,
   account: Account,
+  isMe: Boolean
 }>();
 
 const totalTime = ref(10)
 const spentTime = ref(8)
+
+const remainingTime = computed(() => {
+  return totalTime.value - spentTime.value
+})
 
 let name = props.account.name;
 if (name.length > 10) {
@@ -35,67 +40,39 @@ function AnimateTimer() {
 
   // calculate color from green -> red
   // progress = 100 → green (#22c55e), progress = 0 → red (#dc2626)
-  const r = Math.min(255, Math.floor(255 - (progress * 2.55))); // red increases as time decreases
-  const g = Math.min(255, Math.floor(progress * 2.55));         // green decreases as time decreases
-  const b = 0;
+  const hue = progress * 1.2
+  const saturation = '80%'
+  const lightness = '45%'
 
   timerDiv.value.style.height = `${progress}%`
-  timerDiv.value.style.backgroundColor = `rgb(${r}, ${g}, ${b})`
+  timerDiv.value.style.backgroundColor = `hsl(${hue}, ${saturation}, ${lightness})`
 }
 
 defineExpose({
-  // ContinueTimer,
-  // PauseTimer,
   spentTime,
   totalTime
 })
 
 </script>
-
 <template>
-  <div class="relative isolate rounded-xl overflow-hidden min-w-[25%] h-14 bg-gray-200 shadow-inner">
+  <div :class="[
+    `relative isolate overflow-hidden flex-1 h-16
+     ring-1 ring-inset ring-white/10 transition-shadow duration-300`,
+    props.isMe ? 'rounded-r-lg' : 'rounded-l-lg',
+    props.isActive ? 'shadow-lg shadow-cyan-500/30' : ''
+  ]">
 
-    <div ref="timerDiv" class="absolute bottom-0 w-full bg-blue-600"></div>
+    <div ref="timerDiv" :class="[
+      `absolute w-full -translate-y-1/2 top-1/2 `,
+    ]"></div>
 
-    <div class="absolute inset-0 z-10 flex items-center justify-center text-white mix-blend-difference">
-      <p class="text-xl font-bold tracking-wider">{{ name }}</p>
+    <div class="absolute inset-0 z-10 text-white
+      flex items-center justify-between px-4
+      drop-shadow-lg
+      ">
+      <p class="text-lg font-semibold tracking-wider uppercase">{{ name }}</p>
+      <p class="text-2xl font-mono font-bold">{{ remainingTime }}</p>
     </div>
 
   </div>
-
 </template>
-
-// function AnimateTimer() {
-// if (timerDiv.value == null) return;
-//
-// const remainingTime = totalTime.value - spentTime.value
-// const progress = (remainingTime / totalTime.value) * 100
-//
-// let wasPaused = true
-// if (timerTween) {
-// wasPaused = timerTween?.paused()
-// }
-// timerTween = gsap.fromTo(timerDiv.value,
-// {
-// height: `${progress}%`,
-// backgroundColor: startColor
-// },
-// {
-// height: "0%",
-// duration: remainingTime,
-// ease: "linear",
-// backgroundColor: endColor
-// }
-// );
-// if (wasPaused) {
-// timerTween.pause()
-// }
-// }
-//
-// function PauseTimer() {
-// timerTween?.pause()
-// }
-//
-// function ContinueTimer() {
-// timerTween?.play()
-// }

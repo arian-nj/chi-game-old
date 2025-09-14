@@ -35,10 +35,15 @@ message SessionMessage {
 service SessionService {
   rpc GetChatHistory(GetChatHistoryRequest) returns (GetChatHistoryResponse) {}
   rpc GetSessionOpponent(GetSessionOpponentRequest) returns (GetSessionOpponentResponse) {}
+  rpc HasActiveSession(HasActiveSessionRequest) returns (HasActiveSessionResponse) {}
+}
+
+message HasActiveSessionRequest {}
+message HasActiveSessionResponse {
+  boolean IsActive = 1;
 }
 
 message GetChatHistoryRequest {}
-
 message GetChatHistoryResponse {
   repeated ChatMessage messages = 1;
 }
