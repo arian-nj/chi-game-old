@@ -150,10 +150,13 @@
 [X] better timer
 [X] better win panel
 
-[ ] fix show chat
+[X] fix show chat
 
 [ ] continue open game in web
-[ ] new message bubble
+[X] new message notify
+
+[ ] Make sure session end after game
+[ ] in web chat is closedd when game is ended
 
 [ ] Play test
 

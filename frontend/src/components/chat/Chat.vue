@@ -43,11 +43,15 @@ watch(chatHistoryData, () => {
 
 const allChatMessages = ref(Array<Message>())
 const showChat = ref(false)
-
 const chatInput = useTemplateRef('chat-input')
+const unreadCount = ref(0); // ✨ New state for unread messages
 
-watch(showChat, () => {
-  console.log("show " + showChat)
+watch(showChat, (isNowVisible) => {
+  console.log("show " + isNowVisible)
+  // ✨ If chat is opened, reset the counter
+  if (isNowVisible) {
+    unreadCount.value = 0;
+  }
 })
 
 const props = defineProps({
@@ -69,6 +73,10 @@ function sendMessage(msgText: string) {
 
 function HandleIncomingChat(chatMsg: ChatMessage) {
   allChatMessages.value.push(new Message(chatMsg.text, chatMsg.playerId))
+  // ✨ Increment counter if chat is hidden
+  if (!showChat.value) {
+    unreadCount.value++;
+  }
 }
 
 function handleOutClick(event: MouseEvent) {
@@ -94,14 +102,20 @@ defineExpose({
 
     <div class="flex flex-col w-full h-full justify-end font-[Rubik]">
       <div class="flex flex-col w-full h-full overflow-hidden">
-        <div :class="[`flex flex-col gap-3 px-4 py-2 overflow-y-auto flex-grow transition-all duration-1000`,
+        <div :class="[`flex flex-col gap-3 px-4 py-2 overflow-y-auto flex-grow transition-all
+duration-1000 rounded-xl`,
           showChat ? 'opacity-100 bg-gray-800/50' : 'opacity-0']">
           <ChatBubble v-for="msg in allChatMessages" :text="msg.text" :is-me="meData!.account?.id ==
             msg.userID" />
         </div>
       </div>
     </div>
-    <div ref="chat-input">
+    <div ref="chat-input" class="relative">
+      <div v-if="unreadCount > 0"
+        class="absolute top-0 right-0 w-5 h-5 bg-red-600 rounded-full flex items-center justify-center text-white text-xs font-bold transform translate-x-1/4 -translate-y-1/4">
+        {{ unreadCount }}
+      </div>
+
       <ChatInput @input-click="showChat = true" @submit="sendMessage" />
     </div>
   </div>
