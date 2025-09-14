@@ -47,15 +47,37 @@ function goToHome() {
 </script>
 
 <template>
-  <div ref="end-panel-div-ref"
-    class="absolute w-[80%] h-[50%] bg-gray-600 rounded-2xl flex flex-col justify-center items-center">
+  <div ref="end-panel-div-ref" class="
+      absolute w-[90%] max-w-md h-auto p-8
+      bg-slate-800/70 backdrop-blur-lg
+      rounded-2xl border border-slate-600 shadow-2xl shadow-black/50
+      flex flex-col justify-center items-center gap-6
+      text-center text-white
+    ">
 
-    <h1 v-if="props.winner" class="text-5xl bg-green-400 p-4 m-3 rounded-2xl border-2 border-white">🏆 {{
-      props.winner.name }}</h1>
+    <div v-if="props.winner" class="flex flex-col items-center">
+      <h1
+        class="text-5xl font-black bg-gradient-to-r from-amber-400 to-yellow-300 bg-clip-text text-transparent drop-shadow-lg">
+        🏆 {{ props.winner.name }}
+      </h1>
+    </div>
 
-    <h1 v-if="props.loser" class="text-4xl bg-red-400 p-4 m-4 rounded-2xl border-1 border-white">💀 {{ props.loser.name
-    }}</h1>
+    <div v-if="props.loser" class="flex flex-col items-center opacity-60">
+      <h1 class="text-4xl font-medium text-slate-400 line-through">
+        💀 {{ props.loser.name }}
+      </h1>
+    </div>
 
-    <button class="text-7xl" ref="home-btn-ref" @click="goToHome()">🏠</button>
+    <hr class="w-1/2 border-slate-600 my-2" />
+
+    <button class="
+        p-4 rounded-full text-5xl
+        bg-slate-700/50 text-white
+        border border-slate-600
+        active:scale-95
+        shadow-xl
+      " ref="home-btn-ref" @click="goToHome()">
+      🏠
+    </button>
   </div>
 </template>
