@@ -1,15 +1,17 @@
 <script setup lang="ts">
-import { onMounted, ref } from 'vue';
-import MeComponent from '../components/MeComponent.vue'
+import { computed, onMounted, ref } from 'vue';
 import { useRouter } from 'vue-router';
+import { createClient } from "@connectrpc/connect";
 import GameSelectorBtn from '@/components/Home/GameSelectorBtn.vue';
 import gsap from 'gsap'
 
 import wasmUrl from "@lottiefiles/dotlottie-web/dist/dotlottie-player.wasm?url";
 
-
 import { switchInlineQuery } from '@telegram-apps/sdk';
-
+import { useQuery } from '@tanstack/vue-query';
+import { SessionService } from '@/gen/session/v1/session_pb';
+import { authTransport } from '@/lib/transport';
+import MeComponent from '@/components/MeComponent.vue';
 
 onMounted(() => {
   // prefetch
@@ -24,8 +26,11 @@ const selectedGame = ref(games[0])
 
 const playBtnRef = ref<HTMLButtonElement | null>(null)
 
-
 function handlePlayClick() {
+  if (hasSession.value) {
+    router.push(`/session`)
+    return
+  }
   router.push(`/finder?game=${selectedGame.value}`)
 }
 
@@ -40,9 +45,25 @@ onMounted(() => {
 })
 
 function onPlayFriendsClick() {
-
   switchInlineQuery("", ["users", "groups"])
 }
+
+const { data: hasSessionData } = useQuery({
+  queryKey: ['hasSession'],
+  staleTime: 0,
+  queryFn: async () => {
+    const client = createClient(SessionService, authTransport)
+    const data = await client.hasSession({})
+    return data
+  }
+})
+
+const hasSession = computed(() => {
+  if (hasSessionData.value && hasSessionData.value.hasSession) {
+    return hasSessionData.value.hasSession
+  }
+  return false
+})
 
 </script>
 
@@ -80,7 +101,9 @@ function onPlayFriendsClick() {
             ? 'bg-gradient-to-r from-emerald-400 to-green-500 text-white hover:opacity-95 shadow-xl'
             : 'bg-gray-700 text-gray-400 cursor-not-allowed'
         ]">
-          🚀 شروع بازی
+          {{ hasSession ?
+            "ادامه بازی"
+            : "🚀 شروع بازی" }}
         </button>
 
       </div>

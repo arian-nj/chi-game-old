@@ -6,6 +6,7 @@ import { useQuery } from '@tanstack/vue-query';
 
 const { isPending, error, data } = useQuery({
   queryKey: ['me'],
+  staleTime: 0,
   queryFn: async () => {
     const client = createClient(AccountService, authTransport)
     const data = await client.getMe({})

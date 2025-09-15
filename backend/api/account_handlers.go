@@ -3,6 +3,7 @@ package api
 import (
 	"context"
 	"errors"
+	"log/slog"
 
 	"connectrpc.com/connect"
 	accountv1 "github.com/arian-nj/chibazi/backend/gen/account/v1"
@@ -16,7 +17,7 @@ func (app *ApiApplication) GetMe(
 	if perosnRow == nil {
 		return nil, connect.NewError(connect.CodeUnauthenticated, errors.New("can't get user"))
 	}
-
+	slog.Info("got person", "person", perosnRow)
 	return connect.NewResponse(&accountv1.GetMeResponse{
 		Account: &accountv1.Account{
 			Id:   int64(perosnRow.ID),

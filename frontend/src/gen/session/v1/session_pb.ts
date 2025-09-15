@@ -14,7 +14,7 @@ import type { Message } from "@bufbuild/protobuf";
  * Describes the file session/v1/session.proto.
  */
 export const file_session_v1_session: GenFile = /*@__PURE__*/
-  fileDesc("ChhzZXNzaW9uL3YxL3Nlc3Npb24ucHJvdG8SCnNlc3Npb24udjEiIgoSQ2hhdE1lc3NhZ2VSZXF1ZXN0EgwKBHRleHQYASABKAkiOgoLQ2hhdE1lc3NhZ2USEQoJcGxheWVyX2lkGAEgASgDEgwKBHRleHQYAiABKAkSCgoCaWQYAyABKAMiPgoLR2FtZU1lc3NhZ2USJwoCeG8YASABKAsyGS54b19nYW1lLnYxLlhvR2FtZU1lc3NhZ2VIAEIGCgRnYW1lItABCg5TZXNzaW9uTWVzc2FnZRInCgRjaGF0GAEgASgLMhcuc2Vzc2lvbi52MS5DaGF0TWVzc2FnZUgAEjIKCGNoYXRfcmVxGAIgASgLMh4uc2Vzc2lvbi52MS5DaGF0TWVzc2FnZVJlcXVlc3RIABInCgRnYW1lGAMgASgLMhcuc2Vzc2lvbi52MS5HYW1lTWVzc2FnZUgAEi0KBWVycm9yGAQgASgOMhwuc2Vzc2lvbi52MS5TZXNzaW9uRXJyb3JUeXBlSABCCQoHY29udGVudCIXChVHZXRDaGF0SGlzdG9yeVJlcXVlc3QiQwoWR2V0Q2hhdEhpc3RvcnlSZXNwb25zZRIpCghtZXNzYWdlcxgBIAMoCzIXLnNlc3Npb24udjEuQ2hhdE1lc3NhZ2UiGwoZR2V0U2Vzc2lvbk9wcG9uZW50UmVxdWVzdCJDChpHZXRTZXNzaW9uT3Bwb25lbnRSZXNwb25zZRIlCghvcHBvbmVudBgBIAEoCzITLmFjY291bnQudjEuQWNjb3VudCp1ChBTZXNzaW9uRXJyb3JUeXBlEiIKHlNFU1NJT05fRVJST1JfVFlQRV9VTlNQRUNJRklFRBAAEhsKF1NFU1NJT05fRVJST1JfVFlQRV9BVVRIEAESIAocU0VTU0lPTl9FUlJPUl9UWVBFX05PU0VTU0lPThACMtIBCg5TZXNzaW9uU2VydmljZRJZCg5HZXRDaGF0SGlzdG9yeRIhLnNlc3Npb24udjEuR2V0Q2hhdEhpc3RvcnlSZXF1ZXN0GiIuc2Vzc2lvbi52MS5HZXRDaGF0SGlzdG9yeVJlc3BvbnNlIgASZQoSR2V0U2Vzc2lvbk9wcG9uZW50EiUuc2Vzc2lvbi52MS5HZXRTZXNzaW9uT3Bwb25lbnRSZXF1ZXN0GiYuc2Vzc2lvbi52MS5HZXRTZXNzaW9uT3Bwb25lbnRSZXNwb25zZSIAQqUBCg5jb20uc2Vzc2lvbi52MUIMU2Vzc2lvblByb3RvUAFaPGdpdGh1Yi5jb20vYXJpYW4tbmovY2hpYmF6aS9iYWNrZW5kL2dlbi9zZXNzaW9uL3YxO3Nlc3Npb252MaICA1NYWKoCClNlc3Npb24uVjHKAgpTZXNzaW9uXFYx4gIWU2Vzc2lvblxWMVxHUEJNZXRhZGF0YeoCC1Nlc3Npb246OlYxYgZwcm90bzM", [file_account_v1_account, file_xo_game_v1_xo]);
+  fileDesc("ChhzZXNzaW9uL3YxL3Nlc3Npb24ucHJvdG8SCnNlc3Npb24udjEiIgoSQ2hhdE1lc3NhZ2VSZXF1ZXN0EgwKBHRleHQYASABKAkiOgoLQ2hhdE1lc3NhZ2USEQoJcGxheWVyX2lkGAEgASgDEgwKBHRleHQYAiABKAkSCgoCaWQYAyABKAMiPgoLR2FtZU1lc3NhZ2USJwoCeG8YASABKAsyGS54b19nYW1lLnYxLlhvR2FtZU1lc3NhZ2VIAEIGCgRnYW1lItABCg5TZXNzaW9uTWVzc2FnZRInCgRjaGF0GAEgASgLMhcuc2Vzc2lvbi52MS5DaGF0TWVzc2FnZUgAEjIKCGNoYXRfcmVxGAIgASgLMh4uc2Vzc2lvbi52MS5DaGF0TWVzc2FnZVJlcXVlc3RIABInCgRnYW1lGAMgASgLMhcuc2Vzc2lvbi52MS5HYW1lTWVzc2FnZUgAEi0KBWVycm9yGAQgASgOMhwuc2Vzc2lvbi52MS5TZXNzaW9uRXJyb3JUeXBlSABCCQoHY29udGVudCITChFIYXNTZXNzaW9uUmVxdWVzdCIpChJIYXNTZXNzaW9uUmVzcG9uc2USEwoLaGFzX3Nlc3Npb24YASABKAgiFwoVR2V0Q2hhdEhpc3RvcnlSZXF1ZXN0IkMKFkdldENoYXRIaXN0b3J5UmVzcG9uc2USKQoIbWVzc2FnZXMYASADKAsyFy5zZXNzaW9uLnYxLkNoYXRNZXNzYWdlIhsKGUdldFNlc3Npb25PcHBvbmVudFJlcXVlc3QiQwoaR2V0U2Vzc2lvbk9wcG9uZW50UmVzcG9uc2USJQoIb3Bwb25lbnQYASABKAsyEy5hY2NvdW50LnYxLkFjY291bnQqdQoQU2Vzc2lvbkVycm9yVHlwZRIiCh5TRVNTSU9OX0VSUk9SX1RZUEVfVU5TUEVDSUZJRUQQABIbChdTRVNTSU9OX0VSUk9SX1RZUEVfQVVUSBABEiAKHFNFU1NJT05fRVJST1JfVFlQRV9OT1NFU1NJT04QAjKhAgoOU2Vzc2lvblNlcnZpY2USWQoOR2V0Q2hhdEhpc3RvcnkSIS5zZXNzaW9uLnYxLkdldENoYXRIaXN0b3J5UmVxdWVzdBoiLnNlc3Npb24udjEuR2V0Q2hhdEhpc3RvcnlSZXNwb25zZSIAEmUKEkdldFNlc3Npb25PcHBvbmVudBIlLnNlc3Npb24udjEuR2V0U2Vzc2lvbk9wcG9uZW50UmVxdWVzdBomLnNlc3Npb24udjEuR2V0U2Vzc2lvbk9wcG9uZW50UmVzcG9uc2UiABJNCgpIYXNTZXNzaW9uEh0uc2Vzc2lvbi52MS5IYXNTZXNzaW9uUmVxdWVzdBoeLnNlc3Npb24udjEuSGFzU2Vzc2lvblJlc3BvbnNlIgBCpQEKDmNvbS5zZXNzaW9uLnYxQgxTZXNzaW9uUHJvdG9QAVo8Z2l0aHViLmNvbS9hcmlhbi1uai9jaGliYXppL2JhY2tlbmQvZ2VuL3Nlc3Npb24vdjE7c2Vzc2lvbnYxogIDU1hYqgIKU2Vzc2lvbi5WMcoCClNlc3Npb25cVjHiAhZTZXNzaW9uXFYxXEdQQk1ldGFkYXRh6gILU2Vzc2lvbjo6VjFiBnByb3RvMw", [file_account_v1_account, file_xo_game_v1_xo]);
 
 /**
  * Chat
@@ -131,6 +131,36 @@ export const SessionMessageSchema: GenMessage<SessionMessage> = /*@__PURE__*/
   messageDesc(file_session_v1_session, 3);
 
 /**
+ * @generated from message session.v1.HasSessionRequest
+ */
+export type HasSessionRequest = Message<"session.v1.HasSessionRequest"> & {
+};
+
+/**
+ * Describes the message session.v1.HasSessionRequest.
+ * Use `create(HasSessionRequestSchema)` to create a new message.
+ */
+export const HasSessionRequestSchema: GenMessage<HasSessionRequest> = /*@__PURE__*/
+  messageDesc(file_session_v1_session, 4);
+
+/**
+ * @generated from message session.v1.HasSessionResponse
+ */
+export type HasSessionResponse = Message<"session.v1.HasSessionResponse"> & {
+  /**
+   * @generated from field: bool has_session = 1;
+   */
+  hasSession: boolean;
+};
+
+/**
+ * Describes the message session.v1.HasSessionResponse.
+ * Use `create(HasSessionResponseSchema)` to create a new message.
+ */
+export const HasSessionResponseSchema: GenMessage<HasSessionResponse> = /*@__PURE__*/
+  messageDesc(file_session_v1_session, 5);
+
+/**
  * @generated from message session.v1.GetChatHistoryRequest
  */
 export type GetChatHistoryRequest = Message<"session.v1.GetChatHistoryRequest"> & {
@@ -141,7 +171,7 @@ export type GetChatHistoryRequest = Message<"session.v1.GetChatHistoryRequest"> 
  * Use `create(GetChatHistoryRequestSchema)` to create a new message.
  */
 export const GetChatHistoryRequestSchema: GenMessage<GetChatHistoryRequest> = /*@__PURE__*/
-  messageDesc(file_session_v1_session, 4);
+  messageDesc(file_session_v1_session, 6);
 
 /**
  * @generated from message session.v1.GetChatHistoryResponse
@@ -158,7 +188,7 @@ export type GetChatHistoryResponse = Message<"session.v1.GetChatHistoryResponse"
  * Use `create(GetChatHistoryResponseSchema)` to create a new message.
  */
 export const GetChatHistoryResponseSchema: GenMessage<GetChatHistoryResponse> = /*@__PURE__*/
-  messageDesc(file_session_v1_session, 5);
+  messageDesc(file_session_v1_session, 7);
 
 /**
  * @generated from message session.v1.GetSessionOpponentRequest
@@ -171,7 +201,7 @@ export type GetSessionOpponentRequest = Message<"session.v1.GetSessionOpponentRe
  * Use `create(GetSessionOpponentRequestSchema)` to create a new message.
  */
 export const GetSessionOpponentRequestSchema: GenMessage<GetSessionOpponentRequest> = /*@__PURE__*/
-  messageDesc(file_session_v1_session, 6);
+  messageDesc(file_session_v1_session, 8);
 
 /**
  * @generated from message session.v1.GetSessionOpponentResponse
@@ -188,7 +218,7 @@ export type GetSessionOpponentResponse = Message<"session.v1.GetSessionOpponentR
  * Use `create(GetSessionOpponentResponseSchema)` to create a new message.
  */
 export const GetSessionOpponentResponseSchema: GenMessage<GetSessionOpponentResponse> = /*@__PURE__*/
-  messageDesc(file_session_v1_session, 7);
+  messageDesc(file_session_v1_session, 9);
 
 /**
  * @generated from enum session.v1.SessionErrorType
@@ -235,6 +265,14 @@ export const SessionService: GenService<{
     methodKind: "unary";
     input: typeof GetSessionOpponentRequestSchema;
     output: typeof GetSessionOpponentResponseSchema;
+  },
+  /**
+   * @generated from rpc session.v1.SessionService.HasSession
+   */
+  hasSession: {
+    methodKind: "unary";
+    input: typeof HasSessionRequestSchema;
+    output: typeof HasSessionResponseSchema;
   },
 }> = /*@__PURE__*/
   serviceDesc(file_session_v1_session, 0);

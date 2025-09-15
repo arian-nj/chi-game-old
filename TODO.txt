@@ -152,7 +152,7 @@
 
 [X] fix show chat
 
-[ ] continue open game in web
+[X] continue open game in web
 [X] new message notify
 
 [ ] Make sure session end after game
@@ -166,6 +166,7 @@
 [X] Clean and Disconnect Session
 [ ] Limit Chat Message burst for telegram bot 1per 1s ?
 [X] duplicate ticket sending
+[ ] cors dev/prod
 
 [] add 5x5?
 

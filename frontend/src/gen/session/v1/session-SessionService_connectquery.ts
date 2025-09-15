@@ -13,3 +13,8 @@ export const getChatHistory = SessionService.method.getChatHistory;
  * @generated from rpc session.v1.SessionService.GetSessionOpponent
  */
 export const getSessionOpponent = SessionService.method.getSessionOpponent;
+
+/**
+ * @generated from rpc session.v1.SessionService.HasSession
+ */
+export const hasSession = SessionService.method.hasSession;
