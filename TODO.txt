@@ -155,8 +155,8 @@
 [X] continue open game in web
 [X] new message notify
 
-[ ] Make sure session end after game
-[ ] in web chat is closedd when game is ended
+[X] Make sure session end after game
+[X] in web chat is closedd when game is ended
 
 [ ] Play test
 
@@ -169,6 +169,7 @@
 [ ] cors dev/prod
 
 [] add 5x5?
+
 
 # 0.7.0 connect 4 (not yet)
 
@@ -194,6 +195,9 @@ maybe add scroing to make it harder to use other bots
 # could be ton token
 
 --- League
+
+--- Optimize
+[ ] benchmark small list search vs map for game players
 
 [-] implementing
 [ ] means that it is not implemented

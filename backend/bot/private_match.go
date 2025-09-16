@@ -55,7 +55,7 @@ func (app *BotApplication) inlineResultFeedbackHandler(c telebot.Context) error 
 	}
 
 	creatorPlayer := gamesessions.NewSessionPlayer(personRow.ID, personRow.TgID, personRow.Name)
-	newSession.AddSessionPlayer(creatorPlayer)
+	newSession.AddPlayerToSession(creatorPlayer)
 
 	newSession.RunBgMonitor()
 

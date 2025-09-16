@@ -222,7 +222,7 @@ func (app *BotApplication) StopChatHandler(c telebot.Context) error {
 	}
 
 	if gameSession.IsGameEnded {
-		gameSession.CleanAndDisconnect()
+		gameSession.ShutdownTimer = time.After(0)
 		return nil
 	}
 

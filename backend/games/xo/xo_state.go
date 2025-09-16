@@ -35,6 +35,8 @@ type XOState struct { // of GameInterface type
 
 	*commander.Commander
 
+	endCallback func()
+
 	mu sync.Mutex
 }
 
@@ -72,6 +74,10 @@ func (gameState *XOState) GetGameData() *game.GameData {
 	return gameState.GameData
 }
 
+func (gameState *XOState) OnEnd(endCallback func()) {
+	gameState.endCallback = endCallback
+}
+
 func (gameState *XOState) monitorXoGame() {
 	tickerDuration := time.Second * 1
 	ticker := time.NewTicker(tickerDuration)
@@ -94,6 +100,11 @@ func (gameState *XOState) monitorXoGame() {
 				lastSyncTime = now
 			}
 		case <-gameState.Ctx.Done():
+			if gameState.endCallback != nil {
+				gameState.endCallback()
+			} else {
+				slog.Error("there is not endCallback in xo game state")
+			}
 			return
 		case <-gameState.CommandNotifire:
 			if len(gameState.Commands) > 0 {
@@ -149,10 +160,6 @@ func (g *XOState) nextPlayer() {
 func (g *XOState) AddPlayer(id int, name string, tgId int, socket *socket.Socket) {
 	player := NewXoPlayer(id, name, tgId, socket)
 	g.Players = append(g.Players, player)
-}
-
-func (cg *XOState) GetContext() context.Context {
-	return cg.Ctx
 }
 
 func (gameState *XOState) SubToTelegram(userID int, bot *telebot.Bot, ViaMessageId string) {

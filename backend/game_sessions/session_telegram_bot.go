@@ -31,6 +31,18 @@ func (tg *SessionTelegramBotListener) Update(command commander.Command) {
 				slog.Error("Can not send chat message in session telegram", "error", err)
 			}
 		}
+
+	case *GameEndedCommand:
+		if c.Session.Chat.IsOn == false {
+			return
+		}
+		go func() {
+			text := fmt.Sprintf("چت تا %d ثانیه دیگه بسته میشه", int(ExpirationDur.Seconds()))
+			_, err := c.Session.Bot.Send(&telebot.User{ID: int64(tg.TgID)}, text)
+			if err != nil {
+				slog.Error("can't send end game chat message", "err", err)
+			}
+		}()
 	}
 }
 

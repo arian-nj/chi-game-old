@@ -1,8 +1,6 @@
 package game
 
 import (
-	"context"
-
 	sessionv1 "github.com/arian-nj/chibazi/backend/gen/session/v1"
 	"github.com/arian-nj/chibazi/backend/internals/socket"
 	"gopkg.in/telebot.v4"
@@ -15,12 +13,13 @@ type Game interface {
 	CallBackRouter(c telebot.Context) error
 
 	StartGame() error
-	GetContext() context.Context
 
 	GetGameData() *GameData
 
 	SubToTelegram(ID int, bot *telebot.Bot, ViaMessageId string)
 	SubToSocket(ID int, newSocket *socket.Socket) func()
+
+	OnEnd(func())
 }
 
 type GameData struct {

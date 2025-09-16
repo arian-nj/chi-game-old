@@ -70,6 +70,8 @@ function goToHome() {
 
     <hr class="w-1/2 border-slate-600 my-2" />
 
+    <h1 class="text-lg font-bold text-red-200" dir="auto">۳۰ ثانیه دیگه چت بسته میشه</h1>
+
     <button class="
         p-4 rounded-full text-5xl
         bg-slate-700/50 text-white

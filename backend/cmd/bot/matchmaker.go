@@ -63,8 +63,8 @@ func (gv *GlobalVars) createRandomGame(gameType gametype.GameType, ticketOne *ma
 	playerOne := gamesessions.NewSessionPlayer(ticketOne.UserID, ticketOne.TgID, ticketOne.Name)
 	playerTwo := gamesessions.NewSessionPlayer(ticketTwo.UserID, ticketTwo.TgID, ticketTwo.Name)
 
-	newGameSession.AddSessionPlayer(playerOne)
-	newGameSession.AddSessionPlayer(playerTwo)
+	newGameSession.AddPlayerToSession(playerOne)
+	newGameSession.AddPlayerToSession(playerTwo)
 
 	gv.AllSessions.Add(strconv.Itoa(playerOne.ID), newGameSession)
 	gv.AllSessions.Add(strconv.Itoa(playerTwo.ID), newGameSession)

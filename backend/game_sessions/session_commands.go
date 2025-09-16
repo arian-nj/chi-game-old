@@ -67,6 +67,19 @@ func NewJoinSessionCommand(session *GameSession, JoinedUser *SessionPlayer) *Joi
 }
 
 func (join *JoinSessionCommand) Execute() {
-	join.Session.AddSessionPlayer(join.JoinedPlayer)
+	join.Session.AddPlayerToSession(join.JoinedPlayer)
 	join.Session.StartGame()
+}
+
+type GameEndedCommand struct {
+	Session *GameSession
+}
+
+func NewGameEndedSessionCommand(session *GameSession) *GameEndedCommand {
+	return &GameEndedCommand{
+		Session: session,
+	}
+}
+
+func (EndGame *GameEndedCommand) Execute() {
 }

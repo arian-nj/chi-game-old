@@ -3,7 +3,6 @@ package gamesessions
 import (
 	"context"
 	"errors"
-	"fmt"
 	"log/slog"
 	"strconv"
 	"time"
@@ -25,6 +24,8 @@ const (
 	RandomSession  SessionType = "random"
 )
 
+const ExpirationDur = 30 * time.Second
+
 type SessionPlayer struct {
 	ID     int
 	TgID   int
@@ -43,6 +44,7 @@ func NewSessionPlayer(ID int, tgID int, name string) *SessionPlayer {
 type Chat struct {
 	IsOn bool
 }
+
 type GameSession struct {
 	ID int
 
@@ -66,6 +68,8 @@ type GameSession struct {
 	allSession *AllSession
 
 	*commander.Commander
+
+	ShutdownTimer <-chan time.Time
 }
 
 func NewGameSession(bot *telebot.Bot, Queries *database.Queries, sessionId int, allSession *AllSession) *GameSession {
@@ -86,8 +90,9 @@ func NewGameSession(bot *telebot.Bot, Queries *database.Queries, sessionId int, 
 		CancelSession: cancel,
 		SessionCtx:    ctx,
 
-		Commander:  commander.NewCommander(),
-		allSession: allSession,
+		Commander:     commander.NewCommander(),
+		allSession:    allSession,
+		ShutdownTimer: make(<-chan time.Time),
 	}
 	return gs
 }
@@ -117,10 +122,11 @@ func (session *GameSession) StartGame() error {
 		}
 	}
 
+	session.GameState.OnEnd(session.EndGame)
 	return session.GameState.StartGame()
 }
 
-func (session *GameSession) AddSessionPlayer(player *SessionPlayer) {
+func (session *GameSession) AddPlayerToSession(player *SessionPlayer) {
 	session.Players = append(session.Players, player)
 	utils.RunBackgroundTask(func() {
 		_, err := session.Queries.CreateSessionPlayer(context.Background(), database.CreateSessionPlayerParams{
@@ -133,6 +139,19 @@ func (session *GameSession) AddSessionPlayer(player *SessionPlayer) {
 	})
 }
 
+func (session *GameSession) EndGame() {
+	session.IsGameEnded = true
+
+	gameEnded := NewGameEndedSessionCommand(session)
+	session.PushCommand(gameEnded)
+
+	if session.Chat.IsOn == false {
+		return
+	}
+	session.ShutdownTimer = time.After(30 * time.Second)
+
+}
+
 func (session *GameSession) MonitorGameSession() {
 	for {
 		select {
@@ -143,30 +162,14 @@ func (session *GameSession) MonitorGameSession() {
 			case *sessionv1.SessionMessage_Game:
 				session.GameState.SocketRouter(newSessionEvent.Event.GetGame(), newSessionEvent.Player.ID)
 			}
-
-		case <-session.GameState.GetContext().Done():
-			session.IsGameEnded = true
-			if session.Chat.IsOn {
-				expDur := 30 * time.Second
-				if session.Bot != nil {
-					text := fmt.Sprintf("چت تا %d ثانیه دیگه بسته میشه", int(expDur.Seconds()))
-					for _, player := range session.Players {
-						_, err := session.Bot.Send(&telebot.User{ID: int64(player.TgID)}, text)
-						if err != nil {
-							slog.Error("can't send end game chat message", "err", err)
-						}
-					}
-				}
-				time.Sleep(expDur)
-			}
-			session.CleanAndDisconnect()
-			return
-
 		case <-session.CommandNotifire:
 			if len(session.Commands) > 0 {
 				com := session.PopCommand()
 				session.ApplyCommand(com)
 			}
+		case <-session.ShutdownTimer:
+			session.CleanAndDisconnect()
+			return
 		}
 	}
 }
