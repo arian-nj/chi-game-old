@@ -49,7 +49,7 @@ func CreateInlineKeyboard(buttonGroups ...[][]telebot.InlineButton) *telebot.Rep
 	}
 }
 
-func CreateBotNameInlineButton() [][]telebot.InlineButton {
+func ContinueInWebButton() [][]telebot.InlineButton {
 	return [][]telebot.InlineButton{
 		{
 			{

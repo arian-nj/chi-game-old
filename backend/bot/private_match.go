@@ -7,6 +7,7 @@ import (
 
 	"github.com/arian-nj/chibazi/backend/database"
 	gamesessions "github.com/arian-nj/chibazi/backend/game_sessions"
+	"github.com/arian-nj/chibazi/backend/games/conn4"
 	"github.com/arian-nj/chibazi/backend/games/game"
 	"github.com/arian-nj/chibazi/backend/games/xo"
 	gametype "github.com/arian-nj/chibazi/backend/internals/game_type"
@@ -32,9 +33,11 @@ func (app *BotApplication) inlineResultFeedbackHandler(c telebot.Context) error 
 	gameType := gametype.GameType(resultId)
 	switch gameType {
 	case gametype.XOGameType3X3:
-		newGame = xo.NewXOGame(newSession.SessionCtx, gametype.XOGameType3X3, app.Bot, app.Queries)
+		newGame = xo.NewXOGame(newSession.SessionCtx, gametype.XOGameType3X3, app.Queries)
 	case gametype.XOGameType5X5:
-		newGame = xo.NewXOGame(newSession.SessionCtx, gametype.XOGameType5X5, app.Bot, app.Queries)
+		newGame = xo.NewXOGame(newSession.SessionCtx, gametype.XOGameType5X5, app.Queries)
+	case gametype.Conn4GameType:
+		newGame = conn4.NewConn4State(newSession.SessionCtx, gametype.XOGameType5X5, app.Queries)
 	default:
 		return c.RespondAlert("این بازیرو ندارم!")
 	}
@@ -77,6 +80,7 @@ func (app *BotApplication) inlineResultFeedbackHandler(c telebot.Context) error 
 
 func (app *BotApplication) inlineQueryHandler(c telebot.Context) error {
 	results := telebot.Results{}
+
 	// XO result
 	xoResult3x3 := &telebot.ArticleResult{
 		Title:       "دوز بازی ۳ در ۳",
@@ -84,23 +88,19 @@ func (app *BotApplication) inlineQueryHandler(c telebot.Context) error {
 		Text:        xo.XOStartText,
 	}
 	xoResult3x3.ParseMode = telebot.ModeMarkdownV2
-
 	xoResult3x3.ReplyMarkup = keybul.StartInlineKeyboard
-
 	xoResult3x3.SetResultID(string(gametype.XOGameType3X3))
 	results = append(results, xoResult3x3)
 
-	xoResult5x5 := &telebot.ArticleResult{
-		Title:       "دوز بازی  ۵ در ۵",
+	conn4Result := &telebot.ArticleResult{
+		Title:       "دوز  سنگی",
 		Description: "رو من کلیک کن",
-		Text:        xo.XOStartText,
+		Text:        conn4.Conn4StartText,
 	}
-	xoResult5x5.ParseMode = telebot.ModeMarkdownV2
-
-	xoResult5x5.ReplyMarkup = keybul.StartInlineKeyboard
-
-	xoResult5x5.SetResultID(string(gametype.XOGameType5X5))
-	results = append(results, xoResult5x5)
+	conn4Result.ParseMode = telebot.ModeMarkdownV2
+	conn4Result.ReplyMarkup = keybul.StartInlineKeyboard
+	conn4Result.SetResultID(string(gametype.Conn4GameType))
+	results = append(results, conn4Result)
 
 	// // Dot Box result
 	// dotResult := &telebot.ArticleResult{
@@ -127,7 +127,7 @@ func (app *BotApplication) inlineQueryHandler(c telebot.Context) error {
 	//
 	// webDotResult.SetResultID(string(gametype.WebDotBoxGameType))
 	// results = append(results, webDotResult)
-	//
+
 	return c.Answer(&telebot.QueryResponse{
 		Results:   results,
 		CacheTime: 0,

@@ -157,22 +157,35 @@
 
 [X] Make sure session end after game
 [X] in web chat is closedd when game is ended
-[ ] amesterdam vps
-[ ] Play test
+[X] amesterdam vps
 
 [X] Go Code Maxes cpu usage after a While !!!
 [X] command monitor sleep fix this
 ## WARNINGS
 [X] Clean and Disconnect Session
-[ ] Limit Chat Message burst for telegram bot 1per 1s ?
 [X] duplicate ticket sending
+
+[ ] Limit Chat Message burst for telegram bot 1per 1s ?
 [ ] cors dev/prod
 
-[] add 5x5?
+[ ] Play test
+
+[ ] add 5x5?
 
 
-# 0.7.0 connect 4 (not yet)
+# 0.7.0 multi game
+[X] basic telegram game
+[ ] telgram win panel + show win line in green
+[ ] web board
+[ ] web sync game
 
+# 0.7.1 matchmaking suppot
+[ ] matchmaking support multiple games
+
+# 0.7.2 
+[ ] move between games
+
+# 0.8.0 Chi Coin
 
 # 1.0.0 ()
 maybe add scroing to make it harder to use other bots
@@ -190,14 +203,7 @@ maybe add scroing to make it harder to use other bots
 [ ] add command list
 
 --- Personal Statistics
-
---- Chi Coin
-# could be ton token
-
 --- League
-
---- Optimize
-[ ] benchmark small list search vs map for game players
 
 [-] implementing
 [ ] means that it is not implemented

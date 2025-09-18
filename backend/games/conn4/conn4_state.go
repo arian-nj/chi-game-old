@@ -1,12 +1,12 @@
-package xo
+package conn4
 
 import (
 	"context"
-	"fmt"
 	"log/slog"
 	"time"
 
 	"github.com/arian-nj/chibazi/backend/database"
+	conn4_core "github.com/arian-nj/chibazi/backend/games/conn4/core"
 	"github.com/arian-nj/chibazi/backend/games/game"
 	"github.com/arian-nj/chibazi/backend/internals/commander"
 	gametype "github.com/arian-nj/chibazi/backend/internals/game_type"
@@ -20,27 +20,19 @@ const MAX_ALLOWED_TIME_INT = 60
 const MAX_ALLOWED_TIME = MAX_ALLOWED_TIME_INT * time.Second
 
 const (
-	XOStartText = `❌ *دوز بازی* ⭕️`
-	// ticRulesText = `
+	Conn4StartText = `❌ *دوز بازی* ⭕️`
+	Conn4RulesText = `قوانین`
 	// قوانین 🎮
 	// یک سطر یا ستون یا قطر رو با علامتت پر کن`
 )
 
-func (game *XOState) RulesText() string {
-	text := ""
-	// text += "قوانین:\د"
-	text += fmt.Sprintf("❕اندازه *%dX%d*\n", game.Board.MaxCellSize, game.Board.MaxCellSize)
-	text += fmt.Sprintf("⚠️با یه خط *%d تایی* برنده ای", game.Board.WinSize)
-	return text
-}
-
-type XOState struct { // of GameInterface type
+type Conn4State struct { // of GameInterface type
 	GameType gametype.GameType
 	GameData *game.GameData
 
-	Board *XoBoard
+	Board *conn4_core.Conn4Board
 
-	Players            []*XoPlayer
+	Players            []*Conn4Player
 	CurrentPlayerIndex int
 
 	Queries *database.Queries
@@ -53,45 +45,41 @@ type XOState struct { // of GameInterface type
 	endCallback func()
 }
 
-func NewXOGame(
+func NewConn4State(
 	sessionCtx context.Context, gameType gametype.GameType,
-	queries *database.Queries) *XOState {
+	queries *database.Queries) *Conn4State {
 
-	maxBoardSize := 3
-	winSize := 3
-	if gameType == gametype.XOGameType5X5 {
-		maxBoardSize = 5
-		winSize = 4
-	}
 	randIndex := random.GenerateRandomNumber(2)
 
 	ctx, cancel := context.WithCancel(sessionCtx)
 
-	state := &XOState{
+	state := &Conn4State{
 		CurrentPlayerIndex: randIndex,
-		Players:            []*XoPlayer{},
+		Players:            []*Conn4Player{},
 		CancelGame:         cancel,
 		Ctx:                ctx,
 
 		GameType: gameType,
-		Board:    NewTicBoard(maxBoardSize, winSize),
+		Board:    conn4_core.NewConn4Board(),
 
 		Queries:   queries,
 		Commander: commander.NewCommander(),
 	}
-	state.GameData = game.NewGameData(XOStartText, state.RulesText(), 2)
+	state.GameData = game.NewGameData(Conn4StartText,
+		"قوانین",
+		2,
+	)
 	return state
 }
 
-func (gameState *XOState) GetGameData() *game.GameData {
+func (gameState *Conn4State) GetGameData() *game.GameData {
 	return gameState.GameData
 }
 
-func (gameState *XOState) OnEnd(endCallback func()) {
+func (gameState *Conn4State) OnEnd(endCallback func()) {
 	gameState.endCallback = endCallback
 }
-
-func (gameState *XOState) monitorXoGame() {
+func (gameState *Conn4State) monitorXoGame() {
 	tickerDuration := time.Second * 1
 	ticker := time.NewTicker(tickerDuration)
 	lastSyncTime := time.Now().Add(time.Second * -10)
@@ -103,13 +91,13 @@ func (gameState *XOState) monitorXoGame() {
 			currentPlayer := gameState.CurrentPlayer()
 
 			if currentPlayer.Timer.Spent() >= MAX_ALLOWED_TIME {
-				newEndCommand := NewEndGameCommand(gameState, gameState.OpponentPlayer(), gameState.CurrentPlayer(), END_GAME_TIE)
-				gameState.InjectCommand(newEndCommand)
+				// newEndCommand := NewEndGameCommand(gameState, gameState.OpponentPlayer(), gameState.CurrentPlayer(), END_GAME_TIE)
+				// gameState.InjectCommand(newEndCommand)
 				return
 			}
 			if now.Sub(lastSyncTime) > time.Second*1 {
-				newSyncCommand := NewSyncTimeCommand(gameState)
-				gameState.PushCommand(newSyncCommand)
+				// newSyncCommand := NewSyncTimeCommand(gameState)
+				// gameState.PushCommand(newSyncCommand)
 				lastSyncTime = now
 			}
 		case <-gameState.Ctx.Done():
@@ -129,7 +117,7 @@ func (gameState *XOState) monitorXoGame() {
 }
 
 // helper functions
-func (game *XOState) findByTelegramID(telegramID int) *XoPlayer {
+func (game *Conn4State) findByTelegramID(telegramID int) *Conn4Player {
 	for _, p := range game.Players {
 		if telegramID == p.TelegramID {
 			return p
@@ -138,7 +126,7 @@ func (game *XOState) findByTelegramID(telegramID int) *XoPlayer {
 	return nil
 }
 
-func (game *XOState) findByID(telegramID int) *XoPlayer {
+func (game *Conn4State) findByID(telegramID int) *Conn4Player {
 	for _, p := range game.Players {
 		if telegramID == p.ID {
 			return p
@@ -147,11 +135,11 @@ func (game *XOState) findByID(telegramID int) *XoPlayer {
 	return nil
 }
 
-func (cg *XOState) CurrentPlayer() *XoPlayer {
-	return cg.Players[cg.CurrentPlayerIndex]
+func (game *Conn4State) CurrentPlayer() *Conn4Player {
+	return game.Players[game.CurrentPlayerIndex]
 }
 
-func (gameState *XOState) OpponentPlayer() *XoPlayer {
+func (gameState *Conn4State) OpponentPlayer() *Conn4Player {
 	index := 0
 	if gameState.CurrentPlayerIndex == 0 {
 		index = 1
@@ -159,7 +147,7 @@ func (gameState *XOState) OpponentPlayer() *XoPlayer {
 	return gameState.Players[index]
 }
 
-func (g *XOState) nextPlayer() {
+func (g *Conn4State) nextPlayer() {
 	g.CurrentPlayer().Timer.Stop()
 	if g.CurrentPlayerIndex == len(g.Players)-1 {
 		g.CurrentPlayerIndex = 0
@@ -169,48 +157,47 @@ func (g *XOState) nextPlayer() {
 	g.CurrentPlayer().Timer.Start()
 }
 
-// game interface
-func (g *XOState) AddPlayer(id int, name string, tgId int, socket *socket.Socket) {
-	player := NewXoPlayer(id, name, tgId, socket)
+func (g *Conn4State) AddPlayer(id int, name string, tgId int, socket *socket.Socket) {
+	player := NewConn4Player(id, name, tgId, socket)
 	g.Players = append(g.Players, player)
 }
 
-func (gameState *XOState) SubToTelegram(userID int, bot *telebot.Bot, ViaMessageId string) {
+func (gameState *Conn4State) SubToTelegram(userID int, bot *telebot.Bot, ViaMessageId string) {
 	foundPlayer := gameState.findByID(userID)
 	if foundPlayer == nil && ViaMessageId == "" {
 		slog.Error("no user found")
 		return
 	}
-	gameState.Subscribe(newXOTelegramListener(foundPlayer, bot, ViaMessageId))
+	gameState.Subscribe(newConn4TelegramListener(foundPlayer, bot, ViaMessageId))
 }
 
-func (gameState *XOState) SubToSocket(ID int, newSocket *socket.Socket) func() {
-	foundPlayer := gameState.findByID(ID)
-	if foundPlayer == nil {
-		return nil
-	}
-
-	foundPlayer.Socket = newSocket
-	SocketSendGameState(gameState, foundPlayer)
-	sListener := &SocketListener{
-		Player: foundPlayer,
-	}
-	gameState.Subscribe(sListener)
-	unregister := func() {
-		if gameState != nil {
-			gameState.Unsubscribe(sListener)
-		}
-	}
-	return unregister
+func (gameState *Conn4State) SubToSocket(ID int, newSocket *socket.Socket) func() {
+	// foundPlayer := gameState.findByID(ID)
+	// if foundPlayer == nil {
+	// 	return nil
+	// }
+	//
+	// foundPlayer.Socket = newSocket
+	// SocketSendGameState(gameState, foundPlayer)
+	// sListener := &SocketListener{
+	// 	Player: foundPlayer,
+	// }
+	// gameState.Subscribe(sListener)
+	// unregister := func() {
+	// 	if gameState != nil {
+	// 		gameState.Unsubscribe(sListener)
+	// 	}
+	// }
+	// return unregister
+	return nil
 }
 
-func (game *XOState) StartGame() error {
-
+func (game *Conn4State) StartGame() error {
 	utils.RunBackgroundTask(func() {
 		game.monitorXoGame()
 	})
-	game.Players[0].Move = X
-	game.Players[1].Move = O
+	game.Players[0].Move = conn4_core.One
+	game.Players[1].Move = conn4_core.Two
 
 	game.CurrentPlayer().Timer.Start()
 	startAction := NewStartCommand(game)

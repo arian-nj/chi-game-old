@@ -8,8 +8,9 @@ import (
 	"time"
 
 	gamesessions "github.com/arian-nj/chibazi/backend/game_sessions"
+	"github.com/arian-nj/chibazi/backend/games/conn4"
 	"github.com/arian-nj/chibazi/backend/games/game"
-	xoconsole "github.com/arian-nj/chibazi/backend/games/xo"
+	"github.com/arian-nj/chibazi/backend/games/xo"
 	gametype "github.com/arian-nj/chibazi/backend/internals/game_type"
 	"github.com/arian-nj/chibazi/backend/internals/utils"
 	matchmaking "github.com/arian-nj/chibazi/backend/match_making"
@@ -50,8 +51,11 @@ func (gv *GlobalVars) createRandomGame(gameType gametype.GameType, ticketOne *ma
 
 	switch gameType {
 	case gametype.XOGameType3X3, gametype.XOGameType5X5:
-		newXoGame := xoconsole.NewXOGame(newGameSession.SessionCtx, gametype.XOGameType3X3, gv.Bot, gv.Queries)
+		newXoGame := xo.NewXOGame(newGameSession.SessionCtx, gametype.XOGameType3X3, gv.Queries)
 		newGame = newXoGame
+	case gametype.Conn4GameType:
+		newConn4Game := conn4.NewConn4State(newGameSession.SessionCtx, gametype.Conn4GameType, gv.Queries)
+		newGame = newConn4Game
 
 	default:
 		slog.Error("not possible random game")

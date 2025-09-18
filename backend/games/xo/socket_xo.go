@@ -152,7 +152,7 @@ func (sl *SocketListener) SocketBrodcastSyncTime(gameState *XOState) {
 								SyncTime: &xo_gamev1.Time{
 									PlayerId:  int64(player.ID),
 									SpentTime: int32(player.Timer.SpentInt()),
-									TotalTime: int32(MaxAllowedTimeInt),
+									TotalTime: int32(MAX_ALLOWED_TIME_INT),
 								},
 							},
 						},

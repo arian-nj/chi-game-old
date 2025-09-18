@@ -33,18 +33,21 @@ func NewCommander() *Commander {
 		Subscribers: []Subscriber{},
 	}
 }
-
-// Commands
-func (commander *Commander) PushCommand(newCommand Command) {
-	commander.Commands = append(commander.Commands, newCommand)
+func (commander *Commander) notif() {
 	utils.RunBackgroundTask(func() {
 		commander.CommandNotifire <- nil
 	})
 }
 
+// Commands
+func (commander *Commander) PushCommand(newCommand Command) {
+	commander.Commands = append(commander.Commands, newCommand)
+	commander.notif()
+}
+
 func (commander *Commander) InjectCommand(newAction Command) {
 	commander.Commands = append([]Command{newAction}, commander.Commands...)
-	commander.CommandNotifire <- nil
+	commander.notif()
 }
 func (commander *Commander) PopCommand() Command {
 	firstAction := commander.Commands[0]

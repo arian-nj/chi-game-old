@@ -76,7 +76,7 @@ func (g *XOState) CallBackRouter(c telebot.Context) error {
 func (tg *XoTelegramListener) EditDuringGameBoard(game *XOState) error {
 	err := tg.Edit(tg, XOStartText+"\n\n"+game.RulesText(),
 		keybul.CreateInlineKeyboard(
-			keybul.CreateBotNameInlineButton(),
+			keybul.ContinueInWebButton(),
 			CreateTicBoardInlineButton(game.Board),
 			game.CreatePlayersInlineButton(game.Players, game.CurrentPlayerIndex),
 		),
@@ -95,7 +95,7 @@ func (tg *XoTelegramListener) TheEnd(endCommand *EndGameCommand) error {
 	text := game.EndGameText() + game.WinGameText(endCommand.Winner) + additionalText
 	err := tg.Edit(tg, text,
 		keybul.CreateInlineKeyboard(
-			keybul.CreateBotNameInlineButton(),
+			keybul.ContinueInWebButton(),
 			keybul.EndGameInlineKeyboard(tg.ViaMessageId != ""),
 		),
 		tg.Player,
@@ -108,7 +108,7 @@ func (tg *XoTelegramListener) TieGame(game *XOState) error {
 
 	err := tg.Edit(tg, text,
 		keybul.CreateInlineKeyboard(
-			keybul.CreateBotNameInlineButton(),
+			keybul.ContinueInWebButton(),
 			keybul.EndGameInlineKeyboard(tg.ViaMessageId != ""),
 		),
 		tg.Player,
@@ -149,16 +149,6 @@ func (game *XOState) XOPlayHandler(c telebot.Context, callbackData string) error
 
 // HELPERS
 
-func (tg *XoTelegramListener) MessageSig() (string, int64) {
-	return tg.ViaMessageId, 0
-}
-
-const (
-	XOStartText = `❌ *دوز بازی* ⭕️`
-	// ticRulesText = `
-	// قوانین 🎮
-	// یک سطر یا ستون یا قطر رو با علامتت پر کن`
-)
 const (
 	EmptyEmoji = "◽️"
 	XEmoji     = "❌"  // player one
@@ -230,7 +220,7 @@ func (game *XOState) CreatePlayersInlineButton(humanPlayers []*XoPlayer, Current
 			name = name[:20] + "..."
 		}
 
-		remainedTime := MaxAllowedTime - hplayer.Timer.Spent()
+		remainedTime := MAX_ALLOWED_TIME - hplayer.Timer.Spent()
 		timeText := fmt.Sprintf("%d:%d", int(remainedTime.Minutes()), int(remainedTime.Seconds())%60)
 
 		row := make([]telebot.InlineButton, 2)
@@ -243,14 +233,6 @@ func (game *XOState) CreatePlayersInlineButton(humanPlayers []*XoPlayer, Current
 	}
 
 	return buttons
-}
-
-func (game *XOState) RulesText() string {
-	text := ""
-	// text += "قوانین:\د"
-	text += fmt.Sprintf("❕اندازه *%dX%d*\n", game.Board.MaxCellSize, game.Board.MaxCellSize)
-	text += fmt.Sprintf("⚠️با یه خط *%d تایی* برنده ای", game.Board.WinSize)
-	return text
 }
 
 func (tg *XoTelegramListener) Edit(msg telebot.Editable, text string, keyboard *telebot.ReplyMarkup, player *XoPlayer) error {
@@ -276,4 +258,8 @@ func (tg *XoTelegramListener) Edit(msg telebot.Editable, text string, keyboard *
 
 	}
 	return nil
+}
+
+func (tg *XoTelegramListener) MessageSig() (string, int64) {
+	return tg.ViaMessageId, 0
 }
