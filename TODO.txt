@@ -157,7 +157,7 @@
 
 [X] Make sure session end after game
 [X] in web chat is closedd when game is ended
-
+[ ] amesterdam vps
 [ ] Play test
 
 [X] Go Code Maxes cpu usage after a While !!!
