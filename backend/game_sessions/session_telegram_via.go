@@ -36,7 +36,6 @@ func (tg *SessionTelegramViaListener) Update(command commander.Command) {
 }
 
 func (tg *SessionTelegramViaListener) SendWaitPanel(wait *WaitForPlayerCommand) error {
-	slog.Info("sending Wait Panel")
 	session := wait.Session
 	gameData := session.GameState.GetGameData()
 	creator := wait.Creator

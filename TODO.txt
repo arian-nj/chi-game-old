@@ -175,7 +175,7 @@
 
 # 0.7.0 multi game
 [X] basic telegram game
-[ ] telgram win panel + show win line in green
+[X] telgram win panel + show win line in green
 [ ] web board
 [ ] web sync game
 
@@ -186,6 +186,8 @@
 [ ] move between games
 
 # 0.8.0 Chi Coin
+
+# 0.9.0 Exact Statistics
 
 # 1.0.0 ()
 maybe add scroing to make it harder to use other bots
@@ -202,8 +204,12 @@ maybe add scroing to make it harder to use other bots
 [ ] add /help
 [ ] add command list
 
---- Personal Statistics
---- League
+# 1.1.0 League
+
+# 1.2.0 Dot Line
+
+# 2.0.0 Hokm
+
 
 [-] implementing
 [ ] means that it is not implemented

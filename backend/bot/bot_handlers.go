@@ -190,9 +190,9 @@ var (
 				{
 					Text: keybul.Xo3x3ButtonText,
 				},
-				{
-					Text: keybul.Xo5x5ButtonText,
-				},
+				// {
+				// 	Text: keybul.Xo5x5ButtonText,
+				// },
 			},
 			{
 				{Text: keybul.MainKeyboardButtonText},

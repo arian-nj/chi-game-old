@@ -63,47 +63,58 @@ func (board *Conn4Board) DropPiece(column int, cellType Cell) (int, bool) {
 	return -1, false
 }
 
-func (board *Conn4Board) HasWon(index int) bool {
+func (board *Conn4Board) HasWon(index int) (bool, []int) {
 	moveType := board.Board[index]
+	if moveType == Empty {
+		return false, nil
+	}
+
 	r, c := board.indexToRC(index)
 	directions := [][2]int{
 		{0, 1},  // Horizontal check
 		{1, 0},  // Vertical check
-		{1, 1},  // DIAGONAL check (\)
-		{1, -1}, // ANTI-DIAGONAL check (/)
+		{1, 1},  // Diagonal (\)
+		{1, -1}, // Anti-Diagonal (/)
 	}
-	for _, dir := range directions {
-		// Start at 1 to count the piece just played at (r, c)
-		count := 1
 
-		// Check in one direction (e.g., down-right)
+	for _, dir := range directions {
+		// Start the line with the current index
+		line := []int{index}
+
+		// Forward direction
 		for i := 1; i < WIN_SIZE; i++ {
 			nr, nc := r+(dir[0]*i), c+(dir[1]*i)
-			if nr >= 0 && nr < BOARD_HEIGHT && nc >= 0 && nc < BOARD_WIDTH && board.GetCell(board.rcToIndex(nr, nc)) == moveType {
-				count++
-			} else {
-				break
+			if nr >= 0 && nr < BOARD_HEIGHT && nc >= 0 && nc < BOARD_WIDTH {
+				ni := board.rcToIndex(nr, nc)
+				if board.Board[ni] == moveType {
+					line = append(line, ni)
+				} else {
+					break
+				}
 			}
 		}
 
-		// Check in the opposite direction (e.g., up-left)
+		// Backward direction
 		for i := 1; i < WIN_SIZE; i++ {
 			nr, nc := r-(dir[0]*i), c-(dir[1]*i)
-			if nr >= 0 && nr < BOARD_HEIGHT && nc >= 0 && nc < BOARD_WIDTH && board.GetCell(board.rcToIndex(nr, nc)) == moveType {
-				count++
-			} else {
-				break
+			if nr >= 0 && nr < BOARD_HEIGHT && nc >= 0 && nc < BOARD_WIDTH {
+				ni := board.rcToIndex(nr, nc)
+				if board.Board[ni] == moveType {
+					line = append(line, ni)
+				} else {
+					break
+				}
 			}
 		}
 
-		// If the total count on this axis meets the win condition, we have a winner
-		if count >= WIN_SIZE {
-			return true
+		// If enough in line → return winner
+		if len(line) >= WIN_SIZE {
+			return true, line
 		}
 	}
-	return false
-}
 
+	return false, nil
+}
 func (board *Conn4Board) IsAnyCellEmpty() bool {
 	return slices.Contains(board.Board, Empty)
 }

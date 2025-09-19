@@ -66,11 +66,16 @@ func (commander *Commander) ApplyCommand(newCommand Command) {
 
 // Subscription
 func (commander *Commander) Notify(command Command) {
+	var wg sync.WaitGroup
+
 	for _, sub := range commander.Subscribers {
-		utils.RunBackgroundTask(func() {
+		wg.Add(1)
+		go func(s Subscriber) {
+			defer wg.Done()
 			sub.Update(command) // pass both state + action
-		})
+		}(sub)
 	}
+	wg.Wait()
 }
 
 func (commander *Commander) Subscribe(subscriber Subscriber) {

@@ -7,7 +7,7 @@ const (
 
 const (
 	Xo3x3ButtonText = "بازی دوز ۳ در ۳❌"
-	Xo5x5ButtonText = "بازی دوز ۵ در ۵⭕️"
+	// Xo5x5ButtonText = "بازی دوز ۵ در ۵⭕️"
 
 	CancelGameButtonText = "🔙 نگرد پشیمون شدم"
 )

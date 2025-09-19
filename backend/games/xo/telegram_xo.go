@@ -157,8 +157,8 @@ const (
 
 func (game *XOState) WinGameText(winner *XoPlayer) string {
 	return "\n🏆برنده بازی:" + "*" + winner.Name + "*"
-
 }
+
 func (game *XOState) EndGameText() string {
 	players := game.Players
 	return XOStartText + "\nبازیکن ها:\n" + players[0].Name + " " + XEmoji + "\n" + players[1].Name + " " + OEmoji + "\n\n" + game.CreateBoardAsEmoji()

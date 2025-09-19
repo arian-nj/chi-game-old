@@ -28,18 +28,20 @@ const (
 )
 
 type EndGameCommand struct {
-	reason EndGameReason
-	Winner *Conn4Player
-	Loser  *Conn4Player
-	Game   *Conn4State
+	reason  EndGameReason
+	Winner  *Conn4Player
+	Loser   *Conn4Player
+	Game    *Conn4State
+	WinLine []int
 }
 
-func NewEndGameCommand(game *Conn4State, winner *Conn4Player, loser *Conn4Player, endGameReason EndGameReason) *EndGameCommand {
+func NewEndGameCommand(game *Conn4State, winner *Conn4Player, loser *Conn4Player, endGameReason EndGameReason, winLine []int) *EndGameCommand {
 	return &EndGameCommand{
-		reason: endGameReason,
-		Winner: winner,
-		Loser:  loser,
-		Game:   game,
+		reason:  endGameReason,
+		Winner:  winner,
+		Loser:   loser,
+		Game:    game,
+		WinLine: winLine,
 	}
 }
 
@@ -90,13 +92,13 @@ func (move *PlayCommand) Execute() {
 		return
 	}
 
-	hasWon := game.Board.HasWon(idx)
+	hasWon, winLine := game.Board.HasWon(idx)
 
 	var endGameCommand *EndGameCommand = nil
 	if hasWon {
-		endGameCommand = NewEndGameCommand(move.Game, currentPlayer, game.OpponentPlayer(), END_GAME_FULL)
+		endGameCommand = NewEndGameCommand(move.Game, currentPlayer, game.OpponentPlayer(), END_GAME_FULL, winLine)
 	} else if !game.Board.IsAnyCellEmpty() {
-		endGameCommand = NewEndGameCommand(move.Game, nil, nil, END_GAME_TIE)
+		endGameCommand = NewEndGameCommand(move.Game, nil, nil, END_GAME_TIE, []int{})
 	}
 
 	if endGameCommand != nil {

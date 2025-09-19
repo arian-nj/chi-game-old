@@ -3,6 +3,7 @@ package conn4
 import (
 	"fmt"
 	"log/slog"
+	"slices"
 	"strconv"
 	"strings"
 	"time"
@@ -50,18 +51,18 @@ func (tg *Conn4TelegramListener) Update(command commander.Command) {
 		if err != nil {
 			slog.Error("can't edit during start command", "err", err)
 		}
-	// case *EndGameCommand:
-	// 	if c.Winner == nil {
-	// 		err := tg.TieGame(c.Game)
-	// 		if err != nil {
-	// 			slog.Error("tie failed", "error", err)
-	// 		}
-	// 	} else {
-	// 		err := tg.TheEnd(c)
-	// 		if err != nil {
-	// 			slog.Error("the end failed", "error", err)
-	// 		}
-	// 	}
+	case *EndGameCommand:
+		if c.Winner == nil {
+			err := tg.TieGame(c)
+			if err != nil {
+				slog.Error("tie failed", "error", err)
+			}
+		} else {
+			err := tg.TheEnd(c)
+			if err != nil {
+				slog.Error("the end failed", "error", err)
+			}
+		}
 	case *SyncTimeCommand:
 		if time.Since(tg.LastEdit) > 10*time.Second {
 			err := tg.EditDuringGameBoard(c.Game)
@@ -116,9 +117,10 @@ var Conn4PlayNumberButton = [][]telebot.InlineButton{
 	},
 }
 
-func MakeBoardAsEmojies(game *Conn4State) string {
+func MakeBoardAsEmojies(game *Conn4State, winList []int) string {
 	board := game.Board.Board
 	boardText := ""
+	winListLen := len(winList)
 	for cIndex, cell := range board {
 		cellEmoji := EmptyEmoji
 		switch cell {
@@ -127,6 +129,9 @@ func MakeBoardAsEmojies(game *Conn4State) string {
 			cellEmoji = OneEmoji
 		case conn4_core.Two:
 			cellEmoji = TwoEmoji
+		}
+		if winListLen != 0 && slices.Contains(winList, cIndex) {
+			cellEmoji = WinEmoji
 		}
 		boardText += cellEmoji
 		if cIndex%(conn4_core.BOARD_WIDTH) == conn4_core.BOARD_WIDTH-1 {
@@ -137,10 +142,10 @@ func MakeBoardAsEmojies(game *Conn4State) string {
 }
 
 func (tg *Conn4TelegramListener) EditDuringGameBoard(game *Conn4State) error {
-	err := tg.Edit(tg, Conn4StartText+"\n"+MakeBoardAsEmojies(game)+
+	err := tg.Edit(tg, Conn4StartText+"\n"+MakeBoardAsEmojies(game, nil)+
 		"1️⃣2️⃣3️⃣4️⃣5️⃣6️⃣7️⃣",
 		keybul.CreateInlineKeyboard(
-			keybul.ContinueInWebButton(),
+			// keybul.ContinueInWebButton(),
 			Conn4PlayNumberButton,
 			game.CreatePlayersInlineButton(game.Players, game.CurrentPlayerIndex),
 		),
@@ -219,4 +224,45 @@ func (game *Conn4State) CreatePlayersInlineButton(humanPlayers []*Conn4Player, C
 	return [][]telebot.InlineButton{
 		rows,
 	}
+}
+
+func WinnerGameText(winner *Conn4Player) string {
+	return "\n🏆برنده بازی:" + "*" + winner.Name + "*"
+}
+func (game *Conn4State) EndGameText(winLine []int) string {
+	players := game.Players
+	return Conn4StartText + "\nبازیکن ها:\n" +
+		players[0].Name + " " + OneEmoji + "\n" + players[1].Name + " " + TwoEmoji + "\n\n" +
+		MakeBoardAsEmojies(game, winLine)
+}
+
+func (tg *Conn4TelegramListener) TheEnd(endCommand *EndGameCommand) error {
+	game := endCommand.Game
+	additionalText := ""
+	if endCommand.reason == END_GAME_TIMEOUT {
+		additionalText = "\n برنده زمانی"
+	}
+
+	text := game.EndGameText(endCommand.WinLine) + WinnerGameText(endCommand.Winner) + additionalText
+	err := tg.Edit(tg, text,
+		keybul.CreateInlineKeyboard(
+			// keybul.ContinueInWebButton(),
+			keybul.EndGameInlineKeyboard(tg.ViaMessageId != ""),
+		),
+		tg.Player,
+	)
+	return err
+}
+
+func (tg *Conn4TelegramListener) TieGame(endCommand *EndGameCommand) error {
+	text := endCommand.Game.EndGameText(endCommand.WinLine) + "\nبازی مساوی شد"
+
+	err := tg.Edit(tg, text,
+		keybul.CreateInlineKeyboard(
+			keybul.ContinueInWebButton(),
+			keybul.EndGameInlineKeyboard(tg.ViaMessageId != ""),
+		),
+		tg.Player,
+	)
+	return err
 }
