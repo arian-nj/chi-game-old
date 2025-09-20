@@ -4,6 +4,7 @@ package session.v1;
 
 import "account/v1/account.proto";
 import "xo_game/v1/xo.proto";
+import "conn4_game/v1/conn4.proto";
 
 // Chat
 message ChatMessageRequest {
@@ -19,6 +20,7 @@ message ChatMessage {
 message GameMessage {
   oneof game {
     xo_game.v1.XoGameMessage xo = 1;
+    conn4_game.v1.Conn4GameMessage conn4 = 2;
   }
 }
 

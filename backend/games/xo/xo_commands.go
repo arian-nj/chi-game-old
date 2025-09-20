@@ -2,6 +2,9 @@ package xo
 
 import (
 	"log/slog"
+	"time"
+
+	"github.com/arian-nj/chibazi/backend/internals/utils"
 )
 
 type MoveCommand struct {
@@ -83,7 +86,10 @@ func NewEndGameCommand(game *XOState, winner *XoPlayer, loser *XoPlayer, endGame
 }
 
 func (endGame *EndGameCommand) Execute() {
-	endGame.Game.CancelGame()
+	utils.RunBackgroundTask(func() {
+		time.Sleep(10 * time.Second)
+		endGame.Game.CancelGame()
+	})
 }
 
 type SyncTimeCommand struct {

@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import * as XoBuff from "@/gen/xo_game/v1/xo_pb";
 import { SessionSocket } from '@/lib/SessionWs';
-import XoGame from './XoGame.vue';
 import { ref, useTemplateRef } from "vue";
 import { create, toBinary } from "@bufbuild/protobuf";
 import { SessionMessageSchema } from "@/gen/session/v1/session_pb";
@@ -13,6 +12,7 @@ import { AccountService } from '@/gen/account/v1/account_pb';
 import { authTransport } from '@/lib/transport';
 import { useQuery } from '@tanstack/vue-query';
 import { createClient } from '@connectrpc/connect'
+import XoBoard from "./XoBoard.vue";
 
 const { isPending: meIsPending, error: meErr, data: meData } = useQuery({
   queryKey: ['me'],
@@ -110,7 +110,7 @@ function sendClick(i: number) {
     <span v-if="meIsPending">Loading ...</span>
     <span v-if="meErr">Error {{ meErr?.message }}</span>
     <PlayersBoard v-else ref="players-board" :is-my-turn="isMyTurn" />
-    <XoGame @cell-selected="sendClick" :board-size="boardSize" ref="xo-board-ref" />
+    <XoBoard @cell-selected="sendClick" :board-size="boardSize" ref="xo-board-ref" />
 
     <XoEndGame v-if="EndGameData" :loser="EndGameData.loser" :winner="EndGameData.winner" />
   </div>

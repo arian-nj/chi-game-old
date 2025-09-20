@@ -140,6 +140,7 @@ func (sl *SocketListener) SocketBrodcastNewMove(game *XOState, moveIndex int, ce
 		}
 	}
 }
+
 func (sl *SocketListener) SocketBrodcastSyncTime(gameState *XOState) {
 	allTimeMessages := []*sessionv1.SessionMessage{}
 	for _, player := range gameState.Players {

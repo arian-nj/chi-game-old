@@ -7,7 +7,8 @@
 package sessionv1
 
 import (
-	v11 "github.com/arian-nj/chibazi/backend/gen/account/v1"
+	v12 "github.com/arian-nj/chibazi/backend/gen/account/v1"
+	v11 "github.com/arian-nj/chibazi/backend/gen/conn4_game/v1"
 	v1 "github.com/arian-nj/chibazi/backend/gen/xo_game/v1"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
@@ -183,6 +184,7 @@ type GameMessage struct {
 	// Types that are valid to be assigned to Game:
 	//
 	//	*GameMessage_Xo
+	//	*GameMessage_Conn4
 	Game          isGameMessage_Game `protobuf_oneof:"game"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -234,6 +236,15 @@ func (x *GameMessage) GetXo() *v1.XoGameMessage {
 	return nil
 }
 
+func (x *GameMessage) GetConn4() *v11.Conn4GameMessage {
+	if x != nil {
+		if x, ok := x.Game.(*GameMessage_Conn4); ok {
+			return x.Conn4
+		}
+	}
+	return nil
+}
+
 type isGameMessage_Game interface {
 	isGameMessage_Game()
 }
@@ -242,7 +253,13 @@ type GameMessage_Xo struct {
 	Xo *v1.XoGameMessage `protobuf:"bytes,1,opt,name=xo,proto3,oneof"`
 }
 
+type GameMessage_Conn4 struct {
+	Conn4 *v11.Conn4GameMessage `protobuf:"bytes,2,opt,name=conn4,proto3,oneof"`
+}
+
 func (*GameMessage_Xo) isGameMessage_Game() {}
+
+func (*GameMessage_Conn4) isGameMessage_Game() {}
 
 // / Session
 type SessionMessage struct {
@@ -557,7 +574,7 @@ func (*GetSessionOpponentRequest) Descriptor() ([]byte, []int) {
 
 type GetSessionOpponentResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Opponent      *v11.Account           `protobuf:"bytes,1,opt,name=opponent,proto3" json:"opponent,omitempty"`
+	Opponent      *v12.Account           `protobuf:"bytes,1,opt,name=opponent,proto3" json:"opponent,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -592,7 +609,7 @@ func (*GetSessionOpponentResponse) Descriptor() ([]byte, []int) {
 	return file_session_v1_session_proto_rawDescGZIP(), []int{9}
 }
 
-func (x *GetSessionOpponentResponse) GetOpponent() *v11.Account {
+func (x *GetSessionOpponentResponse) GetOpponent() *v12.Account {
 	if x != nil {
 		return x.Opponent
 	}
@@ -604,15 +621,16 @@ var File_session_v1_session_proto protoreflect.FileDescriptor
 const file_session_v1_session_proto_rawDesc = "" +
 	"\n" +
 	"\x18session/v1/session.proto\x12\n" +
-	"session.v1\x1a\x18account/v1/account.proto\x1a\x13xo_game/v1/xo.proto\"(\n" +
+	"session.v1\x1a\x18account/v1/account.proto\x1a\x13xo_game/v1/xo.proto\x1a\x19conn4_game/v1/conn4.proto\"(\n" +
 	"\x12ChatMessageRequest\x12\x12\n" +
 	"\x04text\x18\x01 \x01(\tR\x04text\"N\n" +
 	"\vChatMessage\x12\x1b\n" +
 	"\tplayer_id\x18\x01 \x01(\x03R\bplayerId\x12\x12\n" +
 	"\x04text\x18\x02 \x01(\tR\x04text\x12\x0e\n" +
-	"\x02id\x18\x03 \x01(\x03R\x02id\"B\n" +
+	"\x02id\x18\x03 \x01(\x03R\x02id\"{\n" +
 	"\vGameMessage\x12+\n" +
-	"\x02xo\x18\x01 \x01(\v2\x19.xo_game.v1.XoGameMessageH\x00R\x02xoB\x06\n" +
+	"\x02xo\x18\x01 \x01(\v2\x19.xo_game.v1.XoGameMessageH\x00R\x02xo\x127\n" +
+	"\x05conn4\x18\x02 \x01(\v2\x1f.conn4_game.v1.Conn4GameMessageH\x00R\x05conn4B\x06\n" +
 	"\x04game\"\xec\x01\n" +
 	"\x0eSessionMessage\x12-\n" +
 	"\x04chat\x18\x01 \x01(\v2\x17.session.v1.ChatMessageH\x00R\x04chat\x12;\n" +
@@ -670,27 +688,29 @@ var file_session_v1_session_proto_goTypes = []any{
 	(*GetSessionOpponentRequest)(nil),  // 9: session.v1.GetSessionOpponentRequest
 	(*GetSessionOpponentResponse)(nil), // 10: session.v1.GetSessionOpponentResponse
 	(*v1.XoGameMessage)(nil),           // 11: xo_game.v1.XoGameMessage
-	(*v11.Account)(nil),                // 12: account.v1.Account
+	(*v11.Conn4GameMessage)(nil),       // 12: conn4_game.v1.Conn4GameMessage
+	(*v12.Account)(nil),                // 13: account.v1.Account
 }
 var file_session_v1_session_proto_depIdxs = []int32{
 	11, // 0: session.v1.GameMessage.xo:type_name -> xo_game.v1.XoGameMessage
-	2,  // 1: session.v1.SessionMessage.chat:type_name -> session.v1.ChatMessage
-	1,  // 2: session.v1.SessionMessage.chat_req:type_name -> session.v1.ChatMessageRequest
-	3,  // 3: session.v1.SessionMessage.game:type_name -> session.v1.GameMessage
-	0,  // 4: session.v1.SessionMessage.error:type_name -> session.v1.SessionErrorType
-	2,  // 5: session.v1.GetChatHistoryResponse.messages:type_name -> session.v1.ChatMessage
-	12, // 6: session.v1.GetSessionOpponentResponse.opponent:type_name -> account.v1.Account
-	7,  // 7: session.v1.SessionService.GetChatHistory:input_type -> session.v1.GetChatHistoryRequest
-	9,  // 8: session.v1.SessionService.GetSessionOpponent:input_type -> session.v1.GetSessionOpponentRequest
-	5,  // 9: session.v1.SessionService.HasSession:input_type -> session.v1.HasSessionRequest
-	8,  // 10: session.v1.SessionService.GetChatHistory:output_type -> session.v1.GetChatHistoryResponse
-	10, // 11: session.v1.SessionService.GetSessionOpponent:output_type -> session.v1.GetSessionOpponentResponse
-	6,  // 12: session.v1.SessionService.HasSession:output_type -> session.v1.HasSessionResponse
-	10, // [10:13] is the sub-list for method output_type
-	7,  // [7:10] is the sub-list for method input_type
-	7,  // [7:7] is the sub-list for extension type_name
-	7,  // [7:7] is the sub-list for extension extendee
-	0,  // [0:7] is the sub-list for field type_name
+	12, // 1: session.v1.GameMessage.conn4:type_name -> conn4_game.v1.Conn4GameMessage
+	2,  // 2: session.v1.SessionMessage.chat:type_name -> session.v1.ChatMessage
+	1,  // 3: session.v1.SessionMessage.chat_req:type_name -> session.v1.ChatMessageRequest
+	3,  // 4: session.v1.SessionMessage.game:type_name -> session.v1.GameMessage
+	0,  // 5: session.v1.SessionMessage.error:type_name -> session.v1.SessionErrorType
+	2,  // 6: session.v1.GetChatHistoryResponse.messages:type_name -> session.v1.ChatMessage
+	13, // 7: session.v1.GetSessionOpponentResponse.opponent:type_name -> account.v1.Account
+	7,  // 8: session.v1.SessionService.GetChatHistory:input_type -> session.v1.GetChatHistoryRequest
+	9,  // 9: session.v1.SessionService.GetSessionOpponent:input_type -> session.v1.GetSessionOpponentRequest
+	5,  // 10: session.v1.SessionService.HasSession:input_type -> session.v1.HasSessionRequest
+	8,  // 11: session.v1.SessionService.GetChatHistory:output_type -> session.v1.GetChatHistoryResponse
+	10, // 12: session.v1.SessionService.GetSessionOpponent:output_type -> session.v1.GetSessionOpponentResponse
+	6,  // 13: session.v1.SessionService.HasSession:output_type -> session.v1.HasSessionResponse
+	11, // [11:14] is the sub-list for method output_type
+	8,  // [8:11] is the sub-list for method input_type
+	8,  // [8:8] is the sub-list for extension type_name
+	8,  // [8:8] is the sub-list for extension extendee
+	0,  // [0:8] is the sub-list for field type_name
 }
 
 func init() { file_session_v1_session_proto_init() }
@@ -700,6 +720,7 @@ func file_session_v1_session_proto_init() {
 	}
 	file_session_v1_session_proto_msgTypes[2].OneofWrappers = []any{
 		(*GameMessage_Xo)(nil),
+		(*GameMessage_Conn4)(nil),
 	}
 	file_session_v1_session_proto_msgTypes[3].OneofWrappers = []any{
 		(*SessionMessage_Chat)(nil),

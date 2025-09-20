@@ -173,6 +173,9 @@
 [ ] add 5x5?
 
 
+# Bugs 
+[ ] end panel not working
+[ ] 2025/09/20 21:04:52 ERROR error parsing token err="token is malformed: token contains an invalid number of segments"
 # 0.7.0 multi game
 [X] basic telegram game
 [X] telgram win panel + show win line in green

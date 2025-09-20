@@ -1,0 +1,56 @@
+syntax = "proto3";
+
+package conn4_game.v1;
+
+option go_package = "backend/gen/conn4_game/v1;conn4v1";
+import "account/v1/account.proto";
+
+message GameState {
+  repeated int32 cells = 1;
+  int64 turn_player_id = 2;
+}
+
+message Move {
+  int32 cell_value = 1;
+  int32 cell_index = 2;
+}
+
+message Play {
+  int32 cell_index = 1;
+}
+
+message PlayResponse {
+  bool is_valid = 1;
+  Move move = 2;
+  string reason = 3;
+}
+
+message Time {
+  int64 player_id = 1;
+  int32 spent_time = 2;
+  int32 total_time = 3;
+}
+
+enum EndReason {
+  END_REASON_UNSPECIFIED= 0;
+  END_REASON_TIMOUT = 1;
+  END_REASON_TIE = 2;
+  END_REASON_FULL = 3;
+}
+
+message EndGame {
+  EndReason reason = 1;
+  account.v1.Account winner = 2;
+  account.v1.Account loser = 3;
+}
+
+message Conn4GameMessage {
+  oneof payload {
+    Move move = 1;
+    Play play = 2;
+    PlayResponse play_response = 3;
+    Time sync_time= 4;
+    GameState game_state = 5;
+    EndGame end_game = 6;
+  }
+}
