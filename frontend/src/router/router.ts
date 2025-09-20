@@ -72,6 +72,11 @@ const router = createRouter({
       name: 'session',
       component: () => import('../views/SessionView.vue')
     },
+    {
+      path: '/conn4',
+      name: 'conn4',
+      component: () => import('../components/game/conn4/conn4_game.vue')
+    },
   ],
 })
 

@@ -176,7 +176,7 @@
 # 0.7.0 multi game
 [X] basic telegram game
 [X] telgram win panel + show win line in green
-[ ] web board
+[X] web board
 [ ] web sync game
 
 # 0.7.1 matchmaking suppot
