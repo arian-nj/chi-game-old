@@ -204,11 +204,9 @@ func (sl *SocketListener) SendEndGameSocket(endGameCommand *EndGameCommand) {
 			}}},
 		},
 	}
-	for _, player := range endGameCommand.Game.Players {
-		err := player.Socket.SendMessage(&newSessionMessage)
-		if err != nil {
-			slog.Error("error sending game state")
-		}
+	err := sl.Player.Socket.SendMessage(&newSessionMessage)
+	if err != nil {
+		slog.Error("error sending game state")
 	}
 
 }

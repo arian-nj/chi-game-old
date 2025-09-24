@@ -126,16 +126,30 @@ func panicRecover(next telebot.HandlerFunc) telebot.HandlerFunc {
 	}
 }
 
+var IDtoTgIDMap = make(map[int64]int)
+
+func GetUserID(tgId int64, queries *database.Queries) int {
+	id, cacheSuccess := IDtoTgIDMap[tgId]
+	if cacheSuccess {
+		return id
+	}
+	user, err := queries.GetTgUserByTgID(context.Background(), int(tgId))
+	if err != nil {
+		slog.Info("can't find user", "tg_id", tgId, "err", err)
+		return 0
+	}
+	IDtoTgIDMap[tgId] = user.ID
+	return user.ID
+}
+
 func (app *BotApplication) handleCallback(c telebot.Context) error {
 	callback := c.Callback()
-	messageId := c.Callback().MessageID
+	messageId := callback.MessageID
 	if messageId == "" {
-		messageId = strconv.Itoa(int(callback.Sender.ID))
+		messageId = strconv.Itoa(GetUserID(callback.Sender.ID, app.Queries))
 	}
 
-	app.AllSessions.Mutex.Lock()
-	gameSession, hasSession := app.AllSessions.Sessions[messageId]
-	app.AllSessions.Mutex.Unlock()
+	gameSession, hasSession := app.AllSessions.Get(messageId)
 
 	if hasSession {
 		return gameSession.HandleCallback(c, app.Queries)

@@ -1,6 +1,7 @@
 package matchmaking
 
 import (
+	"log/slog"
 	"sync"
 	"time"
 
@@ -17,26 +18,31 @@ type MatchMaking struct {
 }
 
 func NewMatchMaking(allSessions *gamesessions.AllSession, queries *database.Queries) *MatchMaking {
-	return &MatchMaking{
+	mm := &MatchMaking{
 		AllSessions:    allSessions,
 		Queries:        queries,
 		WaitingPlayers: map[gametype.GameType][]*Ticket{},
 	}
+	for _, gType := range gametype.AllGameTypes {
+		mm.WaitingPlayers[gType] = []*Ticket{}
+	}
+	return mm
 }
 
-type PlatformType string
-
-const (
-	TelegramConsole PlatformType = "telegram_console"
-	TelegramMiniApp PlatformType = "telegram_miniapp"
-)
+//
+// type PlatformType string
+//
+// const (
+// 	TelegramConsole PlatformType = "telegram_console"
+// 	TelegramMiniApp PlatformType = "telegram_miniapp"
+// )
 
 type Ticket struct {
 	Name   string
 	UserID int
 	TgID   int
 
-	Platform PlatformType
+	// Platform PlatformType
 	GameType gametype.GameType
 
 	MatchFoundChan chan *gamesessions.GameSession
@@ -66,23 +72,27 @@ func (mm *MatchMaking) HasTicket(UserID int) bool {
 		}
 	}
 	return false
-
 }
 
 func (mm *MatchMaking) PushTicket(newTicket *Ticket) {
 	mm.Mutex.Lock()
 	defer mm.Mutex.Unlock()
 
-	queue := mm.WaitingPlayers[newTicket.GameType]
+	queue, isFound := mm.WaitingPlayers[newTicket.GameType]
+	if !isFound {
+		slog.Error("game type is not found", "game_type", newTicket.GameType)
+		return
+	}
 	mm.WaitingPlayers[newTicket.GameType] = append(queue, newTicket)
 }
-func (mm *MatchMaking) RemovePlayerTicket(UserID int) bool {
+
+func (mm *MatchMaking) RemovePlayerTicket(TgID int) bool {
 	mm.Mutex.Lock()
 	defer mm.Mutex.Unlock()
 
 	for gameType, tickets := range mm.WaitingPlayers {
 		for index, ticket := range tickets {
-			if ticket.UserID == UserID {
+			if ticket.TgID == TgID {
 				li := mm.WaitingPlayers[gameType]
 				mm.WaitingPlayers[gameType] = append(li[:index], li[index+1:]...)
 				return true

@@ -109,7 +109,6 @@ func (session *GameSession) StartGame() error {
 	}
 
 	for _, player := range session.Players {
-		session.allSession.Add(strconv.Itoa(player.ID), session)
 		session.GameState.AddPlayer(player.ID, player.Name, player.TgID, player.Socket)
 	}
 

@@ -203,10 +203,10 @@ var (
 )
 
 func (app *BotApplication) CancelSearchingForGame(c telebot.Context) error {
-	app.MatchMaking.Mutex.Lock()
-	defer app.MatchMaking.Mutex.Unlock()
-
-	app.MatchMaking.RemovePlayerTicket(int(c.Sender().ID))
+	success := app.MatchMaking.RemovePlayerTicket(int(c.Sender().ID))
+	if !success {
+		slog.Error("can not remove Players Ticket")
+	}
 	return c.Send("لغوش کردم 😔", WhatRandomGameReplyKeyboard)
 }
 

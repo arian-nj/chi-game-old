@@ -12,13 +12,14 @@ type AllSession struct {
 
 func (all *AllSession) Get(look_for string) (*GameSession, bool) {
 	all.Mutex.Lock()
+	defer all.Mutex.Unlock()
 	gameSession, ok := all.Sessions[look_for]
-	all.Mutex.Unlock()
 	return gameSession, ok
 }
 func (allSessions *AllSession) IsSessionEmpty(playerId int) bool {
 	allSessions.Mutex.Lock()
 	defer allSessions.Mutex.Unlock()
+
 	_, isFound := allSessions.Sessions[strconv.Itoa(playerId)]
 
 	return !isFound

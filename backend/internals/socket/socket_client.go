@@ -2,6 +2,7 @@ package socket
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"log/slog"
 	"net/http"
@@ -68,6 +69,9 @@ func (sc *Socket) SendMessage(message proto.Message) error {
 	out, err := proto.Marshal(message)
 	if err != nil {
 		return fmt.Errorf("can't marshal proto message %w", err)
+	}
+	if sc.Conn == nil {
+		return errors.New("conn is nil")
 	}
 	return sc.Conn.Write(sc.Ctx, websocket.MessageBinary, out)
 
