@@ -6,13 +6,13 @@ import { create, toBinary } from "@bufbuild/protobuf";
 import { SessionMessageSchema } from "@/gen/session/v1/session_pb";
 import { useToast } from "@/components/Toast.vue";
 import PlayersBoard from "./PlayersBoard.vue";
-import XoEndGame from "./XoEndGame.vue";
 
 import { AccountService } from '@/gen/account/v1/account_pb';
 import { authTransport } from '@/lib/transport';
 import { useQuery } from '@tanstack/vue-query';
 import { createClient } from '@connectrpc/connect'
 import XoBoard from "./XoBoard.vue";
+import EndGame from "@/components/game/EndGame.vue";
 
 const { isPending: meIsPending, error: meErr, data: meData } = useQuery({
   queryKey: ['me'],
@@ -112,6 +112,6 @@ function sendClick(i: number) {
     <PlayersBoard v-else ref="players-board" :is-my-turn="isMyTurn" />
     <XoBoard @cell-selected="sendClick" :board-size="boardSize" ref="xo-board-ref" />
 
-    <XoEndGame v-if="EndGameData" :loser="EndGameData.loser" :winner="EndGameData.winner" />
+    <EndGame v-if="EndGameData" :loser="EndGameData.loser" :winner="EndGameData.winner" />
   </div>
 </template>

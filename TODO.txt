@@ -183,8 +183,10 @@
 [X] telgram win panel + show win line in green
 [X] web board
 [X] Session multigame
-[ ] Session end count down
+[X] Session end count down
 [ ] sync web & console game
+[ ] make SyncTime into Time Proto
+[ ] session is not cleaned up after timeout
 
 # 0.7.1 matchmaking suppot
 [ ] matchmaking support multiple games
