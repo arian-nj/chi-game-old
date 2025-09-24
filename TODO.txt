@@ -182,7 +182,8 @@
 [X] basic telegram game
 [X] telgram win panel + show win line in green
 [X] web board
-[ ] Session multigame
+[X] Session multigame
+[ ] Session end count down
 [ ] sync web & console game
 
 # 0.7.1 matchmaking suppot

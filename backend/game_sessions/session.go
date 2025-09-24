@@ -107,6 +107,9 @@ func (session *GameSession) StartGame() error {
 	if session.GameState == nil {
 		return errors.New("failed to start game field GameState is nil")
 	}
+	// session.PushCommand(
+	// 	NewGameStartSessionCommand(session),
+	// )
 
 	for _, player := range session.Players {
 		session.GameState.AddPlayer(player.ID, player.Name, player.TgID, player.Socket)

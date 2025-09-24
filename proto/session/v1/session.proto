@@ -42,6 +42,7 @@ message SessionMessage {
     ChatMessageRequest chat_req = 2;
     GameMessage game = 3;
     SessionErrorType error = 4;
+    ChangeGameTypeMessage game_type = 5;
   }
 }
 

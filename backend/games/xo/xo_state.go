@@ -78,7 +78,7 @@ func NewXOGame(
 		Queries:   queries,
 		Commander: commander.NewCommander(),
 	}
-	state.GameData = games.NewGameData(XOStartText, state.RulesText(), 2)
+	state.GameData = games.NewGameData(games.XOGameType3X3, XOStartText, state.RulesText(), 2)
 	return state
 }
 

@@ -33,7 +33,7 @@ func sendSessionSocketError(socketClient *socket.Socket, errType sessionv1.Sessi
 	}
 }
 
-func (app *ApiApplication) gameSessionWS(w http.ResponseWriter, r *http.Request) {
+func (app *ApiApplication) sessionWebsocket(w http.ResponseWriter, r *http.Request) {
 	conn, err := websocket.Accept(w, r, &websocket.AcceptOptions{
 		OriginPatterns: CORS_PATTERNS,
 	})
@@ -56,7 +56,6 @@ func (app *ApiApplication) gameSessionWS(w http.ResponseWriter, r *http.Request)
 		sendSessionSocketError(socketClient, sessionv1.SessionErrorType_SESSION_ERROR_TYPE_NOSESSION)
 		return
 	}
-	// if gameSession.GameState.
 
 	socketClient.Listen(r)
 
@@ -68,7 +67,12 @@ func (app *ApiApplication) gameSessionWS(w http.ResponseWriter, r *http.Request)
 			break
 		}
 	}
+	if sessionPlayer == nil {
+		slog.Error("no player found in session", "id", personRow.ID)
+		return
+	}
 	sessionPlayer.Socket = socketClient
+	gamesessions.SendGametypeOverSocket(gameSession, sessionPlayer)
 
 	socketSubber := gamesessions.NewSessionSocketListener(sessionPlayer)
 	gameSession.Subscribe(socketSubber)
@@ -151,6 +155,7 @@ func (app *ApiApplication) GetSessionOpponent(
 
 	gs, gsExist := app.AllSessions.Get(strconv.Itoa(person.ID))
 	if !gsExist {
+		slog.Error("session not found", "person", person.ID)
 		return nil, connect.NewError(connect.CodeNotFound, errors.New("session not found"))
 	}
 

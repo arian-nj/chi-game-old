@@ -64,7 +64,7 @@ func NewConn4State(
 		Queries:   queries,
 		Commander: commander.NewCommander(),
 	}
-	state.GameData = games.NewGameData(Conn4StartText,
+	state.GameData = games.NewGameData(games.Conn4GameType, Conn4StartText,
 		"قوانین",
 		2,
 	)

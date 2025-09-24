@@ -46,7 +46,7 @@ func (app *ApiApplication) createRouter() *http.ServeMux {
 	accountPath, accountHandler := accountv1connect.NewAccountServiceHandler(app)
 	mux.Handle(accountPath, withCORS(accountHandler))
 
-	mux.Handle("/api/session/", withCORS(app.AuthenticateQuery(http.HandlerFunc(app.gameSessionWS))))
+	mux.Handle("/api/session/", withCORS(app.AuthenticateQuery(http.HandlerFunc(app.sessionWebsocket))))
 	mux.Handle("/api/match_making/ticket/", withCORS(app.AuthenticateQuery(http.HandlerFunc(app.makeMatchMakingTicketWS))))
 	return mux
 }

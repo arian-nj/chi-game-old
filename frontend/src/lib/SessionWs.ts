@@ -1,5 +1,5 @@
 import { create, fromBinary, toBinary } from "@bufbuild/protobuf";
-import { ChatMessageRequestSchema, SessionMessageSchema, type ChatMessage, type GameMessage, type SessionErrorType } from "../gen/session/v1/session_pb";
+import { ChatMessageRequestSchema, SessionMessageSchema, type ChangeGameTypeMessage, type ChatMessage, type GameMessage, type SessionErrorType } from "../gen/session/v1/session_pb";
 
 export class SessionSocket extends WebSocket {
   HandleChatMessage: ((chatMsg: ChatMessage) => void) | null = null
@@ -7,6 +7,8 @@ export class SessionSocket extends WebSocket {
   HandleGameMessage: ((msg: GameMessage) => void) | null = null
 
   HandleSessionErrorMessage: ((errType: SessionErrorType) => void) | null = null
+
+  HandleChangeGametype: ((chngGameMessage: ChangeGameTypeMessage) => void) | null = null
 
   constructor(url: string) {
     super(url, [])
@@ -41,6 +43,10 @@ export class SessionSocket extends WebSocket {
           this.HandleSessionErrorMessage(newSessionMessage.content.value)
         } else {
           console.error("no Session Error handler is set", newSessionMessage.content.value)
+        }
+      } else if (newSessionMessage.content.case == "gameType") {
+        if (this.HandleChangeGametype != null) {
+          this.HandleChangeGametype(newSessionMessage.content.value)
         }
       }
 

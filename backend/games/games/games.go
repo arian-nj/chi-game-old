@@ -29,8 +29,9 @@ type GameData struct {
 	MaxPlayer int
 }
 
-func NewGameData(startText, rulesText string, maxPlayer int) *GameData {
+func NewGameData(gameType GameType, startText, rulesText string, maxPlayer int) *GameData {
 	return &GameData{
+		GameType:  gameType,
 		StartText: startText,
 		RulesText: rulesText,
 		MaxPlayer: maxPlayer,

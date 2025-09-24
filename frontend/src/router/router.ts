@@ -75,7 +75,7 @@ const router = createRouter({
     {
       path: '/conn4',
       name: 'conn4',
-      component: () => import('../components/game/conn4/conn4_game.vue')
+      component: () => import('../components/game/conn4/Conn4Board.vue')
     },
   ],
 })

@@ -83,3 +83,16 @@ func NewGameEndedSessionCommand(session *GameSession) *GameEndedCommand {
 
 func (EndGame *GameEndedCommand) Execute() {
 }
+
+type GameStartCommand struct {
+	Session *GameSession
+}
+
+func NewGameStartSessionCommand(session *GameSession) *GameEndedCommand {
+	return &GameEndedCommand{
+		Session: session,
+	}
+}
+
+func (EndGame *GameStartCommand) Execute() {
+}
