@@ -1,4 +1,4 @@
-package gametype
+package games
 
 type GameType string
 

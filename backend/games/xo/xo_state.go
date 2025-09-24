@@ -7,9 +7,8 @@ import (
 	"time"
 
 	"github.com/arian-nj/chibazi/backend/database"
-	"github.com/arian-nj/chibazi/backend/games/game"
+	"github.com/arian-nj/chibazi/backend/games/games"
 	"github.com/arian-nj/chibazi/backend/internals/commander"
-	gametype "github.com/arian-nj/chibazi/backend/internals/game_type"
 	"github.com/arian-nj/chibazi/backend/internals/random"
 	"github.com/arian-nj/chibazi/backend/internals/socket"
 	"github.com/arian-nj/chibazi/backend/internals/utils"
@@ -35,8 +34,8 @@ func (game *XOState) RulesText() string {
 }
 
 type XOState struct { // of GameInterface type
-	GameType gametype.GameType
-	GameData *game.GameData
+	GameType games.GameType
+	GameData *games.GameData
 
 	Board *XoBoard
 
@@ -54,12 +53,12 @@ type XOState struct { // of GameInterface type
 }
 
 func NewXOGame(
-	sessionCtx context.Context, gameType gametype.GameType,
+	sessionCtx context.Context, gameType games.GameType,
 	queries *database.Queries) *XOState {
 
 	maxBoardSize := 3
 	winSize := 3
-	if gameType == gametype.XOGameType5X5 {
+	if gameType == games.XOGameType5X5 {
 		maxBoardSize = 5
 		winSize = 4
 	}
@@ -79,11 +78,11 @@ func NewXOGame(
 		Queries:   queries,
 		Commander: commander.NewCommander(),
 	}
-	state.GameData = game.NewGameData(XOStartText, state.RulesText(), 2)
+	state.GameData = games.NewGameData(XOStartText, state.RulesText(), 2)
 	return state
 }
 
-func (gameState *XOState) GetGameData() *game.GameData {
+func (gameState *XOState) GetGameData() *games.GameData {
 	return gameState.GameData
 }
 

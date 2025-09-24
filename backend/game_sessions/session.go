@@ -8,7 +8,7 @@ import (
 	"time"
 
 	"github.com/arian-nj/chibazi/backend/database"
-	"github.com/arian-nj/chibazi/backend/games/game"
+	"github.com/arian-nj/chibazi/backend/games/games"
 	sessionv1 "github.com/arian-nj/chibazi/backend/gen/session/v1"
 	"github.com/arian-nj/chibazi/backend/internals/commander"
 	"github.com/arian-nj/chibazi/backend/internals/keybul"
@@ -53,7 +53,7 @@ type GameSession struct {
 
 	IsGameEnded bool
 	Chat        Chat
-	GameState   game.Game
+	GameState   games.Game
 
 	MsgChnl chan *SessionEvent
 

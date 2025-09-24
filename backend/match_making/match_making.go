@@ -7,11 +7,11 @@ import (
 
 	"github.com/arian-nj/chibazi/backend/database"
 	gamesessions "github.com/arian-nj/chibazi/backend/game_sessions"
-	gametype "github.com/arian-nj/chibazi/backend/internals/game_type"
+	"github.com/arian-nj/chibazi/backend/games/games"
 )
 
 type MatchMaking struct {
-	WaitingPlayers map[gametype.GameType][]*Ticket
+	WaitingPlayers map[games.GameType][]*Ticket
 	Mutex          sync.Mutex
 	AllSessions    *gamesessions.AllSession
 	Queries        *database.Queries
@@ -21,9 +21,9 @@ func NewMatchMaking(allSessions *gamesessions.AllSession, queries *database.Quer
 	mm := &MatchMaking{
 		AllSessions:    allSessions,
 		Queries:        queries,
-		WaitingPlayers: map[gametype.GameType][]*Ticket{},
+		WaitingPlayers: map[games.GameType][]*Ticket{},
 	}
-	for _, gType := range gametype.AllGameTypes {
+	for _, gType := range games.AllGameTypes {
 		mm.WaitingPlayers[gType] = []*Ticket{}
 	}
 	return mm
@@ -43,14 +43,14 @@ type Ticket struct {
 	TgID   int
 
 	// Platform PlatformType
-	GameType gametype.GameType
+	GameType games.GameType
 
 	MatchFoundChan chan *gamesessions.GameSession
 
 	Timestamp time.Time
 }
 
-func NewTicket(name string, userID int, tgID int, gameType gametype.GameType) *Ticket {
+func NewTicket(name string, userID int, tgID int, gameType games.GameType) *Ticket {
 	return &Ticket{
 		UserID:         userID,
 		TgID:           tgID,

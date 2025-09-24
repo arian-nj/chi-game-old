@@ -24,6 +24,17 @@ message GameMessage {
   }
 }
 
+// GameType Message
+enum GameType {
+  GAME_TYPE_UNSPECIFIED = 0;
+  GAME_TYPE_XO3X3 = 1;
+  GAME_TYPE_XO5X5 = 2;
+  GAME_TYPE_CONN4 = 3;
+}
+message ChangeGameTypeMessage {
+  GameType game_type = 1;
+}
+
 /// Session
 message SessionMessage {
   oneof content {

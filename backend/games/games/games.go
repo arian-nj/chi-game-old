@@ -1,4 +1,4 @@
-package game
+package games
 
 import (
 	sessionv1 "github.com/arian-nj/chibazi/backend/gen/session/v1"
@@ -23,6 +23,7 @@ type Game interface {
 }
 
 type GameData struct {
+	GameType  GameType
 	StartText string
 	RulesText string
 	MaxPlayer int

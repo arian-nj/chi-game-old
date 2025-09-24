@@ -9,9 +9,8 @@ import (
 
 	gamesessions "github.com/arian-nj/chibazi/backend/game_sessions"
 	"github.com/arian-nj/chibazi/backend/games/conn4"
-	"github.com/arian-nj/chibazi/backend/games/game"
+	"github.com/arian-nj/chibazi/backend/games/games"
 	"github.com/arian-nj/chibazi/backend/games/xo"
-	gametype "github.com/arian-nj/chibazi/backend/internals/game_type"
 	"github.com/arian-nj/chibazi/backend/internals/utils"
 	matchmaking "github.com/arian-nj/chibazi/backend/match_making"
 )
@@ -38,7 +37,7 @@ func (gv *GlobalVars) MakeMatches() {
 	}
 }
 
-func (gv *GlobalVars) createRandomGame(gameType gametype.GameType, ticketOne *matchmaking.Ticket, ticketTwo *matchmaking.Ticket) {
+func (gv *GlobalVars) createRandomGame(gameType games.GameType, ticketOne *matchmaking.Ticket, ticketTwo *matchmaking.Ticket) {
 	newSessionRow, err := gv.Queries.CreateSession(context.Background(), string(gamesessions.RandomSession))
 	if err != nil {
 		slog.Error("can't create new random game", "error", err)
@@ -47,14 +46,14 @@ func (gv *GlobalVars) createRandomGame(gameType gametype.GameType, ticketOne *ma
 	newGameSession.Subscribe(gamesessions.NewSessionTelegramBotListener(ticketOne.UserID, ticketOne.TgID, gv.Bot, ""))
 	newGameSession.Subscribe(gamesessions.NewSessionTelegramBotListener(ticketTwo.UserID, ticketTwo.TgID, gv.Bot, ""))
 
-	var newGame game.Game
+	var newGame games.Game
 
 	switch gameType {
-	case gametype.XOGameType3X3, gametype.XOGameType5X5:
-		newXoGame := xo.NewXOGame(newGameSession.SessionCtx, gametype.XOGameType3X3, gv.Queries)
+	case games.XOGameType3X3, games.XOGameType5X5:
+		newXoGame := xo.NewXOGame(newGameSession.SessionCtx, games.XOGameType3X3, gv.Queries)
 		newGame = newXoGame
-	case gametype.Conn4GameType:
-		newConn4Game := conn4.NewConn4State(newGameSession.SessionCtx, gametype.Conn4GameType, gv.Queries)
+	case games.Conn4GameType:
+		newConn4Game := conn4.NewConn4State(newGameSession.SessionCtx, games.Conn4GameType, gv.Queries)
 		newGame = newConn4Game
 
 	default:

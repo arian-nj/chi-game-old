@@ -7,9 +7,8 @@ import (
 
 	"github.com/arian-nj/chibazi/backend/database"
 	conn4_core "github.com/arian-nj/chibazi/backend/games/conn4/core"
-	"github.com/arian-nj/chibazi/backend/games/game"
+	"github.com/arian-nj/chibazi/backend/games/games"
 	"github.com/arian-nj/chibazi/backend/internals/commander"
-	gametype "github.com/arian-nj/chibazi/backend/internals/game_type"
 	"github.com/arian-nj/chibazi/backend/internals/random"
 	"github.com/arian-nj/chibazi/backend/internals/socket"
 	"github.com/arian-nj/chibazi/backend/internals/utils"
@@ -27,8 +26,8 @@ const (
 )
 
 type Conn4State struct { // of GameInterface type
-	GameType gametype.GameType
-	GameData *game.GameData
+	GameType games.GameType
+	GameData *games.GameData
 
 	Board *conn4_core.Conn4Board
 
@@ -46,7 +45,7 @@ type Conn4State struct { // of GameInterface type
 }
 
 func NewConn4State(
-	sessionCtx context.Context, gameType gametype.GameType,
+	sessionCtx context.Context, gameType games.GameType,
 	queries *database.Queries) *Conn4State {
 
 	randIndex := random.GenerateRandomNumber(2)
@@ -65,14 +64,14 @@ func NewConn4State(
 		Queries:   queries,
 		Commander: commander.NewCommander(),
 	}
-	state.GameData = game.NewGameData(Conn4StartText,
+	state.GameData = games.NewGameData(Conn4StartText,
 		"قوانین",
 		2,
 	)
 	return state
 }
 
-func (gameState *Conn4State) GetGameData() *game.GameData {
+func (gameState *Conn4State) GetGameData() *games.GameData {
 	return gameState.GameData
 }
 

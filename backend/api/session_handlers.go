@@ -41,7 +41,7 @@ func (app *ApiApplication) gameSessionWS(w http.ResponseWriter, r *http.Request)
 		slog.Error("error accepting new connection", "err", err)
 		return
 	}
-	defer conn.CloseNow()
+	defer conn.Close(websocket.StatusNormalClosure, "websocket ended")
 
 	socketClient := socket.NewSocketClient(conn)
 
@@ -56,6 +56,7 @@ func (app *ApiApplication) gameSessionWS(w http.ResponseWriter, r *http.Request)
 		sendSessionSocketError(socketClient, sessionv1.SessionErrorType_SESSION_ERROR_TYPE_NOSESSION)
 		return
 	}
+	// if gameSession.GameState.
 
 	socketClient.Listen(r)
 

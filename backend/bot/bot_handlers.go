@@ -8,7 +8,7 @@ import (
 	"time"
 
 	"github.com/arian-nj/chibazi/backend/database"
-	gametype "github.com/arian-nj/chibazi/backend/internals/game_type"
+	"github.com/arian-nj/chibazi/backend/games/games"
 	keybul "github.com/arian-nj/chibazi/backend/internals/keybul"
 	matchmaking "github.com/arian-nj/chibazi/backend/match_making"
 	"github.com/jackc/pgx/v5/pgtype"
@@ -130,7 +130,7 @@ func (app *BotApplication) PlayWithRandomPlayerHandler(c telebot.Context) error 
 }
 
 func (app *BotApplication) PlayRandomXO3X3Handler(c telebot.Context) error {
-	return app.PlayRandomGameHandler(c, gametype.XOGameType3X3)
+	return app.PlayRandomGameHandler(c, games.XOGameType3X3)
 }
 
 var (
@@ -145,10 +145,10 @@ var (
 )
 
 func (app *BotApplication) PlayRandomXO5X5Handler(c telebot.Context) error {
-	return app.PlayRandomGameHandler(c, gametype.XOGameType5X5)
+	return app.PlayRandomGameHandler(c, games.XOGameType5X5)
 }
 
-func (app *BotApplication) PlayRandomGameHandler(c telebot.Context, gameType gametype.GameType) error {
+func (app *BotApplication) PlayRandomGameHandler(c telebot.Context, gameType games.GameType) error {
 	text := ""
 	sender := c.Sender()
 	personRow, err := app.Queries.GetTgUserByTgID(context.Background(), int(sender.ID))

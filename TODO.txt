@@ -182,7 +182,8 @@
 [X] basic telegram game
 [X] telgram win panel + show win line in green
 [X] web board
-[ ] web sync game
+[ ] Session multigame
+[ ] sync web & console game
 
 # 0.7.1 matchmaking suppot
 [ ] matchmaking support multiple games

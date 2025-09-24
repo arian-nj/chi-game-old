@@ -16,7 +16,7 @@ import type { Message } from "@bufbuild/protobuf";
  * Describes the file session/v1/session.proto.
  */
 export const file_session_v1_session: GenFile = /*@__PURE__*/
-  fileDesc("ChhzZXNzaW9uL3YxL3Nlc3Npb24ucHJvdG8SCnNlc3Npb24udjEiIgoSQ2hhdE1lc3NhZ2VSZXF1ZXN0EgwKBHRleHQYASABKAkiOgoLQ2hhdE1lc3NhZ2USEQoJcGxheWVyX2lkGAEgASgDEgwKBHRleHQYAiABKAkSCgoCaWQYAyABKAMicAoLR2FtZU1lc3NhZ2USJwoCeG8YASABKAsyGS54b19nYW1lLnYxLlhvR2FtZU1lc3NhZ2VIABIwCgVjb25uNBgCIAEoCzIfLmNvbm40X2dhbWUudjEuQ29ubjRHYW1lTWVzc2FnZUgAQgYKBGdhbWUi0AEKDlNlc3Npb25NZXNzYWdlEicKBGNoYXQYASABKAsyFy5zZXNzaW9uLnYxLkNoYXRNZXNzYWdlSAASMgoIY2hhdF9yZXEYAiABKAsyHi5zZXNzaW9uLnYxLkNoYXRNZXNzYWdlUmVxdWVzdEgAEicKBGdhbWUYAyABKAsyFy5zZXNzaW9uLnYxLkdhbWVNZXNzYWdlSAASLQoFZXJyb3IYBCABKA4yHC5zZXNzaW9uLnYxLlNlc3Npb25FcnJvclR5cGVIAEIJCgdjb250ZW50IhMKEUhhc1Nlc3Npb25SZXF1ZXN0IikKEkhhc1Nlc3Npb25SZXNwb25zZRITCgtoYXNfc2Vzc2lvbhgBIAEoCCIXChVHZXRDaGF0SGlzdG9yeVJlcXVlc3QiQwoWR2V0Q2hhdEhpc3RvcnlSZXNwb25zZRIpCghtZXNzYWdlcxgBIAMoCzIXLnNlc3Npb24udjEuQ2hhdE1lc3NhZ2UiGwoZR2V0U2Vzc2lvbk9wcG9uZW50UmVxdWVzdCJDChpHZXRTZXNzaW9uT3Bwb25lbnRSZXNwb25zZRIlCghvcHBvbmVudBgBIAEoCzITLmFjY291bnQudjEuQWNjb3VudCp1ChBTZXNzaW9uRXJyb3JUeXBlEiIKHlNFU1NJT05fRVJST1JfVFlQRV9VTlNQRUNJRklFRBAAEhsKF1NFU1NJT05fRVJST1JfVFlQRV9BVVRIEAESIAocU0VTU0lPTl9FUlJPUl9UWVBFX05PU0VTU0lPThACMqECCg5TZXNzaW9uU2VydmljZRJZCg5HZXRDaGF0SGlzdG9yeRIhLnNlc3Npb24udjEuR2V0Q2hhdEhpc3RvcnlSZXF1ZXN0GiIuc2Vzc2lvbi52MS5HZXRDaGF0SGlzdG9yeVJlc3BvbnNlIgASZQoSR2V0U2Vzc2lvbk9wcG9uZW50EiUuc2Vzc2lvbi52MS5HZXRTZXNzaW9uT3Bwb25lbnRSZXF1ZXN0GiYuc2Vzc2lvbi52MS5HZXRTZXNzaW9uT3Bwb25lbnRSZXNwb25zZSIAEk0KCkhhc1Nlc3Npb24SHS5zZXNzaW9uLnYxLkhhc1Nlc3Npb25SZXF1ZXN0Gh4uc2Vzc2lvbi52MS5IYXNTZXNzaW9uUmVzcG9uc2UiAEKlAQoOY29tLnNlc3Npb24udjFCDFNlc3Npb25Qcm90b1ABWjxnaXRodWIuY29tL2FyaWFuLW5qL2NoaWJhemkvYmFja2VuZC9nZW4vc2Vzc2lvbi92MTtzZXNzaW9udjGiAgNTWFiqAgpTZXNzaW9uLlYxygIKU2Vzc2lvblxWMeICFlNlc3Npb25cVjFcR1BCTWV0YWRhdGHqAgtTZXNzaW9uOjpWMWIGcHJvdG8z", [file_account_v1_account, file_xo_game_v1_xo, file_conn4_game_v1_conn4]);
+  fileDesc("ChhzZXNzaW9uL3YxL3Nlc3Npb24ucHJvdG8SCnNlc3Npb24udjEiIgoSQ2hhdE1lc3NhZ2VSZXF1ZXN0EgwKBHRleHQYASABKAkiOgoLQ2hhdE1lc3NhZ2USEQoJcGxheWVyX2lkGAEgASgDEgwKBHRleHQYAiABKAkSCgoCaWQYAyABKAMicAoLR2FtZU1lc3NhZ2USJwoCeG8YASABKAsyGS54b19nYW1lLnYxLlhvR2FtZU1lc3NhZ2VIABIwCgVjb25uNBgCIAEoCzIfLmNvbm40X2dhbWUudjEuQ29ubjRHYW1lTWVzc2FnZUgAQgYKBGdhbWUiQAoVQ2hhbmdlR2FtZVR5cGVNZXNzYWdlEicKCWdhbWVfdHlwZRgBIAEoDjIULnNlc3Npb24udjEuR2FtZVR5cGUi0AEKDlNlc3Npb25NZXNzYWdlEicKBGNoYXQYASABKAsyFy5zZXNzaW9uLnYxLkNoYXRNZXNzYWdlSAASMgoIY2hhdF9yZXEYAiABKAsyHi5zZXNzaW9uLnYxLkNoYXRNZXNzYWdlUmVxdWVzdEgAEicKBGdhbWUYAyABKAsyFy5zZXNzaW9uLnYxLkdhbWVNZXNzYWdlSAASLQoFZXJyb3IYBCABKA4yHC5zZXNzaW9uLnYxLlNlc3Npb25FcnJvclR5cGVIAEIJCgdjb250ZW50IhMKEUhhc1Nlc3Npb25SZXF1ZXN0IikKEkhhc1Nlc3Npb25SZXNwb25zZRITCgtoYXNfc2Vzc2lvbhgBIAEoCCIXChVHZXRDaGF0SGlzdG9yeVJlcXVlc3QiQwoWR2V0Q2hhdEhpc3RvcnlSZXNwb25zZRIpCghtZXNzYWdlcxgBIAMoCzIXLnNlc3Npb24udjEuQ2hhdE1lc3NhZ2UiGwoZR2V0U2Vzc2lvbk9wcG9uZW50UmVxdWVzdCJDChpHZXRTZXNzaW9uT3Bwb25lbnRSZXNwb25zZRIlCghvcHBvbmVudBgBIAEoCzITLmFjY291bnQudjEuQWNjb3VudCpkCghHYW1lVHlwZRIZChVHQU1FX1RZUEVfVU5TUEVDSUZJRUQQABITCg9HQU1FX1RZUEVfWE8zWDMQARITCg9HQU1FX1RZUEVfWE81WDUQAhITCg9HQU1FX1RZUEVfQ09OTjQQAyp1ChBTZXNzaW9uRXJyb3JUeXBlEiIKHlNFU1NJT05fRVJST1JfVFlQRV9VTlNQRUNJRklFRBAAEhsKF1NFU1NJT05fRVJST1JfVFlQRV9BVVRIEAESIAocU0VTU0lPTl9FUlJPUl9UWVBFX05PU0VTU0lPThACMqECCg5TZXNzaW9uU2VydmljZRJZCg5HZXRDaGF0SGlzdG9yeRIhLnNlc3Npb24udjEuR2V0Q2hhdEhpc3RvcnlSZXF1ZXN0GiIuc2Vzc2lvbi52MS5HZXRDaGF0SGlzdG9yeVJlc3BvbnNlIgASZQoSR2V0U2Vzc2lvbk9wcG9uZW50EiUuc2Vzc2lvbi52MS5HZXRTZXNzaW9uT3Bwb25lbnRSZXF1ZXN0GiYuc2Vzc2lvbi52MS5HZXRTZXNzaW9uT3Bwb25lbnRSZXNwb25zZSIAEk0KCkhhc1Nlc3Npb24SHS5zZXNzaW9uLnYxLkhhc1Nlc3Npb25SZXF1ZXN0Gh4uc2Vzc2lvbi52MS5IYXNTZXNzaW9uUmVzcG9uc2UiAEKlAQoOY29tLnNlc3Npb24udjFCDFNlc3Npb25Qcm90b1ABWjxnaXRodWIuY29tL2FyaWFuLW5qL2NoaWJhemkvYmFja2VuZC9nZW4vc2Vzc2lvbi92MTtzZXNzaW9udjGiAgNTWFiqAgpTZXNzaW9uLlYxygIKU2Vzc2lvblxWMeICFlNlc3Npb25cVjFcR1BCTWV0YWRhdGHqAgtTZXNzaW9uOjpWMWIGcHJvdG8z", [file_account_v1_account, file_xo_game_v1_xo, file_conn4_game_v1_conn4]);
 
 /**
  * Chat
@@ -96,6 +96,23 @@ export const GameMessageSchema: GenMessage<GameMessage> = /*@__PURE__*/
   messageDesc(file_session_v1_session, 2);
 
 /**
+ * @generated from message session.v1.ChangeGameTypeMessage
+ */
+export type ChangeGameTypeMessage = Message<"session.v1.ChangeGameTypeMessage"> & {
+  /**
+   * @generated from field: session.v1.GameType game_type = 1;
+   */
+  gameType: GameType;
+};
+
+/**
+ * Describes the message session.v1.ChangeGameTypeMessage.
+ * Use `create(ChangeGameTypeMessageSchema)` to create a new message.
+ */
+export const ChangeGameTypeMessageSchema: GenMessage<ChangeGameTypeMessage> = /*@__PURE__*/
+  messageDesc(file_session_v1_session, 3);
+
+/**
  * / Session
  *
  * @generated from message session.v1.SessionMessage
@@ -136,7 +153,7 @@ export type SessionMessage = Message<"session.v1.SessionMessage"> & {
  * Use `create(SessionMessageSchema)` to create a new message.
  */
 export const SessionMessageSchema: GenMessage<SessionMessage> = /*@__PURE__*/
-  messageDesc(file_session_v1_session, 3);
+  messageDesc(file_session_v1_session, 4);
 
 /**
  * @generated from message session.v1.HasSessionRequest
@@ -149,7 +166,7 @@ export type HasSessionRequest = Message<"session.v1.HasSessionRequest"> & {
  * Use `create(HasSessionRequestSchema)` to create a new message.
  */
 export const HasSessionRequestSchema: GenMessage<HasSessionRequest> = /*@__PURE__*/
-  messageDesc(file_session_v1_session, 4);
+  messageDesc(file_session_v1_session, 5);
 
 /**
  * @generated from message session.v1.HasSessionResponse
@@ -166,7 +183,7 @@ export type HasSessionResponse = Message<"session.v1.HasSessionResponse"> & {
  * Use `create(HasSessionResponseSchema)` to create a new message.
  */
 export const HasSessionResponseSchema: GenMessage<HasSessionResponse> = /*@__PURE__*/
-  messageDesc(file_session_v1_session, 5);
+  messageDesc(file_session_v1_session, 6);
 
 /**
  * @generated from message session.v1.GetChatHistoryRequest
@@ -179,7 +196,7 @@ export type GetChatHistoryRequest = Message<"session.v1.GetChatHistoryRequest"> 
  * Use `create(GetChatHistoryRequestSchema)` to create a new message.
  */
 export const GetChatHistoryRequestSchema: GenMessage<GetChatHistoryRequest> = /*@__PURE__*/
-  messageDesc(file_session_v1_session, 6);
+  messageDesc(file_session_v1_session, 7);
 
 /**
  * @generated from message session.v1.GetChatHistoryResponse
@@ -196,7 +213,7 @@ export type GetChatHistoryResponse = Message<"session.v1.GetChatHistoryResponse"
  * Use `create(GetChatHistoryResponseSchema)` to create a new message.
  */
 export const GetChatHistoryResponseSchema: GenMessage<GetChatHistoryResponse> = /*@__PURE__*/
-  messageDesc(file_session_v1_session, 7);
+  messageDesc(file_session_v1_session, 8);
 
 /**
  * @generated from message session.v1.GetSessionOpponentRequest
@@ -209,7 +226,7 @@ export type GetSessionOpponentRequest = Message<"session.v1.GetSessionOpponentRe
  * Use `create(GetSessionOpponentRequestSchema)` to create a new message.
  */
 export const GetSessionOpponentRequestSchema: GenMessage<GetSessionOpponentRequest> = /*@__PURE__*/
-  messageDesc(file_session_v1_session, 8);
+  messageDesc(file_session_v1_session, 9);
 
 /**
  * @generated from message session.v1.GetSessionOpponentResponse
@@ -226,7 +243,40 @@ export type GetSessionOpponentResponse = Message<"session.v1.GetSessionOpponentR
  * Use `create(GetSessionOpponentResponseSchema)` to create a new message.
  */
 export const GetSessionOpponentResponseSchema: GenMessage<GetSessionOpponentResponse> = /*@__PURE__*/
-  messageDesc(file_session_v1_session, 9);
+  messageDesc(file_session_v1_session, 10);
+
+/**
+ * GameType Message
+ *
+ * @generated from enum session.v1.GameType
+ */
+export enum GameType {
+  /**
+   * @generated from enum value: GAME_TYPE_UNSPECIFIED = 0;
+   */
+  UNSPECIFIED = 0,
+
+  /**
+   * @generated from enum value: GAME_TYPE_XO3X3 = 1;
+   */
+  XO3X3 = 1,
+
+  /**
+   * @generated from enum value: GAME_TYPE_XO5X5 = 2;
+   */
+  XO5X5 = 2,
+
+  /**
+   * @generated from enum value: GAME_TYPE_CONN4 = 3;
+   */
+  CONN4 = 3,
+}
+
+/**
+ * Describes the enum session.v1.GameType.
+ */
+export const GameTypeSchema: GenEnum<GameType> = /*@__PURE__*/
+  enumDesc(file_session_v1_session, 0);
 
 /**
  * @generated from enum session.v1.SessionErrorType
@@ -252,7 +302,7 @@ export enum SessionErrorType {
  * Describes the enum session.v1.SessionErrorType.
  */
 export const SessionErrorTypeSchema: GenEnum<SessionErrorType> = /*@__PURE__*/
-  enumDesc(file_session_v1_session, 0);
+  enumDesc(file_session_v1_session, 1);
 
 /**
  * @generated from service session.v1.SessionService

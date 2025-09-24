@@ -5,8 +5,8 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/arian-nj/chibazi/backend/games/games"
 	finderv1 "github.com/arian-nj/chibazi/backend/gen/finder/v1"
-	gametype "github.com/arian-nj/chibazi/backend/internals/game_type"
 	"github.com/arian-nj/chibazi/backend/internals/socket"
 	matchmaking "github.com/arian-nj/chibazi/backend/match_making"
 	"github.com/coder/websocket"
@@ -60,7 +60,7 @@ func (app *ApiApplication) makeMatchMakingTicketWS(w http.ResponseWriter, r *htt
 	// Every thing is ok
 	socketClient.Listen(r)
 
-	NewTicket := matchmaking.NewTicket(tgUser.Name, tgUser.ID, tgUser.TgID, gametype.XOGameType3X3)
+	NewTicket := matchmaking.NewTicket(tgUser.Name, tgUser.ID, tgUser.TgID, games.XOGameType3X3)
 	app.MatchMaking.PushTicket(NewTicket)
 	defer app.MatchMaking.RemovePlayerTicket(tgUser.TgID) // remove in case of error or canceling
 
