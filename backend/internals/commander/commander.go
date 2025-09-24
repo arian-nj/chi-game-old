@@ -1,6 +1,7 @@
 package commander
 
 import (
+	"log/slog"
 	"sync"
 
 	"github.com/arian-nj/chibazi/backend/internals/utils"
@@ -72,6 +73,11 @@ func (commander *Commander) Notify(command Command) {
 		wg.Add(1)
 		go func(s Subscriber) {
 			defer wg.Done()
+			defer func() {
+				if r := recover(); r != nil {
+					slog.Error("commander Notify", "sub", sub, "recover", r)
+				}
+			}()
 			sub.Update(command) // pass both state + action
 		}(sub)
 	}

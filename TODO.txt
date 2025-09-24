@@ -165,7 +165,6 @@
 [X] Clean and Disconnect Session
 [X] duplicate ticket sending
 [X] fix bot matchmaking
-[X] fix not showing win when one is web one is bot
 
 [ ] Limit Chat Message burst for telegram bot 1per 1s ?
 [ ] cors dev/prod
@@ -176,8 +175,9 @@
 
 
 # Bugs 
-[ ] end panel not working (one web one console)
-[ ] 2025/09/20 21:04:52 ERROR error parsing token err="token is malformed: token contains an invalid number of segments"
+[X] make commander panic safe
+[X] end panel not working (one web one console)
+
 # 0.7.0 multi game
 [X] basic telegram game
 [X] telgram win panel + show win line in green
