@@ -40,8 +40,8 @@ onMounted(() => {
     )
   }
 })
+const router = useRouter()
 function goToHome() {
-  const router = useRouter()
   router.push('/')
 }
 const remainedSessionTime = ref(30)

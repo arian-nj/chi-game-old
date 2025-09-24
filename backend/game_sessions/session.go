@@ -191,7 +191,7 @@ func (session *GameSession) CleanAndDisconnect() {
 	defer session.allSession.Mutex.Unlock()
 
 	for _, player := range session.Players {
-		delete(session.allSession.Sessions, strconv.Itoa(player.TgID))
+		delete(session.allSession.Sessions, strconv.Itoa(player.ID))
 	}
 }
 
