@@ -4,7 +4,7 @@ import { FinderErrorType, FinderEventSchema, FinderType } from '@/gen/finder/v1/
 import { GetJwtToken } from '@/lib/auth'
 import { GetApiUrl } from '@/lib/baseURL'
 import { create, fromBinary, toBinary } from '@bufbuild/protobuf'
-import { useRouter } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 
 import EyesAnimation from '../assets/lottie/Eyes.lottie';
 import { DotLottieVue } from '@lottiefiles/dotlottie-vue'
@@ -20,8 +20,12 @@ onMounted(() => {
   import('../views/SessionView.vue')
 })
 const router = useRouter()
+const route = useRoute()
 
-const url = GetApiUrl() + "/api/match_making/ticket/?auth_token=" + GetJwtToken()
+let url = GetApiUrl() + "/api/match_making/ticket/?auth_token=" + GetJwtToken()
+if (route.query.game) {
+  url += "&game=" + route.query.game
+}
 
 const { toast } = useToast()
 
@@ -54,6 +58,9 @@ finderSocket.onmessage = async (msg) => {
       toast.error("already have session")
     } else if (newFinderEvent.errType == FinderErrorType.HAS_TICKET) {
       toast.error("already have ticket")
+    } else if (newFinderEvent.errType == FinderErrorType.INVALID_GAME) {
+      toast.error("can not find this game")
+
     } else if (newFinderEvent.errType == FinderErrorType.UNSPECIFIED) {
       toast.error("an error happend try again")
     }

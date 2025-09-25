@@ -10,7 +10,6 @@ import { SessionSocket } from "@/lib/SessionWs";
 import router from '@/router/router';
 import { ref, useTemplateRef, watch } from 'vue';
 import Conn4Online from '@/components/game/conn4/Conn4Online.vue';
-import { log } from 'console';
 
 const { toast } = useToast()
 const isConnected = ref(false)
@@ -47,9 +46,8 @@ sessionSocket.HandleChangeGametype = (changeGameMessage) => {
   const gameType = changeGameMessage.gameType
   console.log("change game type " + gameType)
   switch (gameType) {
-    case GameType.XO3X3 || GameType.CONN4:
-
-      console.log(" jk change game type " + gameType)
+    case GameType.XO3X3:
+    case GameType.CONN4:
       activeGame.value = gameType
       break;
 
@@ -62,16 +60,14 @@ watch(ChatRef, () => {
     sessionSocket.HandleChatMessage = ChatRef.value.HandleIncomingChat
   }
 })
-
 </script>
-
 
 <template>
   <div class="flex w-screen h-screen items-center justify-center bg-[#14bd96]">
     <div v-if="isConnected" class="w-auto h-full overflow-hidden relative flex items-center justify-center
-      aspect-[9/16] ">
+      aspect-[9/16] bg-amber-500 m-5">
       <XoOnline v-if="activeGame === GameType.XO3X3" :session-socket="sessionSocket" />
-      <Conn4Online v-else-if="activeGame === GameType.CONN4" />
+      <Conn4Online v-else-if="activeGame === GameType.CONN4" :session-socket="sessionSocket" />
       <h1 v-else>No Game</h1>
 
     </div>

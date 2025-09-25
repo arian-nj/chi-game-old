@@ -142,7 +142,7 @@ func (game *XOState) XOPlayHandler(c telebot.Context, callbackData string) error
 		return c.RespondText("can't find player")
 	}
 
-	playCommand := NewPlayCommand(game, cellIndex, moveType, player.ID)
+	playCommand := NewMoveCommand(game, cellIndex, moveType, player.ID)
 	game.PushCommand(playCommand)
 	return nil
 }

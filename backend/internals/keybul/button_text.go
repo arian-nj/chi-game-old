@@ -8,6 +8,7 @@ const (
 const (
 	Xo3x3ButtonText = "بازی دوز ۳ در ۳❌"
 	// Xo5x5ButtonText = "بازی دوز ۵ در ۵⭕️"
+	Conn4ButtonText = "بازی دوز  سنگی🗿"
 
 	CancelGameButtonText = "🔙 نگرد پشیمون شدم"
 )

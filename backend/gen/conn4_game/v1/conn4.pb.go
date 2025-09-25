@@ -77,7 +77,6 @@ func (EndReason) EnumDescriptor() ([]byte, []int) {
 type GameState struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Cells         []int32                `protobuf:"varint,1,rep,packed,name=cells,proto3" json:"cells,omitempty"`
-	TurnPlayerId  int64                  `protobuf:"varint,2,opt,name=turn_player_id,json=turnPlayerId,proto3" json:"turn_player_id,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -117,13 +116,6 @@ func (x *GameState) GetCells() []int32 {
 		return x.Cells
 	}
 	return nil
-}
-
-func (x *GameState) GetTurnPlayerId() int64 {
-	if x != nil {
-		return x.TurnPlayerId
-	}
-	return 0
 }
 
 type Move struct {
@@ -180,7 +172,7 @@ func (x *Move) GetCellIndex() int32 {
 
 type Play struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	CellIndex     int32                  `protobuf:"varint,1,opt,name=cell_index,json=cellIndex,proto3" json:"cell_index,omitempty"`
+	ColIndex      int32                  `protobuf:"varint,1,opt,name=col_index,json=colIndex,proto3" json:"col_index,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -215,9 +207,9 @@ func (*Play) Descriptor() ([]byte, []int) {
 	return file_conn4_game_v1_conn4_proto_rawDescGZIP(), []int{2}
 }
 
-func (x *Play) GetCellIndex() int32 {
+func (x *Play) GetColIndex() int32 {
 	if x != nil {
-		return x.CellIndex
+		return x.ColIndex
 	}
 	return 0
 }
@@ -552,18 +544,16 @@ var File_conn4_game_v1_conn4_proto protoreflect.FileDescriptor
 
 const file_conn4_game_v1_conn4_proto_rawDesc = "" +
 	"\n" +
-	"\x19conn4_game/v1/conn4.proto\x12\rconn4_game.v1\x1a\x18account/v1/account.proto\"G\n" +
+	"\x19conn4_game/v1/conn4.proto\x12\rconn4_game.v1\x1a\x18account/v1/account.proto\"!\n" +
 	"\tGameState\x12\x14\n" +
-	"\x05cells\x18\x01 \x03(\x05R\x05cells\x12$\n" +
-	"\x0eturn_player_id\x18\x02 \x01(\x03R\fturnPlayerId\"D\n" +
+	"\x05cells\x18\x01 \x03(\x05R\x05cells\"D\n" +
 	"\x04Move\x12\x1d\n" +
 	"\n" +
 	"cell_value\x18\x01 \x01(\x05R\tcellValue\x12\x1d\n" +
 	"\n" +
-	"cell_index\x18\x02 \x01(\x05R\tcellIndex\"%\n" +
-	"\x04Play\x12\x1d\n" +
-	"\n" +
-	"cell_index\x18\x01 \x01(\x05R\tcellIndex\"j\n" +
+	"cell_index\x18\x02 \x01(\x05R\tcellIndex\"#\n" +
+	"\x04Play\x12\x1b\n" +
+	"\tcol_index\x18\x01 \x01(\x05R\bcolIndex\"j\n" +
 	"\fPlayResponse\x12\x19\n" +
 	"\bis_valid\x18\x01 \x01(\bR\aisValid\x12'\n" +
 	"\x04move\x18\x02 \x01(\v2\x13.conn4_game.v1.MoveR\x04move\x12\x16\n" +

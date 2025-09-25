@@ -82,10 +82,11 @@ func (FinderType) EnumDescriptor() ([]byte, []int) {
 type FinderErrorType int32
 
 const (
-	FinderErrorType_FINDER_ERROR_TYPE_UNSPECIFIED FinderErrorType = 0
-	FinderErrorType_FINDER_ERROR_TYPE_AUTH        FinderErrorType = 1
-	FinderErrorType_FINDER_ERROR_TYPE_HAS_TICKET  FinderErrorType = 2
-	FinderErrorType_FINDER_ERROR_TYPE_HAS_SESSION FinderErrorType = 3
+	FinderErrorType_FINDER_ERROR_TYPE_UNSPECIFIED  FinderErrorType = 0
+	FinderErrorType_FINDER_ERROR_TYPE_AUTH         FinderErrorType = 1
+	FinderErrorType_FINDER_ERROR_TYPE_HAS_TICKET   FinderErrorType = 2
+	FinderErrorType_FINDER_ERROR_TYPE_HAS_SESSION  FinderErrorType = 3
+	FinderErrorType_FINDER_ERROR_TYPE_INVALID_GAME FinderErrorType = 4
 )
 
 // Enum value maps for FinderErrorType.
@@ -95,12 +96,14 @@ var (
 		1: "FINDER_ERROR_TYPE_AUTH",
 		2: "FINDER_ERROR_TYPE_HAS_TICKET",
 		3: "FINDER_ERROR_TYPE_HAS_SESSION",
+		4: "FINDER_ERROR_TYPE_INVALID_GAME",
 	}
 	FinderErrorType_value = map[string]int32{
-		"FINDER_ERROR_TYPE_UNSPECIFIED": 0,
-		"FINDER_ERROR_TYPE_AUTH":        1,
-		"FINDER_ERROR_TYPE_HAS_TICKET":  2,
-		"FINDER_ERROR_TYPE_HAS_SESSION": 3,
+		"FINDER_ERROR_TYPE_UNSPECIFIED":  0,
+		"FINDER_ERROR_TYPE_AUTH":         1,
+		"FINDER_ERROR_TYPE_HAS_TICKET":   2,
+		"FINDER_ERROR_TYPE_HAS_SESSION":  3,
+		"FINDER_ERROR_TYPE_INVALID_GAME": 4,
 	}
 )
 
@@ -198,12 +201,13 @@ const file_finder_v1_finder_proto_rawDesc = "" +
 	"\x11FINDER_TYPE_FOUND\x10\x02\x12\x17\n" +
 	"\x13FINDER_TYPE_TIMEOUT\x10\x03\x12\x16\n" +
 	"\x12FINDER_TYPE_CANCEL\x10\x04\x12\x15\n" +
-	"\x11FINDER_TYPE_ERROR\x10\x05*\x95\x01\n" +
+	"\x11FINDER_TYPE_ERROR\x10\x05*\xb9\x01\n" +
 	"\x0fFinderErrorType\x12!\n" +
 	"\x1dFINDER_ERROR_TYPE_UNSPECIFIED\x10\x00\x12\x1a\n" +
 	"\x16FINDER_ERROR_TYPE_AUTH\x10\x01\x12 \n" +
 	"\x1cFINDER_ERROR_TYPE_HAS_TICKET\x10\x02\x12!\n" +
-	"\x1dFINDER_ERROR_TYPE_HAS_SESSION\x10\x03B\x9d\x01\n" +
+	"\x1dFINDER_ERROR_TYPE_HAS_SESSION\x10\x03\x12\"\n" +
+	"\x1eFINDER_ERROR_TYPE_INVALID_GAME\x10\x04B\x9d\x01\n" +
 	"\rcom.finder.v1B\vFinderProtoP\x01Z:github.com/arian-nj/chibazi/backend/gen/finder/v1;finderv1\xa2\x02\x03FXX\xaa\x02\tFinder.V1\xca\x02\tFinder\\V1\xe2\x02\x15Finder\\V1\\GPBMetadata\xea\x02\n" +
 	"Finder::V1b\x06proto3"
 

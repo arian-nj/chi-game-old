@@ -16,7 +16,7 @@ func (game *XOState) SocketRouter(newGameMsg *sessionv1.GameMessage, playerId in
 	switch newXoMessage.Payload.(type) {
 	case *xo_gamev1.XoGameMessage_Play:
 		playData := newXoMessage.GetPlay()
-		game.PlayHandlerSocket(playData, playerId)
+		PlayHandlerSocket(game, playData, playerId)
 	}
 }
 
@@ -61,7 +61,7 @@ func sendInvalidResponse(player *XoPlayer, errMsg string, cellIndex int32, cellT
 	return player.Socket.SendMessage(&newSessionMsg)
 }
 
-func (game *XOState) PlayHandlerSocket(playInput *xo_gamev1.Play, playerID int) {
+func PlayHandlerSocket(game *XOState, playInput *xo_gamev1.Play, playerID int) {
 	player := game.findByID(playerID)
 
 	if player == nil {
@@ -86,7 +86,7 @@ func (game *XOState) PlayHandlerSocket(playInput *xo_gamev1.Play, playerID int) 
 		return
 	}
 
-	playCommand := NewPlayCommand(game, int(playInput.CellIndex), moveType, player.ID)
+	playCommand := NewMoveCommand(game, int(playInput.CellIndex), moveType, player.ID)
 	game.PushCommand(playCommand)
 }
 
@@ -210,6 +210,7 @@ func (sl *SocketListener) SendEndGameSocket(endGameCommand *EndGameCommand) {
 	}
 
 }
+
 func SocketSendGameState(gameState *XOState, player *XoPlayer) {
 	cells := []int32{}
 	for _, cell := range gameState.Board.Board {

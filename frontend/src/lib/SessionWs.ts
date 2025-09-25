@@ -21,8 +21,6 @@ export class SessionSocket extends WebSocket {
       });
     };
 
-
-
     this.onmessage = async (event) => {
       const bytes = new Uint8Array(event.data)
       const newSessionMessage = fromBinary(SessionMessageSchema, bytes)

@@ -184,8 +184,8 @@
 [X] web board
 [X] Session multigame
 [X] Session end count down
-[ ] matchmaking support multiple games
-[ ] sync web & console game
+[X] matchmaking support multiple games
+[X] sync web & console game
 [ ] make SyncTime into Time Proto
 [X] session is not cleaned up after timeout
 

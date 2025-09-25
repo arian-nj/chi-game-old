@@ -62,23 +62,25 @@ func NewSyncTimeCommand(game *Conn4State) *SyncTimeCommand {
 func (syncTime *SyncTimeCommand) Execute() {
 }
 
-type PlayCommand struct {
+type MoveCommand struct {
 	PlayerID    int
 	ColumnIndex int
+	CellIndex   int
 	MoveType    conn4_core.Cell
 	Game        *Conn4State
 }
 
-func NewPlayCommand(game *Conn4State, rowIndex int, moveType conn4_core.Cell, playerID int) *PlayCommand {
-	return &PlayCommand{
+func NewMoveCommand(game *Conn4State, colIndex int, moveType conn4_core.Cell, playerID int) *MoveCommand {
+	return &MoveCommand{
 		PlayerID:    playerID,
-		ColumnIndex: rowIndex,
+		ColumnIndex: colIndex,
+		CellIndex:   -1,
 		MoveType:    moveType,
 		Game:        game,
 	}
 }
 
-func (move *PlayCommand) Execute() {
+func (move *MoveCommand) Execute() {
 	currentPlayer := move.Game.CurrentPlayer()
 	if currentPlayer.ID != move.PlayerID {
 		slog.Error("play command recieved wrongly")
@@ -91,6 +93,7 @@ func (move *PlayCommand) Execute() {
 		slog.Error("drop piece failed")
 		return
 	}
+	move.CellIndex = idx
 
 	hasWon, winLine := game.Board.HasWon(idx)
 

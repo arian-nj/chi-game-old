@@ -171,24 +171,23 @@ func (gameState *Conn4State) SubToTelegram(userID int, bot *telebot.Bot, ViaMess
 }
 
 func (gameState *Conn4State) SubToSocket(ID int, newSocket *socket.Socket) func() {
-	// foundPlayer := gameState.findByID(ID)
-	// if foundPlayer == nil {
-	// 	return nil
-	// }
-	//
-	// foundPlayer.Socket = newSocket
-	// SocketSendGameState(gameState, foundPlayer)
-	// sListener := &SocketListener{
-	// 	Player: foundPlayer,
-	// }
-	// gameState.Subscribe(sListener)
-	// unregister := func() {
-	// 	if gameState != nil {
-	// 		gameState.Unsubscribe(sListener)
-	// 	}
-	// }
-	// return unregister
-	return nil
+	foundPlayer := gameState.findByID(ID)
+	if foundPlayer == nil {
+		return nil
+	}
+
+	foundPlayer.Socket = newSocket
+	SocketSendGameState(gameState, foundPlayer)
+	sListener := &SocketListener{
+		Player: foundPlayer,
+	}
+	gameState.Subscribe(sListener)
+	unregister := func() {
+		if gameState != nil {
+			gameState.Unsubscribe(sListener)
+		}
+	}
+	return unregister
 }
 
 func (game *Conn4State) StartGame() error {

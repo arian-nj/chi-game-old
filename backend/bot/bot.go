@@ -78,6 +78,7 @@ func (app *BotApplication) MakeBot() (*telebot.Bot, error) {
 
 	b.Handle(keybul.Xo3x3ButtonText, app.PlayRandomXO3X3Handler)
 	// b.Handle(keybul.Xo5x5ButtonText, app.PlayRandomXO5X5Handler)
+	b.Handle(keybul.Conn4ButtonText, app.PlayRandomConn4Handler)
 
 	b.Handle(keybul.CancelGameButtonText, app.CancelSearchingForGame)
 

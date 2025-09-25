@@ -14,7 +14,7 @@ type MoveCommand struct {
 	Game     *XOState
 }
 
-func NewPlayCommand(game *XOState, pos int, moveType Cell, playerID int) *MoveCommand {
+func NewMoveCommand(game *XOState, pos int, moveType Cell, playerID int) *MoveCommand {
 	return &MoveCommand{
 		PlayerID: playerID,
 		Pos:      pos,

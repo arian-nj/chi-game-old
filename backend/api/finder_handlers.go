@@ -3,6 +3,7 @@ package api
 import (
 	"log/slog"
 	"net/http"
+	"slices"
 	"time"
 
 	"github.com/arian-nj/chibazi/backend/games/games"
@@ -57,10 +58,18 @@ func (app *ApiApplication) makeMatchMakingTicketWS(w http.ResponseWriter, r *htt
 		slog.Error("user already have ticket can't make another one")
 		return
 	}
+
+	wantedGameTypeString := r.URL.Query().Get("game")
+	gameType := games.GameType(wantedGameTypeString)
+	if wantedGameTypeString == "" || !slices.Contains(games.AllGameTypes, gameType) {
+		sendFinderSocketError(socketClient, finderv1.FinderErrorType_FINDER_ERROR_TYPE_INVALID_GAME)
+		return
+	}
+
 	// Every thing is ok
 	socketClient.Listen(r)
 
-	NewTicket := matchmaking.NewTicket(tgUser.Name, tgUser.ID, tgUser.TgID, games.XOGameType3X3)
+	NewTicket := matchmaking.NewTicket(tgUser.Name, tgUser.ID, tgUser.TgID, gameType)
 	app.MatchMaking.PushTicket(NewTicket)
 	defer app.MatchMaking.RemovePlayerTicket(tgUser.TgID) // remove in case of error or canceling
 

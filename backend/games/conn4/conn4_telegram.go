@@ -41,7 +41,7 @@ func (game *Conn4State) CallBackRouter(c telebot.Context) error {
 
 func (tg *Conn4TelegramListener) Update(command commander.Command) {
 	switch c := command.(type) {
-	case *PlayCommand:
+	case *MoveCommand:
 		err := tg.EditDuringGameBoard(c.Game)
 		if err != nil {
 			slog.Error("can't edit durning move command", "err", err)
@@ -98,7 +98,7 @@ func (game *Conn4State) Conn4PlayHandler(c telebot.Context, callbackData string)
 		return c.RespondText("can't find player")
 	}
 
-	playCommand := NewPlayCommand(game, rowIndex, moveType, player.ID)
+	playCommand := NewMoveCommand(game, rowIndex, moveType, player.ID)
 	game.PushCommand(playCommand)
 
 	return nil
@@ -145,7 +145,7 @@ func (tg *Conn4TelegramListener) EditDuringGameBoard(game *Conn4State) error {
 	err := tg.Edit(tg, Conn4StartText+"\n"+MakeBoardAsEmojies(game, nil)+
 		"1️⃣2️⃣3️⃣4️⃣5️⃣6️⃣7️⃣",
 		keybul.CreateInlineKeyboard(
-			// keybul.ContinueInWebButton(),
+			keybul.ContinueInWebButton(),
 			Conn4PlayNumberButton,
 			game.CreatePlayersInlineButton(game.Players, game.CurrentPlayerIndex),
 		),

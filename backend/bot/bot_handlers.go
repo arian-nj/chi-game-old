@@ -133,6 +133,10 @@ func (app *BotApplication) PlayRandomXO3X3Handler(c telebot.Context) error {
 	return app.PlayRandomGameHandler(c, games.XOGameType3X3)
 }
 
+func (app *BotApplication) PlayRandomConn4Handler(c telebot.Context) error {
+	return app.PlayRandomGameHandler(c, games.Conn4GameType)
+}
+
 var (
 	CancelGameReplyKeyboard = &telebot.ReplyMarkup{
 		ReplyKeyboard: [][]telebot.ReplyButton{
@@ -189,6 +193,9 @@ var (
 			{
 				{
 					Text: keybul.Xo3x3ButtonText,
+				},
+				{
+					Text: keybul.Conn4ButtonText,
 				},
 				// {
 				// 	Text: keybul.Xo5x5ButtonText,
