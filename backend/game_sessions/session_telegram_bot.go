@@ -43,6 +43,8 @@ func (tg *SessionTelegramBotListener) Update(command commander.Command) {
 				slog.Error("can't send end game chat message", "err", err)
 			}
 		}()
+	case *GameStartCommand:
+		SendFoundOpponentMessage(c.Session.Players, tg.Bot)
 	}
 }
 

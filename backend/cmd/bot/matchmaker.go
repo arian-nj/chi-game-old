@@ -11,7 +11,6 @@ import (
 	"github.com/arian-nj/chibazi/backend/games/conn4"
 	"github.com/arian-nj/chibazi/backend/games/games"
 	"github.com/arian-nj/chibazi/backend/games/xo"
-	"github.com/arian-nj/chibazi/backend/internals/utils"
 	matchmaking "github.com/arian-nj/chibazi/backend/match_making"
 )
 
@@ -76,13 +75,5 @@ func (gv *GlobalVars) createRandomGame(gameType games.GameType, ticketOne *match
 		ticket.MatchFoundChan <- newGameSession
 	}
 
-	utils.RunBackgroundTask(func() {
-		err = newGameSession.StartGame()
-		if err != nil {
-			slog.Error("error in starting random xo match", "error", err)
-			return
-		}
-		gamesessions.SendFoundOpponentMessage(newGameSession.Players, gv.Bot)
-
-	})
+	newGameSession.StartGame()
 }

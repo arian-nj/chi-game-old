@@ -2,7 +2,6 @@ package xo
 
 import (
 	"log/slog"
-	"time"
 
 	"github.com/arian-nj/chibazi/backend/internals/utils"
 )
@@ -87,7 +86,6 @@ func NewEndGameCommand(game *XOState, winner *XoPlayer, loser *XoPlayer, endGame
 
 func (endGame *EndGameCommand) Execute() {
 	utils.RunBackgroundTask(func() {
-		time.Sleep(10 * time.Second)
 		endGame.Game.CancelGame()
 	})
 }

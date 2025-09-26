@@ -15,7 +15,7 @@ import (
 	"gopkg.in/telebot.v4"
 )
 
-const MAX_ALLOWED_TIME_INT = 10
+const MAX_ALLOWED_TIME_INT = 180
 const MAX_ALLOWED_TIME = MAX_ALLOWED_TIME_INT * time.Second
 
 const (
@@ -78,6 +78,7 @@ func (gameState *Conn4State) GetGameData() *games.GameData {
 func (gameState *Conn4State) OnEnd(endCallback func()) {
 	gameState.endCallback = endCallback
 }
+
 func (gameState *Conn4State) monitorXoGame() {
 	tickerDuration := time.Second * 1
 	ticker := time.NewTicker(tickerDuration)

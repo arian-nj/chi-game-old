@@ -189,7 +189,9 @@
 [X] make SyncTime into Time Proto add Time
 [X] session is not cleaned up after timeout
 
-[ ] Fix via Web Games
+[X] Fix via Web Games
+[ ] make Home exit Session
+[ ] does session has cleaner
 
 # 0.7.2 
 [ ] move between games

@@ -3,6 +3,7 @@ package gamesessions
 import (
 	"context"
 	"log/slog"
+	"strconv"
 
 	"github.com/arian-nj/chibazi/backend/database"
 	"github.com/arian-nj/chibazi/backend/internals/utils"
@@ -57,17 +58,22 @@ func (wait *WaitForPlayerCommand) Execute() {
 type JoinSessionCommand struct {
 	Session      *GameSession
 	JoinedPlayer *SessionPlayer
+	AllSession   *AllSession
 }
 
-func NewJoinSessionCommand(session *GameSession, JoinedUser *SessionPlayer) *JoinSessionCommand {
+func NewJoinSessionCommand(session *GameSession, JoinedUser *SessionPlayer, allSession *AllSession) *JoinSessionCommand {
 	return &JoinSessionCommand{
 		Session:      session,
 		JoinedPlayer: JoinedUser,
+		AllSession:   allSession,
 	}
 }
 
 func (join *JoinSessionCommand) Execute() {
 	join.Session.AddPlayerToSession(join.JoinedPlayer)
+	for _, player := range join.Session.Players {
+		join.AllSession.Add(strconv.Itoa(player.ID), join.Session)
+	}
 	join.Session.StartGame()
 }
 

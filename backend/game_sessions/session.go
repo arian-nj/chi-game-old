@@ -2,7 +2,6 @@ package gamesessions
 
 import (
 	"context"
-	"errors"
 	"log/slog"
 	"strconv"
 	"time"
@@ -103,29 +102,36 @@ func (session *GameSession) RunBgMonitor() {
 	})
 }
 
-func (session *GameSession) StartGame() error {
-	if session.GameState == nil {
-		return errors.New("failed to start game field GameState is nil")
-	}
-	// session.PushCommand(
-	// 	NewGameStartSessionCommand(session),
-	// )
-
-	for _, player := range session.Players {
-		session.GameState.AddPlayer(player.ID, player.Name, player.TgID, player.Socket)
-	}
-
-	for _, suber := range session.Subscribers {
-		if listener, ok := suber.(*SessionTelegramBotListener); ok {
-			session.GameState.SubToTelegram(listener.UserID, listener.Bot, "")
+func (session *GameSession) StartGame() {
+	utils.RunBackgroundTask(func() {
+		if session.GameState == nil {
+			slog.Error("failed to start game field GameState is nil")
+			return
 		}
-		if listener, ok := suber.(*SessionTelegramViaListener); ok {
-			session.GameState.SubToTelegram(0, listener.Bot, listener.ViaMessageId)
-		}
-	}
+		session.PushCommand(
+			NewGameStartSessionCommand(session),
+		)
 
-	session.GameState.OnEnd(session.EndGame)
-	return session.GameState.StartGame()
+		for _, player := range session.Players {
+			session.GameState.AddPlayer(player.ID, player.Name, player.TgID, player.Socket)
+		}
+
+		for _, suber := range session.Subscribers {
+			if listener, ok := suber.(*SessionTelegramBotListener); ok {
+				session.GameState.SubToTelegram(listener.UserID, listener.Bot, "")
+			}
+			if listener, ok := suber.(*SessionTelegramViaListener); ok {
+				session.GameState.SubToTelegram(0, listener.Bot, listener.ViaMessageId)
+			}
+		}
+
+		session.GameState.OnEnd(session.EndGame)
+		gameErr := session.GameState.StartGame()
+		if gameErr != nil {
+			slog.Error("gamer error", gameErr)
+			return
+		}
+	})
 }
 
 func (session *GameSession) AddPlayerToSession(player *SessionPlayer) {
@@ -195,7 +201,7 @@ func (session *GameSession) CleanAndDisconnect() {
 	}
 }
 
-func (session *GameSession) HandleCallback(c telebot.Context, queries *database.Queries) error {
+func (session *GameSession) HandleCallback(c telebot.Context, queries *database.Queries, allSession *AllSession) error {
 	callbackData := c.Callback().Data
 	if callbackData == "join" {
 		personRow, err := queries.GetTgUserByTgID(context.Background(), int(c.Sender().ID))
@@ -208,7 +214,7 @@ func (session *GameSession) HandleCallback(c telebot.Context, queries *database.
 			return c.RespondText(text)
 		}
 
-		newJoinCommand := NewJoinSessionCommand(session, NewSessionPlayer(personRow.ID, personRow.TgID, personRow.Name))
+		newJoinCommand := NewJoinSessionCommand(session, NewSessionPlayer(personRow.ID, personRow.TgID, personRow.Name), allSession)
 		session.PushCommand(newJoinCommand)
 
 		text := "اضافه شدی بازی شروع شد"

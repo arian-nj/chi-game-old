@@ -153,7 +153,7 @@ func (app *BotApplication) handleCallback(c telebot.Context) error {
 	gameSession, hasSession := app.AllSessions.Get(messageId)
 
 	if hasSession {
-		return gameSession.HandleCallback(c, app.Queries)
+		return gameSession.HandleCallback(c, app.Queries, app.AllSessions)
 	}
 	return c.RespondText("no active game")
 }

@@ -72,16 +72,24 @@ defineExpose({
 
 <style>
 @keyframes drop {
-  from {
+  0% {
     transform: translateY(-300px);
   }
 
-  to {
+  40% {
+    transform: translateY(0);
+  }
+
+  60% {
+    transform: translateY(-30px);
+  }
+
+  100% {
     transform: translateY(0);
   }
 }
 
 .animate-drop {
-  animation: drop 0.4s ease-out;
+  animation: drop 0.6s ease-out;
 }
 </style>
