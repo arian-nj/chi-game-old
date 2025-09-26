@@ -5,7 +5,6 @@ import { ref, useTemplateRef } from "vue";
 import { create, toBinary } from "@bufbuild/protobuf";
 import { SessionMessageSchema } from "@/gen/session/v1/session_pb";
 import { useToast } from "@/components/Toast.vue";
-import PlayersBoard from "./PlayersBoard.vue";
 
 import { AccountService } from '@/gen/account/v1/account_pb';
 import { authTransport } from '@/lib/transport';
@@ -13,6 +12,7 @@ import { useQuery } from '@tanstack/vue-query';
 import { createClient } from '@connectrpc/connect'
 import XoBoard from "./XoBoard.vue";
 import EndGame from "@/components/game/EndGame.vue";
+import PlayersBoard from '@/components/game/PlayersBoard.vue';
 
 const { isPending: meIsPending, error: meErr, data: meData } = useQuery({
   queryKey: ['me'],
@@ -35,7 +35,6 @@ const EndGameData = ref<XoBuff.EndGame>()
 const isMyTurn = ref(false)
 
 const XoBoardRef = useTemplateRef('xo-board-ref')
-const PlayersBoardRef = useTemplateRef('players-board')
 
 let boardSize = ref(3)
 
@@ -59,9 +58,6 @@ props.sessionSocket.HandleGameMessage = (gameMessage) => {
 
     case "playResponse":
       handlePlayResponse(payload.value)
-      break
-    case "syncTime":
-      PlayersBoardRef.value?.handleTimeSync(payload.value)
       break
     case "endGame":
       EndGameData.value = payload.value
@@ -107,9 +103,7 @@ function sendClick(i: number) {
 
   <div class="flex w-full items-center justify-center">
 
-    <span v-if="meIsPending">Loading ...</span>
-    <span v-if="meErr">Error {{ meErr?.message }}</span>
-    <PlayersBoard v-else ref="players-board" :is-my-turn="isMyTurn" />
+    <PlayersBoard :session-socket="sessionSocket" />
     <XoBoard @cell-selected="sendClick" :board-size="boardSize" ref="xo-board-ref" />
 
     <EndGame v-if="EndGameData" :loser="EndGameData.loser" :winner="EndGameData.winner" />

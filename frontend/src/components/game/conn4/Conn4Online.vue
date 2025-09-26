@@ -8,6 +8,7 @@ import { SessionMessageSchema } from "@/gen/session/v1/session_pb";
 import { create, toBinary } from "@bufbuild/protobuf";
 import { useToast } from "@/components/Toast.vue";
 import EndGame from "../EndGame.vue";
+import PlayersBoard from "../PlayersBoard.vue";
 
 
 const props = defineProps({
@@ -51,6 +52,7 @@ const handleMoveAction = (moveData: Conn4Buff.Move) => {
 }
 
 function sendClick(i: number) {
+  console.log(i, " clicked")
   const newSessionMsg = create(SessionMessageSchema, {
     content: {
       case: "game",
@@ -80,6 +82,7 @@ const handlePlayResponse = (playResponse: Conn4Buff.PlayResponse) => {
 </script>
 
 <template>
+  <PlayersBoard :session-socket="sessionSocket" />
   <Conn4Board ref="conn4-board-ref" @col-selected="sendClick" />
   <EndGame v-if="EndGameData" :loser="EndGameData.loser" :winner="EndGameData.winner" />
 </template>

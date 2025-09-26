@@ -12,7 +12,7 @@ import type { Message } from "@bufbuild/protobuf";
  * Describes the file xo_game/v1/xo.proto.
  */
 export const file_xo_game_v1_xo: GenFile = /*@__PURE__*/
-  fileDesc("ChN4b19nYW1lL3YxL3hvLnByb3RvEgp4b19nYW1lLnYxIkYKCUdhbWVTdGF0ZRINCgVjZWxscxgBIAMoBRIWCg50dXJuX3BsYXllcl9pZBgCIAEoAxISCgpib2FyZF9zaXplGAMgASgFIi4KBE1vdmUSEgoKY2VsbF92YWx1ZRgBIAEoBRISCgpjZWxsX2luZGV4GAIgASgFIhoKBFBsYXkSEgoKY2VsbF9pbmRleBgBIAEoBSJQCgxQbGF5UmVzcG9uc2USEAoIaXNfdmFsaWQYASABKAgSHgoEbW92ZRgCIAEoCzIQLnhvX2dhbWUudjEuTW92ZRIOCgZyZWFzb24YAyABKAkiQQoEVGltZRIRCglwbGF5ZXJfaWQYASABKAMSEgoKc3BlbnRfdGltZRgCIAEoBRISCgp0b3RhbF90aW1lGAMgASgFInkKB0VuZEdhbWUSJQoGcmVhc29uGAEgASgOMhUueG9fZ2FtZS52MS5FbmRSZWFzb24SIwoGd2lubmVyGAIgASgLMhMuYWNjb3VudC52MS5BY2NvdW50EiIKBWxvc2VyGAMgASgLMhMuYWNjb3VudC52MS5BY2NvdW50Io4CCg1Yb0dhbWVNZXNzYWdlEiAKBG1vdmUYASABKAsyEC54b19nYW1lLnYxLk1vdmVIABIgCgRwbGF5GAIgASgLMhAueG9fZ2FtZS52MS5QbGF5SAASMQoNcGxheV9yZXNwb25zZRgDIAEoCzIYLnhvX2dhbWUudjEuUGxheVJlc3BvbnNlSAASJQoJc3luY190aW1lGAQgASgLMhAueG9fZ2FtZS52MS5UaW1lSAASKwoKZ2FtZV9zdGF0ZRgFIAEoCzIVLnhvX2dhbWUudjEuR2FtZVN0YXRlSAASJwoIZW5kX2dhbWUYBiABKAsyEy54b19nYW1lLnYxLkVuZEdhbWVIAEIJCgdwYXlsb2FkKmcKCUVuZFJlYXNvbhIaChZFTkRfUkVBU09OX1VOU1BFQ0lGSUVEEAASFQoRRU5EX1JFQVNPTl9USU1PVVQQARISCg5FTkRfUkVBU09OX1RJRRACEhMKD0VORF9SRUFTT05fRlVMTBADQpwBCg5jb20ueG9fZ2FtZS52MUIHWG9Qcm90b1ABWjxnaXRodWIuY29tL2FyaWFuLW5qL2NoaWJhemkvYmFja2VuZC9nZW4veG9fZ2FtZS92MTt4b19nYW1ldjGiAgNYWFiqAglYb0dhbWUuVjHKAglYb0dhbWVcVjHiAhVYb0dhbWVcVjFcR1BCTWV0YWRhdGHqAgpYb0dhbWU6OlYxYgZwcm90bzM", [file_account_v1_account]);
+  fileDesc("ChN4b19nYW1lL3YxL3hvLnByb3RvEgp4b19nYW1lLnYxIkYKCUdhbWVTdGF0ZRINCgVjZWxscxgBIAMoBRIWCg50dXJuX3BsYXllcl9pZBgCIAEoAxISCgpib2FyZF9zaXplGAMgASgFIi4KBE1vdmUSEgoKY2VsbF92YWx1ZRgBIAEoBRISCgpjZWxsX2luZGV4GAIgASgFIhoKBFBsYXkSEgoKY2VsbF9pbmRleBgBIAEoBSJQCgxQbGF5UmVzcG9uc2USEAoIaXNfdmFsaWQYASABKAgSHgoEbW92ZRgCIAEoCzIQLnhvX2dhbWUudjEuTW92ZRIOCgZyZWFzb24YAyABKAkieQoHRW5kR2FtZRIlCgZyZWFzb24YASABKA4yFS54b19nYW1lLnYxLkVuZFJlYXNvbhIjCgZ3aW5uZXIYAiABKAsyEy5hY2NvdW50LnYxLkFjY291bnQSIgoFbG9zZXIYAyABKAsyEy5hY2NvdW50LnYxLkFjY291bnQi5wEKDVhvR2FtZU1lc3NhZ2USIAoEbW92ZRgBIAEoCzIQLnhvX2dhbWUudjEuTW92ZUgAEiAKBHBsYXkYAiABKAsyEC54b19nYW1lLnYxLlBsYXlIABIxCg1wbGF5X3Jlc3BvbnNlGAMgASgLMhgueG9fZ2FtZS52MS5QbGF5UmVzcG9uc2VIABIrCgpnYW1lX3N0YXRlGAUgASgLMhUueG9fZ2FtZS52MS5HYW1lU3RhdGVIABInCghlbmRfZ2FtZRgGIAEoCzITLnhvX2dhbWUudjEuRW5kR2FtZUgAQgkKB3BheWxvYWQqZwoJRW5kUmVhc29uEhoKFkVORF9SRUFTT05fVU5TUEVDSUZJRUQQABIVChFFTkRfUkVBU09OX1RJTU9VVBABEhIKDkVORF9SRUFTT05fVElFEAISEwoPRU5EX1JFQVNPTl9GVUxMEANCnAEKDmNvbS54b19nYW1lLnYxQgdYb1Byb3RvUAFaPGdpdGh1Yi5jb20vYXJpYW4tbmovY2hpYmF6aS9iYWNrZW5kL2dlbi94b19nYW1lL3YxO3hvX2dhbWV2MaICA1hYWKoCCVhvR2FtZS5WMcoCCVhvR2FtZVxWMeICFVhvR2FtZVxWMVxHUEJNZXRhZGF0YeoCClhvR2FtZTo6VjFiBnByb3RvMw", [file_account_v1_account]);
 
 /**
  * @generated from message xo_game.v1.GameState
@@ -108,33 +108,6 @@ export const PlayResponseSchema: GenMessage<PlayResponse> = /*@__PURE__*/
   messageDesc(file_xo_game_v1_xo, 3);
 
 /**
- * @generated from message xo_game.v1.Time
- */
-export type Time = Message<"xo_game.v1.Time"> & {
-  /**
-   * @generated from field: int64 player_id = 1;
-   */
-  playerId: bigint;
-
-  /**
-   * @generated from field: int32 spent_time = 2;
-   */
-  spentTime: number;
-
-  /**
-   * @generated from field: int32 total_time = 3;
-   */
-  totalTime: number;
-};
-
-/**
- * Describes the message xo_game.v1.Time.
- * Use `create(TimeSchema)` to create a new message.
- */
-export const TimeSchema: GenMessage<Time> = /*@__PURE__*/
-  messageDesc(file_xo_game_v1_xo, 4);
-
-/**
  * @generated from message xo_game.v1.EndGame
  */
 export type EndGame = Message<"xo_game.v1.EndGame"> & {
@@ -159,7 +132,7 @@ export type EndGame = Message<"xo_game.v1.EndGame"> & {
  * Use `create(EndGameSchema)` to create a new message.
  */
 export const EndGameSchema: GenMessage<EndGame> = /*@__PURE__*/
-  messageDesc(file_xo_game_v1_xo, 5);
+  messageDesc(file_xo_game_v1_xo, 4);
 
 /**
  * @generated from message xo_game.v1.XoGameMessage
@@ -188,12 +161,6 @@ export type XoGameMessage = Message<"xo_game.v1.XoGameMessage"> & {
     case: "playResponse";
   } | {
     /**
-     * @generated from field: xo_game.v1.Time sync_time = 4;
-     */
-    value: Time;
-    case: "syncTime";
-  } | {
-    /**
      * @generated from field: xo_game.v1.GameState game_state = 5;
      */
     value: GameState;
@@ -212,7 +179,7 @@ export type XoGameMessage = Message<"xo_game.v1.XoGameMessage"> & {
  * Use `create(XoGameMessageSchema)` to create a new message.
  */
 export const XoGameMessageSchema: GenMessage<XoGameMessage> = /*@__PURE__*/
-  messageDesc(file_xo_game_v1_xo, 6);
+  messageDesc(file_xo_game_v1_xo, 5);
 
 /**
  * @generated from enum xo_game.v1.EndReason

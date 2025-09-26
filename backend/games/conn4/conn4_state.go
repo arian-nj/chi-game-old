@@ -15,7 +15,7 @@ import (
 	"gopkg.in/telebot.v4"
 )
 
-const MAX_ALLOWED_TIME_INT = 60
+const MAX_ALLOWED_TIME_INT = 10
 const MAX_ALLOWED_TIME = MAX_ALLOWED_TIME_INT * time.Second
 
 const (
@@ -90,13 +90,13 @@ func (gameState *Conn4State) monitorXoGame() {
 			currentPlayer := gameState.CurrentPlayer()
 
 			if currentPlayer.Timer.Spent() >= MAX_ALLOWED_TIME {
-				// newEndCommand := NewEndGameCommand(gameState, gameState.OpponentPlayer(), gameState.CurrentPlayer(), END_GAME_TIE)
-				// gameState.InjectCommand(newEndCommand)
-				return
+				slog.Info("add timeout end end command")
+				newEndCommand := NewEndGameCommand(gameState, gameState.OpponentPlayer(), gameState.CurrentPlayer(), END_GAME_TIMEOUT, []int{})
+				gameState.InjectCommand(newEndCommand)
 			}
 			if now.Sub(lastSyncTime) > time.Second*1 {
-				// newSyncCommand := NewSyncTimeCommand(gameState)
-				// gameState.PushCommand(newSyncCommand)
+				newSyncCommand := NewSyncTimeCommand(gameState)
+				gameState.PushCommand(newSyncCommand)
 				lastSyncTime = now
 			}
 		case <-gameState.Ctx.Done():

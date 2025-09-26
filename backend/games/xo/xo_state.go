@@ -104,7 +104,6 @@ func (gameState *XOState) monitorXoGame() {
 			if currentPlayer.Timer.Spent() >= MAX_ALLOWED_TIME {
 				newEndCommand := NewEndGameCommand(gameState, gameState.OpponentPlayer(), gameState.CurrentPlayer(), END_GAME_TIE)
 				gameState.InjectCommand(newEndCommand)
-				return
 			}
 			if now.Sub(lastSyncTime) > time.Second*1 {
 				newSyncCommand := NewSyncTimeCommand(gameState)

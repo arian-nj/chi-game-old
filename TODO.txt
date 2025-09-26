@@ -186,9 +186,10 @@
 [X] Session end count down
 [X] matchmaking support multiple games
 [X] sync web & console game
-[ ] make SyncTime into Time Proto
+[X] make SyncTime into Time Proto add Time
 [X] session is not cleaned up after timeout
 
+[ ] Fix via Web Games
 
 # 0.7.2 
 [ ] move between games

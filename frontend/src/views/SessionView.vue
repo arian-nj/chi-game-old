@@ -65,7 +65,7 @@ watch(ChatRef, () => {
 <template>
   <div class="flex w-screen h-screen items-center justify-center bg-[#14bd96]">
     <div v-if="isConnected" class="w-auto h-full overflow-hidden relative flex items-center justify-center
-      aspect-[9/16] bg-amber-500 m-5">
+      aspect-[9/16] m-5">
       <XoOnline v-if="activeGame === GameType.XO3X3" :session-socket="sessionSocket" />
       <Conn4Online v-else-if="activeGame === GameType.CONN4" :session-socket="sessionSocket" />
       <h1 v-else>No Game</h1>

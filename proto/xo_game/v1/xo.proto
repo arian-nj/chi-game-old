@@ -26,12 +26,6 @@ message PlayResponse {
   string reason = 3;
 }
 
-message Time {
-  int64 player_id = 1;
-  int32 spent_time = 2;
-  int32 total_time = 3;
-}
-
 enum EndReason {
   END_REASON_UNSPECIFIED= 0;
   END_REASON_TIMOUT = 1;
@@ -50,7 +44,6 @@ message XoGameMessage {
     Move move = 1;
     Play play = 2;
     PlayResponse play_response = 3;
-    Time sync_time= 4;
     GameState game_state = 5;
     EndGame end_game = 6;
   }

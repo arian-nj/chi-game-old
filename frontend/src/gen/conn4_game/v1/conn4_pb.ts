@@ -12,7 +12,7 @@ import type { Message } from "@bufbuild/protobuf";
  * Describes the file conn4_game/v1/conn4.proto.
  */
 export const file_conn4_game_v1_conn4: GenFile = /*@__PURE__*/
-  fileDesc("Chljb25uNF9nYW1lL3YxL2Nvbm40LnByb3RvEg1jb25uNF9nYW1lLnYxIhoKCUdhbWVTdGF0ZRINCgVjZWxscxgBIAMoBSIuCgRNb3ZlEhIKCmNlbGxfdmFsdWUYASABKAUSEgoKY2VsbF9pbmRleBgCIAEoBSIZCgRQbGF5EhEKCWNvbF9pbmRleBgBIAEoBSJTCgxQbGF5UmVzcG9uc2USEAoIaXNfdmFsaWQYASABKAgSIQoEbW92ZRgCIAEoCzITLmNvbm40X2dhbWUudjEuTW92ZRIOCgZyZWFzb24YAyABKAkiQQoEVGltZRIRCglwbGF5ZXJfaWQYASABKAMSEgoKc3BlbnRfdGltZRgCIAEoBRISCgp0b3RhbF90aW1lGAMgASgFInwKB0VuZEdhbWUSKAoGcmVhc29uGAEgASgOMhguY29ubjRfZ2FtZS52MS5FbmRSZWFzb24SIwoGd2lubmVyGAIgASgLMhMuYWNjb3VudC52MS5BY2NvdW50EiIKBWxvc2VyGAMgASgLMhMuYWNjb3VudC52MS5BY2NvdW50IqMCChBDb25uNEdhbWVNZXNzYWdlEiMKBG1vdmUYASABKAsyEy5jb25uNF9nYW1lLnYxLk1vdmVIABIjCgRwbGF5GAIgASgLMhMuY29ubjRfZ2FtZS52MS5QbGF5SAASNAoNcGxheV9yZXNwb25zZRgDIAEoCzIbLmNvbm40X2dhbWUudjEuUGxheVJlc3BvbnNlSAASKAoJc3luY190aW1lGAQgASgLMhMuY29ubjRfZ2FtZS52MS5UaW1lSAASLgoKZ2FtZV9zdGF0ZRgFIAEoCzIYLmNvbm40X2dhbWUudjEuR2FtZVN0YXRlSAASKgoIZW5kX2dhbWUYBiABKAsyFi5jb25uNF9nYW1lLnYxLkVuZEdhbWVIAEIJCgdwYXlsb2FkKmcKCUVuZFJlYXNvbhIaChZFTkRfUkVBU09OX1VOU1BFQ0lGSUVEEAASFQoRRU5EX1JFQVNPTl9USU1PVVQQARISCg5FTkRfUkVBU09OX1RJRRACEhMKD0VORF9SRUFTT05fRlVMTBADQrQBChFjb20uY29ubjRfZ2FtZS52MUIKQ29ubjRQcm90b1ABWkJnaXRodWIuY29tL2FyaWFuLW5qL2NoaWJhemkvYmFja2VuZC9nZW4vY29ubjRfZ2FtZS92MTtjb25uNF9nYW1ldjGiAgNDWFiqAgxDb25uNEdhbWUuVjHKAgxDb25uNEdhbWVcVjHiAhhDb25uNEdhbWVcVjFcR1BCTWV0YWRhdGHqAg1Db25uNEdhbWU6OlYxYgZwcm90bzM", [file_account_v1_account]);
+  fileDesc("Chljb25uNF9nYW1lL3YxL2Nvbm40LnByb3RvEg1jb25uNF9nYW1lLnYxIhoKCUdhbWVTdGF0ZRINCgVjZWxscxgBIAMoBSIuCgRNb3ZlEhIKCmNlbGxfdmFsdWUYASABKAUSEgoKY2VsbF9pbmRleBgCIAEoBSIZCgRQbGF5EhEKCWNvbF9pbmRleBgBIAEoBSJTCgxQbGF5UmVzcG9uc2USEAoIaXNfdmFsaWQYASABKAgSIQoEbW92ZRgCIAEoCzITLmNvbm40X2dhbWUudjEuTW92ZRIOCgZyZWFzb24YAyABKAkifAoHRW5kR2FtZRIoCgZyZWFzb24YASABKA4yGC5jb25uNF9nYW1lLnYxLkVuZFJlYXNvbhIjCgZ3aW5uZXIYAiABKAsyEy5hY2NvdW50LnYxLkFjY291bnQSIgoFbG9zZXIYAyABKAsyEy5hY2NvdW50LnYxLkFjY291bnQi+QEKEENvbm40R2FtZU1lc3NhZ2USIwoEbW92ZRgBIAEoCzITLmNvbm40X2dhbWUudjEuTW92ZUgAEiMKBHBsYXkYAiABKAsyEy5jb25uNF9nYW1lLnYxLlBsYXlIABI0Cg1wbGF5X3Jlc3BvbnNlGAMgASgLMhsuY29ubjRfZ2FtZS52MS5QbGF5UmVzcG9uc2VIABIuCgpnYW1lX3N0YXRlGAUgASgLMhguY29ubjRfZ2FtZS52MS5HYW1lU3RhdGVIABIqCghlbmRfZ2FtZRgGIAEoCzIWLmNvbm40X2dhbWUudjEuRW5kR2FtZUgAQgkKB3BheWxvYWQqZwoJRW5kUmVhc29uEhoKFkVORF9SRUFTT05fVU5TUEVDSUZJRUQQABIVChFFTkRfUkVBU09OX1RJTU9VVBABEhIKDkVORF9SRUFTT05fVElFEAISEwoPRU5EX1JFQVNPTl9GVUxMEANCtAEKEWNvbS5jb25uNF9nYW1lLnYxQgpDb25uNFByb3RvUAFaQmdpdGh1Yi5jb20vYXJpYW4tbmovY2hpYmF6aS9iYWNrZW5kL2dlbi9jb25uNF9nYW1lL3YxO2Nvbm40X2dhbWV2MaICA0NYWKoCDENvbm40R2FtZS5WMcoCDENvbm40R2FtZVxWMeICGENvbm40R2FtZVxWMVxHUEJNZXRhZGF0YeoCDUNvbm40R2FtZTo6VjFiBnByb3RvMw", [file_account_v1_account]);
 
 /**
  * @generated from message conn4_game.v1.GameState
@@ -98,33 +98,6 @@ export const PlayResponseSchema: GenMessage<PlayResponse> = /*@__PURE__*/
   messageDesc(file_conn4_game_v1_conn4, 3);
 
 /**
- * @generated from message conn4_game.v1.Time
- */
-export type Time = Message<"conn4_game.v1.Time"> & {
-  /**
-   * @generated from field: int64 player_id = 1;
-   */
-  playerId: bigint;
-
-  /**
-   * @generated from field: int32 spent_time = 2;
-   */
-  spentTime: number;
-
-  /**
-   * @generated from field: int32 total_time = 3;
-   */
-  totalTime: number;
-};
-
-/**
- * Describes the message conn4_game.v1.Time.
- * Use `create(TimeSchema)` to create a new message.
- */
-export const TimeSchema: GenMessage<Time> = /*@__PURE__*/
-  messageDesc(file_conn4_game_v1_conn4, 4);
-
-/**
  * @generated from message conn4_game.v1.EndGame
  */
 export type EndGame = Message<"conn4_game.v1.EndGame"> & {
@@ -149,7 +122,7 @@ export type EndGame = Message<"conn4_game.v1.EndGame"> & {
  * Use `create(EndGameSchema)` to create a new message.
  */
 export const EndGameSchema: GenMessage<EndGame> = /*@__PURE__*/
-  messageDesc(file_conn4_game_v1_conn4, 5);
+  messageDesc(file_conn4_game_v1_conn4, 4);
 
 /**
  * @generated from message conn4_game.v1.Conn4GameMessage
@@ -178,12 +151,6 @@ export type Conn4GameMessage = Message<"conn4_game.v1.Conn4GameMessage"> & {
     case: "playResponse";
   } | {
     /**
-     * @generated from field: conn4_game.v1.Time sync_time = 4;
-     */
-    value: Time;
-    case: "syncTime";
-  } | {
-    /**
      * @generated from field: conn4_game.v1.GameState game_state = 5;
      */
     value: GameState;
@@ -202,7 +169,7 @@ export type Conn4GameMessage = Message<"conn4_game.v1.Conn4GameMessage"> & {
  * Use `create(Conn4GameMessageSchema)` to create a new message.
  */
 export const Conn4GameMessageSchema: GenMessage<Conn4GameMessage> = /*@__PURE__*/
-  messageDesc(file_conn4_game_v1_conn4, 6);
+  messageDesc(file_conn4_game_v1_conn4, 5);
 
 /**
  * @generated from enum conn4_game.v1.EndReason

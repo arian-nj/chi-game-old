@@ -368,6 +368,7 @@ type SessionMessage struct {
 	//	*SessionMessage_Game
 	//	*SessionMessage_Error
 	//	*SessionMessage_GameType
+	//	*SessionMessage_SyncTime
 	Content       isSessionMessage_Content `protobuf_oneof:"content"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -455,6 +456,15 @@ func (x *SessionMessage) GetGameType() *ChangeGameTypeMessage {
 	return nil
 }
 
+func (x *SessionMessage) GetSyncTime() *Time {
+	if x != nil {
+		if x, ok := x.Content.(*SessionMessage_SyncTime); ok {
+			return x.SyncTime
+		}
+	}
+	return nil
+}
+
 type isSessionMessage_Content interface {
 	isSessionMessage_Content()
 }
@@ -479,6 +489,10 @@ type SessionMessage_GameType struct {
 	GameType *ChangeGameTypeMessage `protobuf:"bytes,5,opt,name=game_type,json=gameType,proto3,oneof"`
 }
 
+type SessionMessage_SyncTime struct {
+	SyncTime *Time `protobuf:"bytes,6,opt,name=sync_time,json=syncTime,proto3,oneof"`
+}
+
 func (*SessionMessage_Chat) isSessionMessage_Content() {}
 
 func (*SessionMessage_ChatReq) isSessionMessage_Content() {}
@@ -488,6 +502,8 @@ func (*SessionMessage_Game) isSessionMessage_Content() {}
 func (*SessionMessage_Error) isSessionMessage_Content() {}
 
 func (*SessionMessage_GameType) isSessionMessage_Content() {}
+
+func (*SessionMessage_SyncTime) isSessionMessage_Content() {}
 
 type HasSessionRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
@@ -729,6 +745,67 @@ func (x *GetSessionOpponentResponse) GetOpponent() *v12.Account {
 	return nil
 }
 
+// Time
+type Time struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	PlayerId      int64                  `protobuf:"varint,1,opt,name=player_id,json=playerId,proto3" json:"player_id,omitempty"`
+	SpentTime     int32                  `protobuf:"varint,2,opt,name=spent_time,json=spentTime,proto3" json:"spent_time,omitempty"`
+	TotalTime     int32                  `protobuf:"varint,3,opt,name=total_time,json=totalTime,proto3" json:"total_time,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *Time) Reset() {
+	*x = Time{}
+	mi := &file_session_v1_session_proto_msgTypes[11]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *Time) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*Time) ProtoMessage() {}
+
+func (x *Time) ProtoReflect() protoreflect.Message {
+	mi := &file_session_v1_session_proto_msgTypes[11]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use Time.ProtoReflect.Descriptor instead.
+func (*Time) Descriptor() ([]byte, []int) {
+	return file_session_v1_session_proto_rawDescGZIP(), []int{11}
+}
+
+func (x *Time) GetPlayerId() int64 {
+	if x != nil {
+		return x.PlayerId
+	}
+	return 0
+}
+
+func (x *Time) GetSpentTime() int32 {
+	if x != nil {
+		return x.SpentTime
+	}
+	return 0
+}
+
+func (x *Time) GetTotalTime() int32 {
+	if x != nil {
+		return x.TotalTime
+	}
+	return 0
+}
+
 var File_session_v1_session_proto protoreflect.FileDescriptor
 
 const file_session_v1_session_proto_rawDesc = "" +
@@ -746,13 +823,14 @@ const file_session_v1_session_proto_rawDesc = "" +
 	"\x05conn4\x18\x02 \x01(\v2\x1f.conn4_game.v1.Conn4GameMessageH\x00R\x05conn4B\x06\n" +
 	"\x04game\"J\n" +
 	"\x15ChangeGameTypeMessage\x121\n" +
-	"\tgame_type\x18\x01 \x01(\x0e2\x14.session.v1.GameTypeR\bgameType\"\xae\x02\n" +
+	"\tgame_type\x18\x01 \x01(\x0e2\x14.session.v1.GameTypeR\bgameType\"\xdf\x02\n" +
 	"\x0eSessionMessage\x12-\n" +
 	"\x04chat\x18\x01 \x01(\v2\x17.session.v1.ChatMessageH\x00R\x04chat\x12;\n" +
 	"\bchat_req\x18\x02 \x01(\v2\x1e.session.v1.ChatMessageRequestH\x00R\achatReq\x12-\n" +
 	"\x04game\x18\x03 \x01(\v2\x17.session.v1.GameMessageH\x00R\x04game\x124\n" +
 	"\x05error\x18\x04 \x01(\x0e2\x1c.session.v1.SessionErrorTypeH\x00R\x05error\x12@\n" +
-	"\tgame_type\x18\x05 \x01(\v2!.session.v1.ChangeGameTypeMessageH\x00R\bgameTypeB\t\n" +
+	"\tgame_type\x18\x05 \x01(\v2!.session.v1.ChangeGameTypeMessageH\x00R\bgameType\x12/\n" +
+	"\tsync_time\x18\x06 \x01(\v2\x10.session.v1.TimeH\x00R\bsyncTimeB\t\n" +
 	"\acontent\"\x13\n" +
 	"\x11HasSessionRequest\"5\n" +
 	"\x12HasSessionResponse\x12\x1f\n" +
@@ -763,7 +841,13 @@ const file_session_v1_session_proto_rawDesc = "" +
 	"\bmessages\x18\x01 \x03(\v2\x17.session.v1.ChatMessageR\bmessages\"\x1b\n" +
 	"\x19GetSessionOpponentRequest\"M\n" +
 	"\x1aGetSessionOpponentResponse\x12/\n" +
-	"\bopponent\x18\x01 \x01(\v2\x13.account.v1.AccountR\bopponent*d\n" +
+	"\bopponent\x18\x01 \x01(\v2\x13.account.v1.AccountR\bopponent\"a\n" +
+	"\x04Time\x12\x1b\n" +
+	"\tplayer_id\x18\x01 \x01(\x03R\bplayerId\x12\x1d\n" +
+	"\n" +
+	"spent_time\x18\x02 \x01(\x05R\tspentTime\x12\x1d\n" +
+	"\n" +
+	"total_time\x18\x03 \x01(\x05R\ttotalTime*d\n" +
 	"\bGameType\x12\x19\n" +
 	"\x15GAME_TYPE_UNSPECIFIED\x10\x00\x12\x13\n" +
 	"\x0fGAME_TYPE_XO3X3\x10\x01\x12\x13\n" +
@@ -795,7 +879,7 @@ func file_session_v1_session_proto_rawDescGZIP() []byte {
 }
 
 var file_session_v1_session_proto_enumTypes = make([]protoimpl.EnumInfo, 2)
-var file_session_v1_session_proto_msgTypes = make([]protoimpl.MessageInfo, 11)
+var file_session_v1_session_proto_msgTypes = make([]protoimpl.MessageInfo, 12)
 var file_session_v1_session_proto_goTypes = []any{
 	(GameType)(0),                      // 0: session.v1.GameType
 	(SessionErrorType)(0),              // 1: session.v1.SessionErrorType
@@ -810,32 +894,34 @@ var file_session_v1_session_proto_goTypes = []any{
 	(*GetChatHistoryResponse)(nil),     // 10: session.v1.GetChatHistoryResponse
 	(*GetSessionOpponentRequest)(nil),  // 11: session.v1.GetSessionOpponentRequest
 	(*GetSessionOpponentResponse)(nil), // 12: session.v1.GetSessionOpponentResponse
-	(*v1.XoGameMessage)(nil),           // 13: xo_game.v1.XoGameMessage
-	(*v11.Conn4GameMessage)(nil),       // 14: conn4_game.v1.Conn4GameMessage
-	(*v12.Account)(nil),                // 15: account.v1.Account
+	(*Time)(nil),                       // 13: session.v1.Time
+	(*v1.XoGameMessage)(nil),           // 14: xo_game.v1.XoGameMessage
+	(*v11.Conn4GameMessage)(nil),       // 15: conn4_game.v1.Conn4GameMessage
+	(*v12.Account)(nil),                // 16: account.v1.Account
 }
 var file_session_v1_session_proto_depIdxs = []int32{
-	13, // 0: session.v1.GameMessage.xo:type_name -> xo_game.v1.XoGameMessage
-	14, // 1: session.v1.GameMessage.conn4:type_name -> conn4_game.v1.Conn4GameMessage
+	14, // 0: session.v1.GameMessage.xo:type_name -> xo_game.v1.XoGameMessage
+	15, // 1: session.v1.GameMessage.conn4:type_name -> conn4_game.v1.Conn4GameMessage
 	0,  // 2: session.v1.ChangeGameTypeMessage.game_type:type_name -> session.v1.GameType
 	3,  // 3: session.v1.SessionMessage.chat:type_name -> session.v1.ChatMessage
 	2,  // 4: session.v1.SessionMessage.chat_req:type_name -> session.v1.ChatMessageRequest
 	4,  // 5: session.v1.SessionMessage.game:type_name -> session.v1.GameMessage
 	1,  // 6: session.v1.SessionMessage.error:type_name -> session.v1.SessionErrorType
 	5,  // 7: session.v1.SessionMessage.game_type:type_name -> session.v1.ChangeGameTypeMessage
-	3,  // 8: session.v1.GetChatHistoryResponse.messages:type_name -> session.v1.ChatMessage
-	15, // 9: session.v1.GetSessionOpponentResponse.opponent:type_name -> account.v1.Account
-	9,  // 10: session.v1.SessionService.GetChatHistory:input_type -> session.v1.GetChatHistoryRequest
-	11, // 11: session.v1.SessionService.GetSessionOpponent:input_type -> session.v1.GetSessionOpponentRequest
-	7,  // 12: session.v1.SessionService.HasSession:input_type -> session.v1.HasSessionRequest
-	10, // 13: session.v1.SessionService.GetChatHistory:output_type -> session.v1.GetChatHistoryResponse
-	12, // 14: session.v1.SessionService.GetSessionOpponent:output_type -> session.v1.GetSessionOpponentResponse
-	8,  // 15: session.v1.SessionService.HasSession:output_type -> session.v1.HasSessionResponse
-	13, // [13:16] is the sub-list for method output_type
-	10, // [10:13] is the sub-list for method input_type
-	10, // [10:10] is the sub-list for extension type_name
-	10, // [10:10] is the sub-list for extension extendee
-	0,  // [0:10] is the sub-list for field type_name
+	13, // 8: session.v1.SessionMessage.sync_time:type_name -> session.v1.Time
+	3,  // 9: session.v1.GetChatHistoryResponse.messages:type_name -> session.v1.ChatMessage
+	16, // 10: session.v1.GetSessionOpponentResponse.opponent:type_name -> account.v1.Account
+	9,  // 11: session.v1.SessionService.GetChatHistory:input_type -> session.v1.GetChatHistoryRequest
+	11, // 12: session.v1.SessionService.GetSessionOpponent:input_type -> session.v1.GetSessionOpponentRequest
+	7,  // 13: session.v1.SessionService.HasSession:input_type -> session.v1.HasSessionRequest
+	10, // 14: session.v1.SessionService.GetChatHistory:output_type -> session.v1.GetChatHistoryResponse
+	12, // 15: session.v1.SessionService.GetSessionOpponent:output_type -> session.v1.GetSessionOpponentResponse
+	8,  // 16: session.v1.SessionService.HasSession:output_type -> session.v1.HasSessionResponse
+	14, // [14:17] is the sub-list for method output_type
+	11, // [11:14] is the sub-list for method input_type
+	11, // [11:11] is the sub-list for extension type_name
+	11, // [11:11] is the sub-list for extension extendee
+	0,  // [0:11] is the sub-list for field type_name
 }
 
 func init() { file_session_v1_session_proto_init() }
@@ -853,6 +939,7 @@ func file_session_v1_session_proto_init() {
 		(*SessionMessage_Game)(nil),
 		(*SessionMessage_Error)(nil),
 		(*SessionMessage_GameType)(nil),
+		(*SessionMessage_SyncTime)(nil),
 	}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
@@ -860,7 +947,7 @@ func file_session_v1_session_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_session_v1_session_proto_rawDesc), len(file_session_v1_session_proto_rawDesc)),
 			NumEnums:      2,
-			NumMessages:   11,
+			NumMessages:   12,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

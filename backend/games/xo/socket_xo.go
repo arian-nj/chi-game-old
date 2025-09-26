@@ -145,19 +145,11 @@ func (sl *SocketListener) SocketBrodcastSyncTime(gameState *XOState) {
 	allTimeMessages := []*sessionv1.SessionMessage{}
 	for _, player := range gameState.Players {
 		newSessionMessage := sessionv1.SessionMessage{
-			Content: &sessionv1.SessionMessage_Game{
-				Game: &sessionv1.GameMessage{
-					Game: &sessionv1.GameMessage_Xo{
-						Xo: &xo_gamev1.XoGameMessage{
-							Payload: &xo_gamev1.XoGameMessage_SyncTime{
-								SyncTime: &xo_gamev1.Time{
-									PlayerId:  int64(player.ID),
-									SpentTime: int32(player.Timer.SpentInt()),
-									TotalTime: int32(MAX_ALLOWED_TIME_INT),
-								},
-							},
-						},
-					},
+			Content: &sessionv1.SessionMessage_SyncTime{
+				SyncTime: &sessionv1.Time{
+					PlayerId:  int64(player.ID),
+					SpentTime: int32(player.Timer.SpentInt()),
+					TotalTime: int32(MAX_ALLOWED_TIME_INT),
 				},
 			},
 		}

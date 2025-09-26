@@ -3,17 +3,20 @@ import { AccountService } from '@/gen/account/v1/account_pb';
 import { authTransport } from '@/lib/transport';
 import { useQuery } from '@tanstack/vue-query';
 import { createClient } from '@connectrpc/connect'
-import { SessionService } from '@/gen/session/v1/session_pb';
+import { SessionService, type Time } from '@/gen/session/v1/session_pb';
 import gsap from 'gsap'
 import { onMounted, useTemplateRef } from 'vue';
 
-import * as XoBuff from "@/gen/xo_game/v1/xo_pb";
 import PlayerCard from '@/components/session/PlayerCard.vue';
+import type { SessionSocket } from '@/lib/SessionWs';
 
-// const props = defineProps<{
-//   isMyTurn: boolean
-// }>()
-//
+const props = defineProps({
+  sessionSocket: {
+    type: Object as () => SessionSocket,
+    required: true
+  }
+})
+
 const mePlayerCardRef = useTemplateRef('me-card-ref')
 const oppPlayerCardRef = useTemplateRef('opp-card-ref')
 // watch(() => props.isMyTurn, (newIsMyTurn) => {
@@ -28,7 +31,7 @@ const oppPlayerCardRef = useTemplateRef('opp-card-ref')
 //   { immediate: true }
 // )
 
-const handleTimeSync = (timeSync: XoBuff.Time) => {
+const handleTimeSync = (timeSync: Time) => {
   if (timeSync.playerId == meData.value?.account?.id && mePlayerCardRef.value) {
     mePlayerCardRef.value.totalTime = timeSync.totalTime
     mePlayerCardRef.value.spentTime = timeSync.spentTime
@@ -38,6 +41,7 @@ const handleTimeSync = (timeSync: XoBuff.Time) => {
     oppPlayerCardRef.value.spentTime = timeSync.spentTime
   }
 }
+props.sessionSocket.HandleGameTimeSyncMessage = handleTimeSync
 
 
 
@@ -72,9 +76,6 @@ onMounted(() => {
   }
 })
 
-defineExpose({
-  handleTimeSync: handleTimeSync
-})
 </script>
 
 <template>

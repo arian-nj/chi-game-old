@@ -290,66 +290,6 @@ func (x *PlayResponse) GetReason() string {
 	return ""
 }
 
-type Time struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	PlayerId      int64                  `protobuf:"varint,1,opt,name=player_id,json=playerId,proto3" json:"player_id,omitempty"`
-	SpentTime     int32                  `protobuf:"varint,2,opt,name=spent_time,json=spentTime,proto3" json:"spent_time,omitempty"`
-	TotalTime     int32                  `protobuf:"varint,3,opt,name=total_time,json=totalTime,proto3" json:"total_time,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *Time) Reset() {
-	*x = Time{}
-	mi := &file_xo_game_v1_xo_proto_msgTypes[4]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *Time) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*Time) ProtoMessage() {}
-
-func (x *Time) ProtoReflect() protoreflect.Message {
-	mi := &file_xo_game_v1_xo_proto_msgTypes[4]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use Time.ProtoReflect.Descriptor instead.
-func (*Time) Descriptor() ([]byte, []int) {
-	return file_xo_game_v1_xo_proto_rawDescGZIP(), []int{4}
-}
-
-func (x *Time) GetPlayerId() int64 {
-	if x != nil {
-		return x.PlayerId
-	}
-	return 0
-}
-
-func (x *Time) GetSpentTime() int32 {
-	if x != nil {
-		return x.SpentTime
-	}
-	return 0
-}
-
-func (x *Time) GetTotalTime() int32 {
-	if x != nil {
-		return x.TotalTime
-	}
-	return 0
-}
-
 type EndGame struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Reason        EndReason              `protobuf:"varint,1,opt,name=reason,proto3,enum=xo_game.v1.EndReason" json:"reason,omitempty"`
@@ -361,7 +301,7 @@ type EndGame struct {
 
 func (x *EndGame) Reset() {
 	*x = EndGame{}
-	mi := &file_xo_game_v1_xo_proto_msgTypes[5]
+	mi := &file_xo_game_v1_xo_proto_msgTypes[4]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -373,7 +313,7 @@ func (x *EndGame) String() string {
 func (*EndGame) ProtoMessage() {}
 
 func (x *EndGame) ProtoReflect() protoreflect.Message {
-	mi := &file_xo_game_v1_xo_proto_msgTypes[5]
+	mi := &file_xo_game_v1_xo_proto_msgTypes[4]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -386,7 +326,7 @@ func (x *EndGame) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use EndGame.ProtoReflect.Descriptor instead.
 func (*EndGame) Descriptor() ([]byte, []int) {
-	return file_xo_game_v1_xo_proto_rawDescGZIP(), []int{5}
+	return file_xo_game_v1_xo_proto_rawDescGZIP(), []int{4}
 }
 
 func (x *EndGame) GetReason() EndReason {
@@ -417,7 +357,6 @@ type XoGameMessage struct {
 	//	*XoGameMessage_Move
 	//	*XoGameMessage_Play
 	//	*XoGameMessage_PlayResponse
-	//	*XoGameMessage_SyncTime
 	//	*XoGameMessage_GameState
 	//	*XoGameMessage_EndGame
 	Payload       isXoGameMessage_Payload `protobuf_oneof:"payload"`
@@ -427,7 +366,7 @@ type XoGameMessage struct {
 
 func (x *XoGameMessage) Reset() {
 	*x = XoGameMessage{}
-	mi := &file_xo_game_v1_xo_proto_msgTypes[6]
+	mi := &file_xo_game_v1_xo_proto_msgTypes[5]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -439,7 +378,7 @@ func (x *XoGameMessage) String() string {
 func (*XoGameMessage) ProtoMessage() {}
 
 func (x *XoGameMessage) ProtoReflect() protoreflect.Message {
-	mi := &file_xo_game_v1_xo_proto_msgTypes[6]
+	mi := &file_xo_game_v1_xo_proto_msgTypes[5]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -452,7 +391,7 @@ func (x *XoGameMessage) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use XoGameMessage.ProtoReflect.Descriptor instead.
 func (*XoGameMessage) Descriptor() ([]byte, []int) {
-	return file_xo_game_v1_xo_proto_rawDescGZIP(), []int{6}
+	return file_xo_game_v1_xo_proto_rawDescGZIP(), []int{5}
 }
 
 func (x *XoGameMessage) GetPayload() isXoGameMessage_Payload {
@@ -484,15 +423,6 @@ func (x *XoGameMessage) GetPlayResponse() *PlayResponse {
 	if x != nil {
 		if x, ok := x.Payload.(*XoGameMessage_PlayResponse); ok {
 			return x.PlayResponse
-		}
-	}
-	return nil
-}
-
-func (x *XoGameMessage) GetSyncTime() *Time {
-	if x != nil {
-		if x, ok := x.Payload.(*XoGameMessage_SyncTime); ok {
-			return x.SyncTime
 		}
 	}
 	return nil
@@ -532,10 +462,6 @@ type XoGameMessage_PlayResponse struct {
 	PlayResponse *PlayResponse `protobuf:"bytes,3,opt,name=play_response,json=playResponse,proto3,oneof"`
 }
 
-type XoGameMessage_SyncTime struct {
-	SyncTime *Time `protobuf:"bytes,4,opt,name=sync_time,json=syncTime,proto3,oneof"`
-}
-
 type XoGameMessage_GameState struct {
 	GameState *GameState `protobuf:"bytes,5,opt,name=game_state,json=gameState,proto3,oneof"`
 }
@@ -549,8 +475,6 @@ func (*XoGameMessage_Move) isXoGameMessage_Payload() {}
 func (*XoGameMessage_Play) isXoGameMessage_Payload() {}
 
 func (*XoGameMessage_PlayResponse) isXoGameMessage_Payload() {}
-
-func (*XoGameMessage_SyncTime) isXoGameMessage_Payload() {}
 
 func (*XoGameMessage_GameState) isXoGameMessage_Payload() {}
 
@@ -578,22 +502,15 @@ const file_xo_game_v1_xo_proto_rawDesc = "" +
 	"\fPlayResponse\x12\x19\n" +
 	"\bis_valid\x18\x01 \x01(\bR\aisValid\x12$\n" +
 	"\x04move\x18\x02 \x01(\v2\x10.xo_game.v1.MoveR\x04move\x12\x16\n" +
-	"\x06reason\x18\x03 \x01(\tR\x06reason\"a\n" +
-	"\x04Time\x12\x1b\n" +
-	"\tplayer_id\x18\x01 \x01(\x03R\bplayerId\x12\x1d\n" +
-	"\n" +
-	"spent_time\x18\x02 \x01(\x05R\tspentTime\x12\x1d\n" +
-	"\n" +
-	"total_time\x18\x03 \x01(\x05R\ttotalTime\"\x90\x01\n" +
+	"\x06reason\x18\x03 \x01(\tR\x06reason\"\x90\x01\n" +
 	"\aEndGame\x12-\n" +
 	"\x06reason\x18\x01 \x01(\x0e2\x15.xo_game.v1.EndReasonR\x06reason\x12+\n" +
 	"\x06winner\x18\x02 \x01(\v2\x13.account.v1.AccountR\x06winner\x12)\n" +
-	"\x05loser\x18\x03 \x01(\v2\x13.account.v1.AccountR\x05loser\"\xc6\x02\n" +
+	"\x05loser\x18\x03 \x01(\v2\x13.account.v1.AccountR\x05loser\"\x95\x02\n" +
 	"\rXoGameMessage\x12&\n" +
 	"\x04move\x18\x01 \x01(\v2\x10.xo_game.v1.MoveH\x00R\x04move\x12&\n" +
 	"\x04play\x18\x02 \x01(\v2\x10.xo_game.v1.PlayH\x00R\x04play\x12?\n" +
-	"\rplay_response\x18\x03 \x01(\v2\x18.xo_game.v1.PlayResponseH\x00R\fplayResponse\x12/\n" +
-	"\tsync_time\x18\x04 \x01(\v2\x10.xo_game.v1.TimeH\x00R\bsyncTime\x126\n" +
+	"\rplay_response\x18\x03 \x01(\v2\x18.xo_game.v1.PlayResponseH\x00R\fplayResponse\x126\n" +
 	"\n" +
 	"game_state\x18\x05 \x01(\v2\x15.xo_game.v1.GameStateH\x00R\tgameState\x120\n" +
 	"\bend_game\x18\x06 \x01(\v2\x13.xo_game.v1.EndGameH\x00R\aendGameB\t\n" +
@@ -619,34 +536,32 @@ func file_xo_game_v1_xo_proto_rawDescGZIP() []byte {
 }
 
 var file_xo_game_v1_xo_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
-var file_xo_game_v1_xo_proto_msgTypes = make([]protoimpl.MessageInfo, 7)
+var file_xo_game_v1_xo_proto_msgTypes = make([]protoimpl.MessageInfo, 6)
 var file_xo_game_v1_xo_proto_goTypes = []any{
 	(EndReason)(0),        // 0: xo_game.v1.EndReason
 	(*GameState)(nil),     // 1: xo_game.v1.GameState
 	(*Move)(nil),          // 2: xo_game.v1.Move
 	(*Play)(nil),          // 3: xo_game.v1.Play
 	(*PlayResponse)(nil),  // 4: xo_game.v1.PlayResponse
-	(*Time)(nil),          // 5: xo_game.v1.Time
-	(*EndGame)(nil),       // 6: xo_game.v1.EndGame
-	(*XoGameMessage)(nil), // 7: xo_game.v1.XoGameMessage
-	(*v1.Account)(nil),    // 8: account.v1.Account
+	(*EndGame)(nil),       // 5: xo_game.v1.EndGame
+	(*XoGameMessage)(nil), // 6: xo_game.v1.XoGameMessage
+	(*v1.Account)(nil),    // 7: account.v1.Account
 }
 var file_xo_game_v1_xo_proto_depIdxs = []int32{
-	2,  // 0: xo_game.v1.PlayResponse.move:type_name -> xo_game.v1.Move
-	0,  // 1: xo_game.v1.EndGame.reason:type_name -> xo_game.v1.EndReason
-	8,  // 2: xo_game.v1.EndGame.winner:type_name -> account.v1.Account
-	8,  // 3: xo_game.v1.EndGame.loser:type_name -> account.v1.Account
-	2,  // 4: xo_game.v1.XoGameMessage.move:type_name -> xo_game.v1.Move
-	3,  // 5: xo_game.v1.XoGameMessage.play:type_name -> xo_game.v1.Play
-	4,  // 6: xo_game.v1.XoGameMessage.play_response:type_name -> xo_game.v1.PlayResponse
-	5,  // 7: xo_game.v1.XoGameMessage.sync_time:type_name -> xo_game.v1.Time
-	1,  // 8: xo_game.v1.XoGameMessage.game_state:type_name -> xo_game.v1.GameState
-	6,  // 9: xo_game.v1.XoGameMessage.end_game:type_name -> xo_game.v1.EndGame
-	10, // [10:10] is the sub-list for method output_type
-	10, // [10:10] is the sub-list for method input_type
-	10, // [10:10] is the sub-list for extension type_name
-	10, // [10:10] is the sub-list for extension extendee
-	0,  // [0:10] is the sub-list for field type_name
+	2, // 0: xo_game.v1.PlayResponse.move:type_name -> xo_game.v1.Move
+	0, // 1: xo_game.v1.EndGame.reason:type_name -> xo_game.v1.EndReason
+	7, // 2: xo_game.v1.EndGame.winner:type_name -> account.v1.Account
+	7, // 3: xo_game.v1.EndGame.loser:type_name -> account.v1.Account
+	2, // 4: xo_game.v1.XoGameMessage.move:type_name -> xo_game.v1.Move
+	3, // 5: xo_game.v1.XoGameMessage.play:type_name -> xo_game.v1.Play
+	4, // 6: xo_game.v1.XoGameMessage.play_response:type_name -> xo_game.v1.PlayResponse
+	1, // 7: xo_game.v1.XoGameMessage.game_state:type_name -> xo_game.v1.GameState
+	5, // 8: xo_game.v1.XoGameMessage.end_game:type_name -> xo_game.v1.EndGame
+	9, // [9:9] is the sub-list for method output_type
+	9, // [9:9] is the sub-list for method input_type
+	9, // [9:9] is the sub-list for extension type_name
+	9, // [9:9] is the sub-list for extension extendee
+	0, // [0:9] is the sub-list for field type_name
 }
 
 func init() { file_xo_game_v1_xo_proto_init() }
@@ -654,11 +569,10 @@ func file_xo_game_v1_xo_proto_init() {
 	if File_xo_game_v1_xo_proto != nil {
 		return
 	}
-	file_xo_game_v1_xo_proto_msgTypes[6].OneofWrappers = []any{
+	file_xo_game_v1_xo_proto_msgTypes[5].OneofWrappers = []any{
 		(*XoGameMessage_Move)(nil),
 		(*XoGameMessage_Play)(nil),
 		(*XoGameMessage_PlayResponse)(nil),
-		(*XoGameMessage_SyncTime)(nil),
 		(*XoGameMessage_GameState)(nil),
 		(*XoGameMessage_EndGame)(nil),
 	}
@@ -668,7 +582,7 @@ func file_xo_game_v1_xo_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_xo_game_v1_xo_proto_rawDesc), len(file_xo_game_v1_xo_proto_rawDesc)),
 			NumEnums:      1,
-			NumMessages:   7,
+			NumMessages:   6,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

@@ -29,9 +29,10 @@ func (sl *SocketListener) Update(command commander.Command) {
 		sl.SocketBrodcastNewMove(c)
 	// case *StartCommand:
 	case *EndGameCommand:
+		slog.Info("end Game", "EndGameCommand", c)
 		sl.SendEndGameSocket(c)
-		// case *SyncTimeCommand:
-		// sl.SocketBrodcastSyncTime(c.Game)
+	case *SyncTimeCommand:
+		sl.SocketBrodcastSyncTime(c.Game)
 	}
 }
 
@@ -56,28 +57,29 @@ func sendInvalidResponse(player *Conn4Player, errMsg string) error {
 	return player.Socket.SendMessage(&newSessionMsg)
 }
 
-//
-// func (sl *SocketListener) SocketBrodcastSyncTime(gameState *Conn4State) {
-// 	allTimeMessages := []*sessionv1.SessionMessage{}
-// 	for _, player := range gameState.Players {
-// 		newSessionMessage := sessionv1.SessionMessage{
-// 			Content: &sessionv1.SessionMessage_Game{
-// 				Game: &sessionv1.GameMessage{
-// 					Game: &conn4_gamev1.Conn4GameMessage,
-// 				},
-// 			},
-// 		}
-// 		allTimeMessages = append(allTimeMessages, &newSessionMessage)
-// 	}
-//
-// 	player := gameState.findByID(sl.Player.ID)
-// 	for _, timeEvent := range allTimeMessages {
-// 		err := player.Socket.SendMessage(timeEvent)
-// 		if err != nil {
-// 			slog.Error("can't send new move", "err", err)
-// 		}
-// 	}
-// }
+func (sl *SocketListener) SocketBrodcastSyncTime(gameState *Conn4State) {
+	allTimeMessages := []*sessionv1.SessionMessage{}
+	for _, player := range gameState.Players {
+		newSessionMessage := sessionv1.SessionMessage{
+			Content: &sessionv1.SessionMessage_SyncTime{
+				SyncTime: &sessionv1.Time{
+					PlayerId:  int64(player.ID),
+					SpentTime: int32(player.Timer.SpentInt()),
+					TotalTime: int32(MAX_ALLOWED_TIME_INT),
+				},
+			},
+		}
+		allTimeMessages = append(allTimeMessages, &newSessionMessage)
+	}
+
+	player := gameState.findByID(sl.Player.ID)
+	for _, timeEvent := range allTimeMessages {
+		err := player.Socket.SendMessage(timeEvent)
+		if err != nil {
+			slog.Error("can't send new move", "err", err)
+		}
+	}
+}
 
 func SocketSendGameState(gameState *Conn4State, player *Conn4Player) {
 	cells := []int32{}
