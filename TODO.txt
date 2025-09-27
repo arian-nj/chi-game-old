@@ -171,9 +171,6 @@
 
 [ ] Play test
 
-[ ] add 5x5?
-
-
 # Bugs 
 [X] make commander panic safe
 [X] end panel not working (one web one console)

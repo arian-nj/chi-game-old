@@ -5,6 +5,7 @@ import (
 	"log/slog"
 
 	"github.com/arian-nj/chibazi/backend/internals/commander"
+	"github.com/arian-nj/chibazi/backend/internals/keybul"
 	"gopkg.in/telebot.v4"
 )
 
@@ -33,16 +34,22 @@ func (tg *SessionTelegramBotListener) Update(command commander.Command) {
 		}
 
 	case *GameEndedCommand:
-		if c.Session.Chat.IsOn == false {
+		session := c.Session
+		if session.Chat.IsOn == false {
 			return
 		}
-		go func() {
-			text := fmt.Sprintf("چت تا %d ثانیه دیگه بسته میشه", int(ExpirationDur.Seconds()))
-			_, err := c.Session.Bot.Send(&telebot.User{ID: int64(tg.TgID)}, text)
+		text := "چت قطع شد"
+		for _, player := range session.Players {
+			_, err := session.Bot.Send(&telebot.User{ID: int64(player.TgID)}, text, keybul.WelcomeReplyKeyboard)
 			if err != nil {
-				slog.Error("can't send end game chat message", "err", err)
+				slog.Error("can't send chat ended message", "err", err)
 			}
-		}()
+		}
+		text = fmt.Sprintf("چت تا %d ثانیه دیگه بسته میشه", int(ExpirationDur.Seconds()))
+		_, err := c.Session.Bot.Send(&telebot.User{ID: int64(tg.TgID)}, text)
+		if err != nil {
+			slog.Error("can't send end game chat message", "err", err)
+		}
 	case *GameStartCommand:
 		SendFoundOpponentMessage(c.Session.Players, tg.Bot)
 	}

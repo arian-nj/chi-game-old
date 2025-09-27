@@ -183,16 +183,6 @@ func (session *GameSession) MonitorGameSession() {
 }
 
 func (session *GameSession) CleanAndDisconnect() {
-	if session.Chat.IsOn {
-		text := "چت قطع شد"
-		for _, player := range session.Players {
-			_, err := session.Bot.Send(&telebot.User{ID: int64(player.TgID)}, text, keybul.WelcomeReplyKeyboard)
-			if err != nil {
-				slog.Error("can't send chat ended message", "err", err)
-			}
-		}
-	}
-
 	session.allSession.Mutex.Lock()
 	defer session.allSession.Mutex.Unlock()
 
