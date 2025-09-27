@@ -29,7 +29,6 @@ func (sl *SocketListener) Update(command commander.Command) {
 		sl.SocketBrodcastNewMove(c)
 	// case *StartCommand:
 	case *EndGameCommand:
-		slog.Info("end Game", "EndGameCommand", c)
 		sl.SendEndGameSocket(c)
 	case *SyncTimeCommand:
 		sl.SocketBrodcastSyncTime(c.Game)

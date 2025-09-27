@@ -35,8 +35,8 @@ func (game *Conn4State) CallBackRouter(c telebot.Context) error {
 	if after, hasPrefix := strings.CutPrefix(callbackData, "play_"); hasPrefix {
 		return game.Conn4PlayHandler(c, after)
 	}
-	slog.Error("invalid callback in xo game callback router")
-	return c.RespondAlert("no a valid callback")
+	slog.Error("invalid callback in conn4 game callback router")
+	return c.RespondAlert("not a valid callback")
 }
 
 func (tg *Conn4TelegramListener) Update(command commander.Command) {

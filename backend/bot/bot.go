@@ -15,7 +15,6 @@ import (
 	gamesessions "github.com/arian-nj/chibazi/backend/game_sessions"
 	"github.com/arian-nj/chibazi/backend/internals/config"
 	"github.com/arian-nj/chibazi/backend/internals/keybul"
-	"github.com/arian-nj/chibazi/backend/internals/utils"
 	matchmaking "github.com/arian-nj/chibazi/backend/match_making"
 	"gopkg.in/telebot.v4"
 )
@@ -91,21 +90,20 @@ func (app *BotApplication) MakeBot() (*telebot.Bot, error) {
 
 func (app *BotApplication) addUserMiddleware(next telebot.HandlerFunc) telebot.HandlerFunc {
 	return func(c telebot.Context) error {
-		utils.RunBackgroundTask(func() {
-			user := c.Sender()
-			if user == nil {
-				slog.Error("User is nil")
-				return
-			}
-			_, err := app.Queries.CreateTgUser(context.Background(), database.CreateTgUserParams{
-				TgID: int(c.Sender().ID),
-				Name: c.Sender().FirstName,
-			})
-			if err != nil {
-				slog.Error("Failed to create user", "err", err)
-				return
-			}
+		user := c.Sender()
+		if user == nil {
+			slog.Error("User is nil")
+			return nil
+		}
+
+		_, err := app.Queries.CreateTgUser(context.Background(), database.CreateTgUserParams{
+			TgID: int(user.ID),
+			Name: user.FirstName,
 		})
+		if err != nil {
+			slog.Error("Failed to create user", "err", err)
+			return nil
+		}
 		return next(c)
 	}
 }
@@ -148,6 +146,10 @@ func (app *BotApplication) handleCallback(c telebot.Context) error {
 	messageId := callback.MessageID
 	if messageId == "" {
 		messageId = strconv.Itoa(GetUserID(callback.Sender.ID, app.Queries))
+	}
+	if callback.Data == "_" {
+		c.RespondText("nothing")
+		return nil
 	}
 
 	gameSession, hasSession := app.AllSessions.Get(messageId)

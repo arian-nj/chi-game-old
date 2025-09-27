@@ -39,14 +39,13 @@ func (tg *SessionTelegramBotListener) Update(command commander.Command) {
 			return
 		}
 		text := "چت قطع شد"
-		for _, player := range session.Players {
-			_, err := session.Bot.Send(&telebot.User{ID: int64(player.TgID)}, text, keybul.WelcomeReplyKeyboard)
-			if err != nil {
-				slog.Error("can't send chat ended message", "err", err)
-			}
+		_, err := session.Bot.Send(&telebot.User{ID: int64(tg.TgID)}, text, keybul.WelcomeReplyKeyboard)
+		if err != nil {
+			slog.Error("can't send chat ended message", "err", err)
 		}
+
 		text = fmt.Sprintf("چت تا %d ثانیه دیگه بسته میشه", int(ExpirationDur.Seconds()))
-		_, err := c.Session.Bot.Send(&telebot.User{ID: int64(tg.TgID)}, text)
+		_, err = c.Session.Bot.Send(&telebot.User{ID: int64(tg.TgID)}, text)
 		if err != nil {
 			slog.Error("can't send end game chat message", "err", err)
 		}
