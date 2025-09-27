@@ -98,25 +98,11 @@ func main() {
 	GlobalVars.Bot = bot
 	go botApp.RunBot(bot, parentCtx, GlobalVars.Wg)
 
-	go ClearDeadGamesCron(GlobalVars.AllSessions)
+	go gamesessions.ClearDeadGamesCron(GlobalVars.AllSessions)
 
 	go GlobalVars.MakeMatches()
 
 	<-quit
 	cancel()
 	GlobalVars.Wg.Wait()
-}
-
-func ClearDeadGamesCron(allSessions *gamesessions.AllSession) {
-	for {
-		nowTime := time.Now()
-		for key, gameSession := range allSessions.Sessions {
-			if nowTime.Sub(gameSession.CreatedAt) > gameSession.ExpireDuaration {
-				allSessions.Mutex.Lock()
-				delete(allSessions.Sessions, key)
-				allSessions.Mutex.Unlock()
-			}
-		}
-		time.Sleep(1 * time.Minute)
-	}
 }

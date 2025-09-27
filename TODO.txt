@@ -190,8 +190,6 @@
 [X] session is not cleaned up after timeout
 
 [X] Fix via Web Games
-[ ] make Home exit Session
-[ ] does session has cleaner
 
 # 0.7.2 
 [ ] move between games

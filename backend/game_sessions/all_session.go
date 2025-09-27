@@ -3,6 +3,7 @@ package gamesessions
 import (
 	"strconv"
 	"sync"
+	"time"
 )
 
 type AllSession struct {
@@ -30,4 +31,18 @@ func (allSession *AllSession) Add(key string, gs *GameSession) {
 	defer allSession.Mutex.Unlock()
 
 	allSession.Sessions[key] = gs
+}
+
+func ClearDeadGamesCron(allSessions *AllSession) {
+	for {
+		nowTime := time.Now()
+		for key, gameSession := range allSessions.Sessions {
+			if nowTime.Sub(gameSession.CreatedAt) > gameSession.ExpireDuaration {
+				allSessions.Mutex.Lock()
+				delete(allSessions.Sessions, key)
+				allSessions.Mutex.Unlock()
+			}
+		}
+		time.Sleep(1 * time.Minute)
+	}
 }
