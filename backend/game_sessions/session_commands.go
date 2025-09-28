@@ -102,3 +102,18 @@ func NewGameStartSessionCommand(session *GameSession) *GameEndedCommand {
 
 func (EndGame *GameStartCommand) Execute() {
 }
+
+type RequestEndSessionCommand struct {
+	Session *GameSession
+	Player  *SessionPlayer
+}
+
+func NewRequestEndSessionCommand(session *GameSession, player *SessionPlayer) *RequestEndSessionCommand {
+	return &RequestEndSessionCommand{
+		Session: session,
+		Player:  player,
+	}
+}
+
+func (ReqEnd *RequestEndSessionCommand) Execute() {
+}

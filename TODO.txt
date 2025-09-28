@@ -187,6 +187,7 @@
 [X] session is not cleaned up after timeout
 
 [X] Fix via Web Games
+[ ] End Session On X button
 
 # 0.7.2 
 [ ] move between games

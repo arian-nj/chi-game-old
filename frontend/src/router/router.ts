@@ -73,9 +73,9 @@ const router = createRouter({
       component: () => import('../views/SessionView.vue')
     },
     {
-      path: '/conn4',
-      name: 'conn4',
-      component: () => import('../components/game/conn4/Conn4Board.vue')
+      path: '/card',
+      name: 'card',
+      component: () => import('../components/game/card/CardView.vue')
     },
   ],
 })

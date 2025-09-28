@@ -31,6 +31,7 @@ enum GameType {
   GAME_TYPE_XO5X5 = 2;
   GAME_TYPE_CONN4 = 3;
 }
+
 message ChangeGameTypeMessage {
   GameType game_type = 1;
 }
@@ -80,3 +81,4 @@ message Time {
   int32 spent_time = 2;
   int32 total_time = 3;
 }
+
