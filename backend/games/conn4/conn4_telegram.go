@@ -145,7 +145,6 @@ func (tg *Conn4TelegramListener) EditDuringGameBoard(game *Conn4State) error {
 	err := tg.Edit(tg, Conn4StartText+"\n"+MakeBoardAsEmojies(game, nil)+
 		"1️⃣2️⃣3️⃣4️⃣5️⃣6️⃣7️⃣",
 		keybul.CreateInlineKeyboard(
-			keybul.ContinueInWebButton(),
 			Conn4PlayNumberButton,
 			game.CreatePlayersInlineButton(game.Players, game.CurrentPlayerIndex),
 		),
@@ -259,7 +258,6 @@ func (tg *Conn4TelegramListener) TieGame(endCommand *EndGameCommand) error {
 
 	err := tg.Edit(tg, text,
 		keybul.CreateInlineKeyboard(
-			keybul.ContinueInWebButton(),
 			keybul.EndGameInlineKeyboard(tg.ViaMessageId != ""),
 		),
 		tg.Player,

@@ -76,7 +76,6 @@ func (g *XOState) CallBackRouter(c telebot.Context) error {
 func (tg *XoTelegramListener) EditDuringGameBoard(game *XOState) error {
 	err := tg.Edit(tg, XOStartText+"\n\n"+game.RulesText(),
 		keybul.CreateInlineKeyboard(
-			keybul.ContinueInWebButton(),
 			CreateTicBoardInlineButton(game.Board),
 			game.CreatePlayersInlineButton(game.Players, game.CurrentPlayerIndex),
 		),
@@ -95,7 +94,6 @@ func (tg *XoTelegramListener) TheEnd(endCommand *EndGameCommand) error {
 	text := game.EndGameText() + game.WinGameText(endCommand.Winner) + additionalText
 	err := tg.Edit(tg, text,
 		keybul.CreateInlineKeyboard(
-			keybul.ContinueInWebButton(),
 			keybul.EndGameInlineKeyboard(tg.ViaMessageId != ""),
 		),
 		tg.Player,
@@ -108,7 +106,6 @@ func (tg *XoTelegramListener) TieGame(game *XOState) error {
 
 	err := tg.Edit(tg, text,
 		keybul.CreateInlineKeyboard(
-			keybul.ContinueInWebButton(),
 			keybul.EndGameInlineKeyboard(tg.ViaMessageId != ""),
 		),
 		tg.Player,

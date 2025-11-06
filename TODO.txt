@@ -188,9 +188,17 @@
 
 [X] Fix via Web Games
 
-[ ] Setup Vps
+[X] Setup Vps
 
-[ ] End Session On X button
+[X] cut web
+[ ] turn off api + front end
+
+# prepare for ads
+[ ] better welcome message
+[ ] add /help
+[ ] add command list
+
+
 
 # 0.7.2 
 [ ] move between games
@@ -206,14 +214,8 @@ maybe add scroing to make it harder to use other bots
 [ ] log who built game session (random from keyboard,random from web, via web ,via + creator)
 
 [ ] log web loading time stats
-[ ] renew jwt token automaticly
 
 [ ] add don't care random game
-
-# prepare for ads
-[ ] better welcome message
-[ ] add /help
-[ ] add command list
 
 # 1.1.0 League
 
