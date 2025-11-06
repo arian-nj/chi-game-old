@@ -73,13 +73,13 @@ services:
 
 
   db:
-    image: postgres:latest
+    image: postgres:18
     environment:
       POSTGRES_USER: pgadmin
       POSTGRES_PASSWORD: p239ijfw921ioad
       POSTGRES_DB: game
     volumes:
-      - postgres_data:/var/lib/postgresql/data  # Keeps data persistent
+      - postgres_data:/var/lib/postgresql
     healthcheck:
       test: [ "CMD", "pg_isready" ]
       interval: 10s
