@@ -71,10 +71,10 @@ func main() {
 	GlobalVars.Queries = database.New(GlobalVars.Conn)
 
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*2)
+	defer cancel()
 	err = GlobalVars.Conn.Ping(ctx)
 	if err != nil {
 		slog.Error("Failed to connect to Database", "err", err)
-		cancel()
 		return
 	}
 	GlobalVars.MatchMaking = matchmaking.NewMatchMaking(GlobalVars.AllSessions, GlobalVars.Queries)
@@ -103,6 +103,5 @@ func main() {
 	go GlobalVars.MakeMatches()
 
 	<-quit
-	cancel()
 	GlobalVars.Wg.Wait()
 }

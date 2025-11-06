@@ -101,32 +101,6 @@ func (app *BotApplication) inlineQueryHandler(c telebot.Context) error {
 	conn4Result.SetResultID(string(games.Conn4GameType))
 	results = append(results, conn4Result)
 
-	// // Dot Box result
-	// dotResult := &telebot.ArticleResult{
-	// 	Title:       "نقطه بازی",
-	// 	Description: "رو من کلیک کن",
-	// 	Text:        dotbox_console.DotBoxStartText,
-	// }
-	// dotResult.ParseMode = telebot.ModeMarkdownV2
-	//
-	// dotResult.ReplyMarkup = keybul.StartInlineKeyboard
-	//
-	// dotResult.SetResultID(string(gametype.DotBoxGameType))
-	// results = append(results, dotResult)
-	//
-	// // Web Dot Box result
-	// webDotResult := &telebot.ArticleResult{
-	// 	Title:       "نقطه بازی گرافیکی",
-	// 	Description: "رو من کلیک کن",
-	// 	Text:        consolegames.DotBoxStartText,
-	// }
-	// webDotResult.ParseMode = telebot.ModeMarkdownV2
-	//
-	// webDotResult.ReplyMarkup = keybul.StartInlineKeyboard
-	//
-	// webDotResult.SetResultID(string(gametype.WebDotBoxGameType))
-	// results = append(results, webDotResult)
-
 	return c.Answer(&telebot.QueryResponse{
 		Results:   results,
 		CacheTime: 0,

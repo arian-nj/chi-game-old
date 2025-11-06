@@ -90,7 +90,7 @@ jobs:
         with:
           name: chi-game
           file: docker-stack.yaml
-          host: 185.224.129.162
+          host: 45.14.224.187
           user: deploy
           ssh_key: ${{ secrets.DEPLOY_SSH_PRIVATE_KEY }}
           env_file: ./envfile
