@@ -76,7 +76,7 @@ func (app *BotApplication) welcomeHandler(c telebot.Context) error {
 
 func (app *BotApplication) welcomePanel(c telebot.Context) error {
 	return c.Send(
-		`خوش اومدید 👋`, keybul.WelcomeReplyKeyboard)
+		"خوش اومدید 👋 \n\n🤜بازی با دوستان رو بزن تا با دوستات توی پیوی و گروه بازی کنی👫\n🎲بازی با ناشناس هم  شانسی به یکی وصلت میکنه🎮", keybul.WelcomeReplyKeyboard)
 }
 
 func (app *BotApplication) meHandler(c telebot.Context) error {

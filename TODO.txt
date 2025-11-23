@@ -198,13 +198,20 @@
 [ ] add /help
 [ ] add command list
 
+# 0.7.3 
+[ ] rock paper game
 
-
-# 0.7.2 
+# 0.7.4
 [ ] move between games
-[ ] cache database calls
 
-# 0.8.0 Chi Coin
+# 0.7.5
+make chat expriense main goal
+[ ] Connect Randomly
+[ ] Choose Game panel (show other person)
+[ ] Choose Panel after end game
+
+
+# 0.8.0 Chi Coin(nope)
 
 # 0.9.0 Exact Statistics
 
