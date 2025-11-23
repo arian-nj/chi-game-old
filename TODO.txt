@@ -190,13 +190,16 @@
 
 [X] Setup Vps
 
-[X] cut web
-[ ] turn off api + front end
+[ ] bring back web
+[ ] make dev flow easier
 
 # prepare for ads
-[ ] better welcome message
+[X] better welcome message
 [ ] add /help
 [ ] add command list
+[ ] add picture in inline queries
+
+[ ] end game in web
 
 # 0.7.3 
 [ ] rock paper game

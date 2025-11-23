@@ -77,6 +77,7 @@ func (tg *XoTelegramListener) EditDuringGameBoard(game *XOState) error {
 	err := tg.Edit(tg, XOStartText+"\n\n"+game.RulesText(),
 		keybul.CreateInlineKeyboard(
 			CreateTicBoardInlineButton(game.Board),
+			keybul.ContinueInWebButtons(),
 			game.CreatePlayersInlineButton(game.Players, game.CurrentPlayerIndex),
 		),
 		tg.Player,
